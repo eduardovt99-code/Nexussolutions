@@ -1,16 +1,31 @@
-# nexus
+# NEXUS — El sistema operativo de tu reforma
 
-A new Flutter project.
+App Flutter para reformistas en España: presupuestos, cuadrilla, Pro-Calc y cobros.
 
-## Getting Started
+## Usar la demo online
 
-This project is a starting point for a Flutter application.
+**URL:** https://eduardovt99-code.github.io/Nexussolutions/
 
-A few resources to get you started if this is your first Flutter project:
+Entra con cualquier correo y contraseña (demo sin backend). Los datos se guardan en el navegador de cada usuario.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Correr en local
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter pub get
+flutter run -d chrome
+```
+
+## Publicar cambios en la web
+
+Cada push a `main` despliega automáticamente la versión web en GitHub Pages.
+
+```bash
+git add .
+git commit -m "Descripción del cambio"
+git push
+```
+
+## Stack
+
+- Flutter (web, Android, iOS, Windows)
+- Datos locales con `shared_preferences` (demo)
