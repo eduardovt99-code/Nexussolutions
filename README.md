@@ -6,6 +6,9 @@ App Flutter para reformistas en España: presupuestos, cuadrilla, Pro-Calc y cob
 
 **URL:** https://eduardovt99-code.github.io/Nexussolutions/
 
+> La primera vez hay que activar GitHub Pages en el repo:
+> **Settings → Pages → Build and deployment → Branch: `gh-pages` / `/ (root)` → Save**
+
 Entra con cualquier correo y contraseña (demo sin backend). Los datos se guardan en el navegador de cada usuario.
 
 ## Correr en local
