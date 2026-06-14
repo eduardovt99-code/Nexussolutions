@@ -302,16 +302,13 @@ class _WorksiteDetailScreenState extends State<WorksiteDetailScreen> with Single
                                 children: [
                                   const Text('OBRA FIRMADA', style: TextStyle(color: AppTheme.textSecondary, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
                                   const SizedBox(height: 4),
-                                  ShaderMask(
-                                    shaderCallback: (bounds) => AppTheme.deepGradient.createShader(bounds),
-                                    child: Text(
-                                      _currencyFormatter.format(_billableTotal),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: -0.5,
-                                      ),
+                                  Text(
+                                    _currencyFormatter.format(_billableTotal),
+                                    style: const TextStyle(
+                                      color: AppTheme.brandBlack,
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: -0.5,
                                     ),
                                   ),
                                 ],
@@ -997,11 +994,11 @@ class AIQuoteAssistantModal extends StatefulWidget {
 
 class _AIQuoteAssistantModalState extends State<AIQuoteAssistantModal> with TickerProviderStateMixin {
   // Paleta oscura exclusiva del asistente
-  static const Color _modalBg = Color(0xFF0B1120);
-  static const Color _modalSurface = Color(0xFF151E32);
-  static const Color _neon = AppTheme.accentCyan;
-  static const Color _white = Color(0xFFFFFFFF);
-  static const Color _grey = Color(0xFF7C8AA5);
+  static const Color _modalBg = AppTheme.brandBlack;
+  static const Color _modalSurface = Color(0xFF1A1A1A);
+  static const Color _neon = AppTheme.brandYellow;
+  static const Color _white = AppTheme.pureWhite;
+  static const Color _grey = Color(0xFF999999);
 
   AIQuoteStage _stage = AIQuoteStage.idle;
   List<EditableBudgetItem> _items = [];
@@ -1193,7 +1190,7 @@ class _AIQuoteAssistantModalState extends State<AIQuoteAssistantModal> with Tick
               ],
             ),
           ),
-          const Divider(color: Color(0xFF1F2A44), height: 1),
+          const Divider(color: Color(0xFF333333), height: 1),
           Expanded(
             child: _stage == AIQuoteStage.complete
                 ? _buildInteractiveTable()
@@ -1412,7 +1409,7 @@ class _AIQuoteAssistantModalState extends State<AIQuoteAssistantModal> with Tick
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
             itemCount: _items.length,
-            separatorBuilder: (context, index) => const Divider(color: Color(0xFF1F2A44), height: 1),
+            separatorBuilder: (context, index) => const Divider(color: Color(0xFF333333), height: 1),
             itemBuilder: (context, index) {
               final item = _items[index];
               return Padding(
@@ -1445,7 +1442,7 @@ class _AIQuoteAssistantModalState extends State<AIQuoteAssistantModal> with Tick
                               filled: true,
                               fillColor: _modalSurface,
                               enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xFF1F2A44)),
+                                borderSide: const BorderSide(color: Color(0xFF333333)),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               focusedBorder: OutlineInputBorder(
@@ -1472,7 +1469,7 @@ class _AIQuoteAssistantModalState extends State<AIQuoteAssistantModal> with Tick
                               filled: true,
                               fillColor: _modalSurface,
                               enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xFF1F2A44)),
+                                borderSide: const BorderSide(color: Color(0xFF333333)),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               focusedBorder: OutlineInputBorder(
@@ -1510,7 +1507,7 @@ class _AIQuoteAssistantModalState extends State<AIQuoteAssistantModal> with Tick
           padding: const EdgeInsets.all(24.0),
           decoration: const BoxDecoration(
             color: _modalSurface,
-            border: Border(top: BorderSide(color: Color(0xFF1F2A44), width: 1)),
+            border: Border(top: BorderSide(color: Color(0xFF333333), width: 1)),
           ),
           child: SafeArea(
             top: false,

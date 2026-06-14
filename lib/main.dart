@@ -91,7 +91,7 @@ class _MainShellState extends State<MainShell> {
           onTap: _onTabSelected,
           type: BottomNavigationBarType.fixed,
           backgroundColor: AppTheme.surfaceLight,
-          selectedItemColor: AppTheme.deepCyan,
+          selectedItemColor: AppTheme.brandBlack,
           unselectedItemColor: AppTheme.textSecondary,
           selectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1),
           unselectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1),
@@ -134,16 +134,16 @@ class _ProCalcNavIcon extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        gradient: AppTheme.cyberGradient,
+        color: AppTheme.brandYellow,
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
-          BoxShadow(color: AppTheme.accentPurple.withValues(alpha: 0.35), blurRadius: 14, spreadRadius: 1),
+          BoxShadow(color: AppTheme.brandBlack.withValues(alpha: 0.2), blurRadius: 14, spreadRadius: 1),
         ],
       ),
       child: const Icon(
         Icons.calculate,
         size: 20,
-        color: Colors.white,
+        color: AppTheme.brandBlack,
       ),
     );
   }

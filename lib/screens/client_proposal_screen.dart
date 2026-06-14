@@ -107,10 +107,10 @@ class _ClientProposalScreenState extends State<ClientProposalScreen> {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              gradient: AppTheme.cyberGradient,
+                              color: AppTheme.brandYellow,
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Icon(Icons.construction, color: Colors.white, size: 20),
+                            child: const Icon(Icons.engineering, color: AppTheme.brandBlack, size: 20),
                           ),
                           const SizedBox(width: 10),
                           const Text(
@@ -219,12 +219,9 @@ class _ClientProposalScreenState extends State<ClientProposalScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text('TOTAL', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 16)),
-                                  ShaderMask(
-                                    shaderCallback: (bounds) => AppTheme.deepGradient.createShader(bounds),
-                                    child: Text(
-                                      _currencyFormatter.format(total),
-                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 24),
-                                    ),
+                                  Text(
+                                    _currencyFormatter.format(total),
+                                    style: const TextStyle(color: AppTheme.brandBlack, fontWeight: FontWeight.w900, fontSize: 24),
                                   ),
                                 ],
                               ),

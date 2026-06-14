@@ -13,7 +13,7 @@ const double kLaborRate = 22.0;
 const TextStyle kSpecNumberStyle = TextStyle(
   fontFamily: 'monospace',
   fontFeatures: [FontFeature.tabularFigures()],
-  color: AppTheme.deepCyan,
+  color: AppTheme.brandBlack,
   fontWeight: FontWeight.w700,
 );
 
@@ -602,28 +602,25 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
                 width: 34,
                 height: 34,
                 decoration: BoxDecoration(
-                  gradient: AppTheme.cyberGradient,
+                  color: AppTheme.brandYellow,
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
-                    BoxShadow(color: AppTheme.accentPurple.withValues(alpha: 0.3), blurRadius: 12),
+                    BoxShadow(color: AppTheme.brandBlack.withValues(alpha: 0.2), blurRadius: 12),
                   ],
                 ),
-                child: const Icon(Icons.calculate, color: Colors.white, size: 20),
+                child: const Icon(Icons.calculate, color: AppTheme.brandBlack, size: 20),
               ),
             ),
             const SizedBox(width: 12),
-            ShaderMask(
-              shaderCallback: (bounds) => AppTheme.cyberGradient.createShader(bounds),
-              child: const Text(
-                'PRO-CALC',
-                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 3),
-              ),
+            const Text(
+              'PRO-CALC',
+              style: TextStyle(color: AppTheme.brandBlack, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 3),
             ),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                border: Border.all(color: AppTheme.deepCyan),
+                border: Border.all(color: AppTheme.brandBlack),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: const Text(
@@ -982,7 +979,7 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E1B4B).withValues(alpha: 0.25),
+            color: AppTheme.brandBlack.withValues(alpha: 0.25),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -1241,7 +1238,7 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E1B4B).withValues(alpha: 0.25),
+            color: AppTheme.brandBlack.withValues(alpha: 0.25),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),

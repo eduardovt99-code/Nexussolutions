@@ -152,32 +152,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: Row(
-          children: [
-            Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                gradient: AppTheme.cyberGradient,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.construction, size: 18, color: Colors.white),
-            ),
-            const SizedBox(width: 10),
-            ShaderMask(
-              shaderCallback: (bounds) => AppTheme.cyberGradient.createShader(bounds),
-              child: const Text(
-                'NEXUS',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 3,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
+        title: const NexusLogo.inline(),
         elevation: 0,
         actions: [
           IconButton(
@@ -276,7 +251,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E1B4B).withValues(alpha: 0.25),
+            color: AppTheme.brandBlack.withValues(alpha: 0.25),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -290,21 +265,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
             style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5),
           ),
           const SizedBox(height: 6),
-          ShaderMask(
-            shaderCallback: (bounds) => AppTheme.cyberGradient.createShader(bounds),
-            child: Text(
-              _currency.format(_totalPipeline),
-              style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: -0.5),
-            ),
+          Text(
+            _currency.format(_totalPipeline),
+            style: const TextStyle(color: AppTheme.brandYellow, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: -0.5),
           ),
           const SizedBox(height: 18),
           Row(
             children: [
-              mini(Icons.hourglass_top, 'PTE. DE COBRO', _currency.format(_pendingCollection), const Color(0xFFFCD34D)),
+              mini(Icons.hourglass_top, 'PTE. DE COBRO', _currency.format(_pendingCollection), AppTheme.brandYellow),
               Container(width: 1, height: 38, color: Colors.white12),
-              mini(Icons.check_circle_outline, 'COBRADO', _currency.format(_collected), const Color(0xFF6EE7B7)),
+              mini(Icons.check_circle_outline, 'COBRADO', _currency.format(_collected), AppTheme.successGreen),
               Container(width: 1, height: 38, color: Colors.white12),
-              mini(Icons.timer_outlined, 'HORAS HOY', '${_hoursToday.toStringAsFixed(1)} h', AppTheme.accentCyan),
+              mini(Icons.timer_outlined, 'HORAS HOY', '${_hoursToday.toStringAsFixed(1)} h', AppTheme.brandYellow),
             ],
           ),
         ],
@@ -332,10 +304,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             child: Column(
               children: [
-                ShaderMask(
-                  shaderCallback: (bounds) => AppTheme.deepGradient.createShader(bounds),
-                  child: Icon(icon, size: 22, color: Colors.white),
-                ),
+                Icon(icon, size: 22, color: AppTheme.brandBlack),
                 const SizedBox(height: 6),
                 Text(
                   label,
@@ -751,11 +720,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      gradient: AppTheme.deepGradient,
+                      color: AppTheme.brandYellow,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Center(
-                      child: Text('P', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 20)),
+                      child: Text('P', style: TextStyle(color: AppTheme.brandBlack, fontWeight: FontWeight.w900, fontSize: 20)),
                     ),
                   ),
                   const SizedBox(width: 16),

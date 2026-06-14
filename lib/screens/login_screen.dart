@@ -40,10 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ShaderMask(
-            shaderCallback: (bounds) => AppTheme.deepGradient.createShader(bounds),
-            child: Icon(icon, size: 16, color: Colors.white),
-          ),
+          Icon(icon, size: 16, color: AppTheme.brandBlack),
           const SizedBox(width: 6),
           Text(
             label,
@@ -72,39 +69,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Logo
-                  Center(
-                    child: Container(
-                      width: 88,
-                      height: 88,
-                      decoration: BoxDecoration(
-                        gradient: AppTheme.cyberGradient,
-                        borderRadius: BorderRadius.circular(28),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.accentPurple.withValues(alpha: 0.30),
-                            blurRadius: 28,
-                            offset: const Offset(0, 12),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(Icons.construction, size: 44, color: Colors.white),
+                  const Center(
+                    child: NexusLogo.onYellow(
+                      iconSize: 40,
+                      fontSize: 36,
+                      borderRadius: 16,
+                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                     ),
                   ),
                   const SizedBox(height: 28),
-                  ShaderMask(
-                    shaderCallback: (bounds) => AppTheme.cyberGradient.createShader(bounds),
-                    child: const Text(
-                      'NEXUS',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 44,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 6,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
                   const Text(
                     'EL SISTEMA OPERATIVO DE TU REFORMA',
                     textAlign: TextAlign.center,
@@ -152,11 +125,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Botón con el gradiente de marca
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      gradient: AppTheme.deepGradient,
+                      color: AppTheme.brandBlack,
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.deepCyan.withValues(alpha: 0.35),
+                          color: AppTheme.brandBlack.withValues(alpha: 0.25),
                           blurRadius: 16,
                           offset: const Offset(0, 6),
                         ),
