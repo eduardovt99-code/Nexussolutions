@@ -457,7 +457,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               Text(
                 '${weekTotal.toStringAsFixed(1)} h fichadas',
-                style: const TextStyle(color: AppTheme.deepCyan, fontSize: 12, fontWeight: FontWeight.w800),
+                style: const TextStyle(color: AppTheme.brandYellowDark, fontSize: 12, fontWeight: FontWeight.w800),
               ),
             ],
           ),
@@ -490,7 +490,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: Text(
                           hours.toStringAsFixed(0),
                           style: TextStyle(
-                            color: isToday ? AppTheme.deepCyan : AppTheme.textSecondary,
+                            color: isToday ? AppTheme.brandYellowDark : AppTheme.textSecondary,
                             fontSize: 10,
                             fontWeight: FontWeight.w800,
                           ),
@@ -509,7 +509,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Text(
                       dayLabel,
                       style: TextStyle(
-                        color: isToday ? AppTheme.deepCyan : AppTheme.textSecondary,
+                        color: isToday ? AppTheme.brandYellowDark : AppTheme.textSecondary,
                         fontSize: 10,
                         fontWeight: isToday ? FontWeight.w900 : FontWeight.w600,
                       ),
@@ -545,7 +545,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onTap: () => widget.onNavigateTab?.call(1),
                 child: const Text(
                   'VER TODAS →',
-                  style: TextStyle(color: AppTheme.deepCyan, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1),
+                  style: TextStyle(color: AppTheme.brandYellowDark, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1),
                 ),
               ),
             ],
@@ -631,7 +631,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                     decoration: BoxDecoration(
-                      color: statusColor.withValues(alpha: 0.10),
+                      color: site.status == 'active'
+                          ? AppTheme.brandYellow
+                          : statusColor.withValues(alpha: 0.10),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -640,12 +642,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Container(
                           width: 6,
                           height: 6,
-                          decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+                          decoration: BoxDecoration(
+                            color: site.status == 'active' ? AppTheme.brandBlack : statusColor,
+                            shape: BoxShape.circle,
+                          ),
                         ),
                         const SizedBox(width: 5),
                         Text(
                           statusLabel,
-                          style: TextStyle(color: statusColor, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.8),
+                          style: TextStyle(
+                            color: site.status == 'active' ? AppTheme.brandBlack : statusColor,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                          ),
                         ),
                       ],
                     ),
@@ -662,11 +672,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  const Icon(Icons.verified_outlined, size: 14, color: AppTheme.deepCyan),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Firmado: ${_currency.format(signed)}',
-                    style: const TextStyle(color: AppTheme.textPrimary, fontSize: 12, fontWeight: FontWeight.w700),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppTheme.brandYellowMuted,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.verified_outlined, size: 14, color: AppTheme.brandYellowDark),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Firmado: ${_currency.format(signed)}',
+                          style: const TextStyle(color: AppTheme.brandYellowDark, fontSize: 12, fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(width: 16),
                   const Icon(Icons.timer_outlined, size: 14, color: AppTheme.textSecondary),
@@ -685,7 +707,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   IconButton(
                     visualDensity: VisualDensity.compact,
                     tooltip: 'Actualizar obra',
-                    icon: const Icon(Icons.edit_note, size: 20, color: AppTheme.deepCyan),
+                    icon: const Icon(Icons.edit_note, size: 20, color: AppTheme.brandYellowDark),
                     onPressed: () => _showUpdateWorksiteModal(site),
                   ),
                 ],

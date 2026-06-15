@@ -7,6 +7,10 @@ class AppTheme {
   static const Color brandYellow = Color(0xFFFFD200);
   static const Color brandBlack = Color(0xFF000000);
   static const Color brandYellowLight = Color(0xFFFFE566);
+  /// Dorado oscuro legible sobre fondo blanco (texto, enlaces, iconos).
+  static const Color brandYellowDark = Color(0xFF9A7500);
+  /// Fondo suave para chips y badges amarillos.
+  static const Color brandYellowMuted = Color(0xFFFFF3C4);
 
   // ── Base ──
   static const Color pureWhite = Color(0xFFFFFFFF);
