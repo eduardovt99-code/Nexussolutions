@@ -227,14 +227,14 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                             decoration: BoxDecoration(
-                              color: selected ? AppTheme.deepCyan : AppTheme.surfaceLight,
+                              color: selected ? AppTheme.brandYellow : AppTheme.surfaceLight,
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: selected ? AppTheme.deepCyan : _cardBorder),
+                              border: Border.all(color: selected ? AppTheme.brandYellow : _cardBorder),
                             ),
                             child: Text(
                               label,
                               style: TextStyle(
-                                color: selected ? Colors.white : AppTheme.textSecondary,
+                                color: selected ? AppTheme.brandBlack : AppTheme.textSecondary,
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 1,
@@ -329,12 +329,19 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                             Container(
                                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                               decoration: BoxDecoration(
-                                                color: color.withValues(alpha: 0.10),
+                                                color: site.status == 'active'
+                                                    ? AppTheme.brandYellow
+                                                    : color.withValues(alpha: 0.10),
                                                 borderRadius: BorderRadius.circular(20),
                                               ),
                                               child: Text(
                                                 label,
-                                                style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.8),
+                                                style: TextStyle(
+                                                  color: site.status == 'active' ? AppTheme.brandBlack : color,
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.w800,
+                                                  letterSpacing: 0.8,
+                                                ),
                                               ),
                                             ),
                                             const SizedBox(height: 4),
@@ -460,7 +467,7 @@ class _FinancesScreenState extends State<FinancesScreen> {
                         const SizedBox(width: 10),
                         _kpiTile('COBRADO', collected, AppTheme.successGreen),
                         const SizedBox(width: 10),
-                        _kpiTile('EN CARTERA', pipeline, AppTheme.deepPurple),
+                        _kpiTile('EN CARTERA', pipeline, AppTheme.brandYellowDark),
                       ],
                     ),
                     const SizedBox(height: 24),
@@ -535,12 +542,19 @@ class _FinancesScreenState extends State<FinancesScreen> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
-                                      color: color.withValues(alpha: 0.10),
+                                      color: budget.status == 'approved'
+                                          ? AppTheme.brandYellow
+                                          : color.withValues(alpha: 0.10),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(
                                       label,
-                                      style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1),
+                                      style: TextStyle(
+                                        color: budget.status == 'approved' ? AppTheme.brandBlack : color,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 1,
+                                      ),
                                     ),
                                   ),
                                 ],
