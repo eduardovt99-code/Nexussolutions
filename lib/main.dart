@@ -89,44 +89,65 @@ class _MainShellState extends State<MainShell> {
           color: AppTheme.surfaceLight,
           border: Border(top: BorderSide(color: _cardBorder)),
         ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: _onTabSelected,
-          type: BottomNavigationBarType.fixed,
+        child: NavigationBar(
+          selectedIndex: _currentIndex,
+          onDestinationSelected: _onTabSelected,
           backgroundColor: AppTheme.surfaceLight,
-          selectedItemColor: AppTheme.brandBlack,
-          unselectedItemColor: AppTheme.textSecondary,
-          selectedLabelStyle: const TextStyle(fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.5),
-          unselectedLabelStyle: const TextStyle(fontSize: 9, fontWeight: FontWeight.w600, letterSpacing: 0.5),
-          elevation: 0,
-          items: [
-            const BottomNavigationBarItem(
+          indicatorColor: AppTheme.brandYellow,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          height: 68,
+          destinations: [
+            const NavigationDestination(
               icon: Icon(Icons.grid_view_outlined),
-              activeIcon: Icon(Icons.grid_view),
+              selectedIcon: Icon(Icons.grid_view),
               label: 'PANEL',
             ),
-            const BottomNavigationBarItem(
+            const NavigationDestination(
               icon: Icon(Icons.construction_outlined),
-              activeIcon: Icon(Icons.construction),
+              selectedIcon: Icon(Icons.construction),
               label: 'OBRAS',
             ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_view_week_outlined),
-              activeIcon: Icon(Icons.calendar_view_week),
+            NavigationDestination(
+              icon: _PlanNavIcon(outlined: true),
+              selectedIcon: _PlanNavIcon(outlined: false),
               label: 'PLAN',
             ),
-            const BottomNavigationBarItem(
+            const NavigationDestination(
               icon: Icon(Icons.calculate_outlined),
-              activeIcon: _ProCalcNavIcon(),
-              label: 'PRO-CALC',
+              selectedIcon: _ProCalcNavIcon(),
+              label: 'CALC',
             ),
-            const BottomNavigationBarItem(
+            const NavigationDestination(
               icon: Icon(Icons.payments_outlined),
-              activeIcon: Icon(Icons.payments),
-              label: 'FINANZAS',
+              selectedIcon: Icon(Icons.payments),
+              label: 'CAJA',
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Icono destacado de la pestaña Planificación.
+class _PlanNavIcon extends StatelessWidget {
+  final bool outlined;
+
+  const _PlanNavIcon({this.outlined = true});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: AppTheme.brandYellowMuted,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppTheme.brandYellowDark.withValues(alpha: 0.25)),
+      ),
+      child: Icon(
+        outlined ? Icons.calendar_view_week_outlined : Icons.calendar_view_week,
+        size: 20,
+        color: AppTheme.brandYellowDark,
       ),
     );
   }

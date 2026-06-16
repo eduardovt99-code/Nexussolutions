@@ -288,7 +288,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildQuickActions() {
     Widget action(IconData icon, String label, VoidCallback onTap) {
-      return Expanded(
+      return SizedBox(
+        width: 76,
         child: InkWell(
           onTap: () {
             HapticFeedback.lightImpact();
@@ -308,7 +309,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 6),
                 Text(
                   label,
-                  style: const TextStyle(color: AppTheme.textPrimary, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: AppTheme.textPrimary, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.3),
                 ),
               ],
             ),
@@ -319,16 +321,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Row(
-        children: [
-          action(Icons.add_business_outlined, 'NUEVA OBRA', _showCreateWorksiteModal),
-          const SizedBox(width: 10),
-          action(Icons.construction_outlined, 'OBRAS', () => widget.onNavigateTab?.call(1)),
-          const SizedBox(width: 10),
-          action(Icons.calculate_outlined, 'PRO-CALC', () => widget.onNavigateTab?.call(3)),
-          const SizedBox(width: 10),
-          action(Icons.payments_outlined, 'FINANZAS', () => widget.onNavigateTab?.call(4)),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            action(Icons.add_business_outlined, 'NUEVA OBRA', _showCreateWorksiteModal),
+            const SizedBox(width: 10),
+            action(Icons.construction_outlined, 'OBRAS', () => widget.onNavigateTab?.call(1)),
+            const SizedBox(width: 10),
+            action(Icons.calendar_view_week_outlined, 'PLAN', () => widget.onNavigateTab?.call(2)),
+            const SizedBox(width: 10),
+            action(Icons.calculate_outlined, 'PRO-CALC', () => widget.onNavigateTab?.call(3)),
+            const SizedBox(width: 10),
+            action(Icons.payments_outlined, 'FINANZAS', () => widget.onNavigateTab?.call(4)),
+          ],
+        ),
       ),
     );
   }
