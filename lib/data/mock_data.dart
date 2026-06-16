@@ -165,28 +165,31 @@ class MockData {
     Worker(id: 'wrk_022', name: 'Dani Paredes', profession: WorkerProfession.general, weeklyCapacityHours: 32),
   ];
 
-  /// weekUtil ≈ objetivo de carga semanal (0.05 = casi libre, 0.98 = casi al límite).
+  static DateTime _startOfWeek(DateTime d) =>
+      DateTime(d.year, d.month, d.day).subtract(Duration(days: d.weekday - 1));
+
+  /// weekUtil = fracción de capacidad semanal (1.0 = saturado al 100%).
   static final List<({String name, double weekUtil, String primarySite, bool openToday})> _crewProfiles = [
-    (name: 'Andrés Gómez', weekUtil: 0.98, primarySite: 'ws_001', openToday: false),
-    (name: 'Luis Martín', weekUtil: 0.95, primarySite: 'ws_001', openToday: false),
+    (name: 'Andrés Gómez', weekUtil: 1.0, primarySite: 'ws_001', openToday: false),
+    (name: 'Luis Martín', weekUtil: 1.0, primarySite: 'ws_001', openToday: false),
     (name: 'Pedro Sánchez', weekUtil: 0.88, primarySite: 'ws_004', openToday: false),
     (name: 'Marco Vargas', weekUtil: 0.62, primarySite: 'ws_002', openToday: false),
     (name: 'Iván Herrera', weekUtil: 0.18, primarySite: 'ws_005', openToday: false),
     (name: 'Raúl Domínguez', weekUtil: 0.74, primarySite: 'ws_004', openToday: false),
-    (name: 'Karim Bensaïd', weekUtil: 0.96, primarySite: 'ws_002', openToday: true),
-    (name: 'David Fernández', weekUtil: 0.91, primarySite: 'ws_001', openToday: false),
+    (name: 'Karim Bensaïd', weekUtil: 0.92, primarySite: 'ws_002', openToday: true),
+    (name: 'David Fernández', weekUtil: 1.0, primarySite: 'ws_001', openToday: false),
     (name: 'Óscar Núñez', weekUtil: 0.55, primarySite: 'ws_005', openToday: false),
     (name: 'Héctor Prieto', weekUtil: 0.12, primarySite: 'ws_003', openToday: false),
-    (name: 'Miguel Torres', weekUtil: 0.97, primarySite: 'ws_004', openToday: false),
+    (name: 'Miguel Torres', weekUtil: 1.0, primarySite: 'ws_004', openToday: false),
     (name: 'Roberto Gil', weekUtil: 0.83, primarySite: 'ws_002', openToday: false),
     (name: 'Fran Delgado', weekUtil: 0.28, primarySite: 'ws_001', openToday: false),
     (name: 'Sandra León', weekUtil: 0.69, primarySite: 'ws_002', openToday: false),
-    (name: 'Carmen Ibáez', weekUtil: 0.94, primarySite: 'ws_004', openToday: false),
+    (name: 'Carmen Ibáez', weekUtil: 1.0, primarySite: 'ws_004', openToday: false),
     (name: 'Lucía Ramos', weekUtil: 0.08, primarySite: 'ws_005', openToday: false),
-    (name: 'Jorge Ruiz', weekUtil: 0.92, primarySite: 'ws_001', openToday: false),
+    (name: 'Jorge Ruiz', weekUtil: 1.0, primarySite: 'ws_001', openToday: false),
     (name: 'Paco Morales', weekUtil: 0.58, primarySite: 'ws_005', openToday: false),
     (name: 'Tomás Vega', weekUtil: 0.22, primarySite: 'ws_002', openToday: false),
-    (name: 'Nacho Castillo', weekUtil: 0.99, primarySite: 'ws_004', openToday: false),
+    (name: 'Nacho Castillo', weekUtil: 1.0, primarySite: 'ws_004', openToday: false),
     (name: 'Sergio Almada', weekUtil: 0.06, primarySite: 'ws_003', openToday: false),
     (name: 'Dani Paredes', weekUtil: 0.41, primarySite: 'ws_005', openToday: false),
   ];
@@ -197,63 +200,111 @@ class MockData {
     final logs = <TimeLog>[];
     var seq = 1;
     const activeSites = ['ws_001', 'ws_002', 'ws_004', 'ws_005'];
+    final weekStart = _startOfWeek(_today);
 
     for (final profile in _crewProfiles) {
-      for (var daysAgo = 0; daysAgo <= 27; daysAgo++) {
-        final day = _daysAgo(daysAgo);
-        if (!_worksOnDay(profile.name, daysAgo, profile.weekUtil, day.weekday)) continue;
+      final capacity = workers.firstWhere((w) => w.name == profile.name).weeklyCapacityHours;
 
-        final hours = _hoursForShift(profile.weekUtil, profile.name, daysAgo);
-        if (hours <= 0) continue;
+      for (var weekOffset = 0; weekOffset < 4; weekOffset++) {
+        final base = weekStart.subtract(Duration(days: 7 * weekOffset));
+        final utilScale = weekOffset == 0 ? 1.0 : 0.82 - weekOffset * 0.05;
+        final targetHours = capacity * profile.weekUtil * utilScale;
+        if (targetHours < 0.5) continue;
 
-        final site = _siteForShift(profile.name, profile.primarySite, activeSites, daysAgo);
-        final coords = _siteCoords[site]!;
-        final startHour = 7 + (profile.name.hashCode.abs() + daysAgo) % 2;
-        final dayBase = _daysAgo(daysAgo);
-        final checkIn = DateTime(dayBase.year, dayBase.month, dayBase.day, startHour);
-        final isOpenToday = profile.openToday && daysAgo == 0;
-        final checkOut = isOpenToday ? null : checkIn.add(Duration(hours: hours));
-        final rate = 20.0 + (profile.name.hashCode.abs() % 6);
-
-        logs.add(
-          TimeLog(
-            id: 'tl_${seq.toString().padLeft(3, '0')}',
-            userId: profile.name,
-            worksiteId: site,
-            checkIn: checkIn,
-            checkOut: checkOut,
-            checkInLat: coords.$1,
-            checkInLng: coords.$2,
-            laborCostCalculated: isOpenToday ? 0 : hours * rate,
-          ),
+        seq = _addWeekLogs(
+          logs,
+          seq,
+          profile,
+          base,
+          targetHours,
+          activeSites,
+          openOnToday: profile.openToday && weekOffset == 0,
         );
-        seq++;
       }
     }
 
     return logs;
   }
 
-  static bool _worksOnDay(String name, int daysAgo, double util, int weekday) {
-    if (weekday == 6) return util >= 0.85 && (name.hashCode + daysAgo) % 3 == 0;
-    if (weekday == 7) return util >= 0.92 && daysAgo % 2 == 0;
+  static int _addWeekLogs(
+    List<TimeLog> logs,
+    int seq,
+    ({String name, double weekUtil, String primarySite, bool openToday}) profile,
+    DateTime weekStart,
+    double targetHours,
+    List<String> activeSites, {
+    required bool openOnToday,
+  }) {
+    var remaining = targetHours;
+    final today = DateTime(_today.year, _today.month, _today.day);
 
-    final score = (name.hashCode.abs() + daysAgo * 13 + weekday * 7) % 100;
-    final threshold = (util * 92).round().clamp(4, 98);
-    return score < threshold;
+    for (var offset = 0; offset < 7 && remaining > 0.2; offset++) {
+      final day = weekStart.add(Duration(days: offset));
+      if (day.weekday == 7) continue;
+
+      if (profile.weekUtil < 0.25 && offset > 2 && (profile.name.hashCode + offset) % 2 != 0) {
+        continue;
+      }
+
+      final isToday = day.year == today.year && day.month == today.month && day.day == today.day;
+
+      if (isToday && openOnToday) {
+        final site = profile.primarySite;
+        final coords = _siteCoords[site]!;
+        final checkIn = _today.subtract(const Duration(hours: 4));
+        logs.add(
+          TimeLog(
+            id: 'tl_${seq.toString().padLeft(3, '0')}',
+            userId: profile.name,
+            worksiteId: site,
+            checkIn: checkIn,
+            checkOut: null,
+            checkInLat: coords.$1,
+            checkInLng: coords.$2,
+            laborCostCalculated: 0,
+          ),
+        );
+        seq++;
+        remaining -= 4;
+        continue;
+      }
+
+      // Semana en curso: los saturados muestran la semana completa; el resto solo hasta hoy.
+      final isCurrentWeek = weekStart.year == _startOfWeek(_today).year &&
+          weekStart.month == _startOfWeek(_today).month &&
+          weekStart.day == _startOfWeek(_today).day;
+      if (isCurrentWeek && day.isAfter(today) && profile.weekUtil < 1.0) continue;
+
+      final hours = remaining >= 8 ? 8.0 : remaining;
+      if (hours < 0.5) break;
+
+      final site = _siteForShift(profile.name, profile.primarySite, activeSites, offset);
+      final coords = _siteCoords[site]!;
+      final startHour = 7 + (profile.name.hashCode.abs() + offset) % 2;
+      final checkIn = DateTime(day.year, day.month, day.day, startHour);
+      final rate = 20.0 + (profile.name.hashCode.abs() % 6);
+
+      logs.add(
+        TimeLog(
+          id: 'tl_${seq.toString().padLeft(3, '0')}',
+          userId: profile.name,
+          worksiteId: site,
+          checkIn: checkIn,
+          checkOut: checkIn.add(Duration(hours: hours.round())),
+          checkInLat: coords.$1,
+          checkInLng: coords.$2,
+          laborCostCalculated: hours * rate,
+        ),
+      );
+      seq++;
+      remaining -= hours;
+    }
+
+    return seq;
   }
 
-  static int _hoursForShift(double util, String name, int daysAgo) {
-    final mod = (name.hashCode.abs() + daysAgo) % 5;
-    if (util >= 0.9) return 8 + (mod % 2);
-    if (util >= 0.7) return 7 + (mod % 3);
-    if (util >= 0.45) return 5 + (mod % 3);
-    if (util >= 0.2) return mod == 0 ? 4 : 3;
-    return mod == 0 ? 2 : 0;
-  }
-
-  static String _siteForShift(String name, String primary, List<String> sites, int daysAgo) {
-    if ((name.hashCode + daysAgo) % 5 != 0) return primary;
-    return sites[(name.hashCode.abs() + daysAgo) % sites.length];
+  static String _siteForShift(String name, String primary, List<String> sites, int dayOffset) {
+    if ((name.hashCode + dayOffset) % 5 != 0) return primary;
+    return sites[(name.hashCode.abs() + dayOffset) % sites.length];
   }
 }

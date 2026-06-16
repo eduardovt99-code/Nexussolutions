@@ -107,9 +107,9 @@ class _MainShellState extends State<MainShell> {
               selectedIcon: Icon(Icons.construction),
               label: 'OBRAS',
             ),
-            NavigationDestination(
-              icon: _PlanNavIcon(outlined: true),
-              selectedIcon: _PlanNavIcon(outlined: false),
+            const NavigationDestination(
+              icon: Icon(Icons.calendar_view_week_outlined),
+              selectedIcon: Icon(Icons.calendar_view_week),
               label: 'PLAN',
             ),
             const NavigationDestination(
@@ -124,30 +124,6 @@ class _MainShellState extends State<MainShell> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// Icono destacado de la pestaña Planificación.
-class _PlanNavIcon extends StatelessWidget {
-  final bool outlined;
-
-  const _PlanNavIcon({this.outlined = true});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: AppTheme.brandYellowMuted,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.brandYellowDark.withValues(alpha: 0.25)),
-      ),
-      child: Icon(
-        outlined ? Icons.calendar_view_week_outlined : Icons.calendar_view_week,
-        size: 20,
-        color: AppTheme.brandYellowDark,
       ),
     );
   }
