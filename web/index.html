@@ -22,6 +22,7 @@
   <meta http-equiv="Expires" content="0">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
+  <meta name="nexus-demo-build" content="16">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -37,31 +38,54 @@
 </head>
 <body>
   <script>
-    // Fuerza datos frescos cuando publicamos una nueva demo (debe coincidir con DemoVersion.build).
+    // La versión autoritativa vive en version.json (siempre sin caché).
     (function () {
-      var BUILD = '15';
       var KEY = 'nexus_demo_build';
-      try {
-        var stored = localStorage.getItem(KEY);
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          for (var i = 0; i < regs.length; i++) regs[i].unregister();
+        });
+      }
+
+      function embeddedBuild() {
+        var meta = document.querySelector('meta[name="nexus-demo-build"]');
+        return meta ? String(meta.getAttribute('content')) : '16';
+      }
+
+      function loadFlutter(build) {
+        if (document.querySelector('script[data-nexus-bootstrap]')) return;
+        var s = document.createElement('script');
+        s.src = 'flutter_bootstrap.js?v=' + build;
+        s.async = true;
+        s.setAttribute('data-nexus-bootstrap', '1');
+        document.body.appendChild(s);
+      }
+
+      function applyBuild(build) {
         var url = new URL(window.location.href);
-        if (url.searchParams.get('b') !== BUILD) {
-          if (stored !== BUILD) {
+        var stored = null;
+        try { stored = localStorage.getItem(KEY); } catch (e) {}
+
+        if (url.searchParams.get('b') !== build || stored !== build) {
+          try {
             localStorage.clear();
             sessionStorage.clear();
-          }
-          localStorage.setItem(KEY, BUILD);
-          url.searchParams.set('b', BUILD);
+            localStorage.setItem(KEY, build);
+          } catch (e) {}
+          url.searchParams.set('b', build);
           window.location.replace(url.toString());
           return;
         }
-      } catch (e) {}
+
+        loadFlutter(build);
+      }
+
+      fetch('version.json?_=' + Date.now(), { cache: 'no-store' })
+        .then(function (res) { return res.json(); })
+        .then(function (data) { applyBuild(String(data.build)); })
+        .catch(function () { applyBuild(embeddedBuild()); });
     })();
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function (regs) {
-        for (var i = 0; i < regs.length; i++) regs[i].unregister();
-      });
-    }
   </script>
-  <script src="flutter_bootstrap.js?v=15" async></script>
 </body>
 </html>
