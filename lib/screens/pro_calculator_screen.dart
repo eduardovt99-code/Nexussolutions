@@ -668,7 +668,7 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
               ),
               child: const Text(
                 'CALCULADORA',
-                style: TextStyle(color: AppTheme.deepCyan, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.5),
+                style: TextStyle(color: AppTheme.brandBlack, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.5),
               ),
             ),
           ],
