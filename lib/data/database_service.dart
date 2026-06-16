@@ -11,7 +11,7 @@ class DatabaseService {
   SharedPreferences? _prefs;
 
   /// Versión de los datos de demo: al subirla se reemplazan los datos antiguos.
-  static const int _seedVersion = 2;
+  static const int _seedVersion = 3;
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -20,6 +20,7 @@ class DatabaseService {
       await saveWorksites(MockData.worksites);
       await saveBudgets(MockData.budgets);
       await saveTimeLogs(MockData.timeLogs);
+      await saveWorkers(MockData.workers);
       await _prefs!.setInt('seed_version', _seedVersion);
     }
   }
@@ -131,5 +132,18 @@ class DatabaseService {
     }
     logs.insert(0, timeLog);
     await saveTimeLogs(logs);
+  }
+
+  // WORKERS
+  Future<List<Worker>> getWorkers() async {
+    final String? data = _prefs?.getString('workers');
+    if (data == null) return [];
+    final List<dynamic> jsonList = jsonDecode(data);
+    return jsonList.map((e) => Worker.fromJson(e)).toList();
+  }
+
+  Future<void> saveWorkers(List<Worker> workers) async {
+    final List<Map<String, dynamic>> jsonList = workers.map((e) => e.toJson()).toList();
+    await _prefs?.setString('workers', jsonEncode(jsonList));
   }
 }

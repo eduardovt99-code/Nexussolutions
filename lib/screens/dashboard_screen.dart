@@ -325,9 +325,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(width: 10),
           action(Icons.construction_outlined, 'OBRAS', () => widget.onNavigateTab?.call(1)),
           const SizedBox(width: 10),
-          action(Icons.calculate_outlined, 'PRO-CALC', () => widget.onNavigateTab?.call(2)),
+          action(Icons.calculate_outlined, 'PRO-CALC', () => widget.onNavigateTab?.call(3)),
           const SizedBox(width: 10),
-          action(Icons.payments_outlined, 'FINANZAS', () => widget.onNavigateTab?.call(3)),
+          action(Icons.payments_outlined, 'FINANZAS', () => widget.onNavigateTab?.call(4)),
         ],
       ),
     );

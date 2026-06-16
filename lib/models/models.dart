@@ -7,6 +7,8 @@ class Worksite {
   final double locationLng;
   final String status; // 'quoting', 'active', 'completed'
   final DateTime createdAt;
+  final DateTime? plannedStart;
+  final DateTime? plannedEnd;
 
   Worksite({
     required this.id,
@@ -17,6 +19,8 @@ class Worksite {
     required this.locationLng,
     required this.status,
     required this.createdAt,
+    this.plannedStart,
+    this.plannedEnd,
   });
 
   Map<String, dynamic> toJson() => {
@@ -28,6 +32,8 @@ class Worksite {
     'locationLng': locationLng,
     'status': status,
     'createdAt': createdAt.toIso8601String(),
+    if (plannedStart != null) 'plannedStart': plannedStart!.toIso8601String(),
+    if (plannedEnd != null) 'plannedEnd': plannedEnd!.toIso8601String(),
   };
 
   factory Worksite.fromJson(Map<String, dynamic> json) => Worksite(
@@ -39,6 +45,8 @@ class Worksite {
     locationLng: json['locationLng'],
     status: json['status'],
     createdAt: DateTime.parse(json['createdAt']),
+    plannedStart: json['plannedStart'] != null ? DateTime.parse(json['plannedStart']) : null,
+    plannedEnd: json['plannedEnd'] != null ? DateTime.parse(json['plannedEnd']) : null,
   );
 }
 
@@ -147,5 +155,52 @@ class TimeLog {
     checkInLat: json['checkInLat'].toDouble(),
     checkInLng: json['checkInLng'].toDouble(),
     laborCostCalculated: json['laborCostCalculated'].toDouble(),
+  );
+}
+
+/// Profesiones de la cuadrilla (clave interna → etiqueta en UI).
+class WorkerProfession {
+  static const String albanileria = 'albanileria';
+  static const String fontaneria = 'fontaneria';
+  static const String electricidad = 'electricidad';
+  static const String pintura = 'pintura';
+  static const String general = 'general';
+
+  static const Map<String, String> labels = {
+    albanileria: 'Albañilería',
+    fontaneria: 'Fontanería',
+    electricidad: 'Electricidad',
+    pintura: 'Pintura',
+    general: 'Oficio general',
+  };
+
+  static String label(String key) => labels[key] ?? key;
+}
+
+class Worker {
+  final String id;
+  final String name;
+  final String profession;
+  final double weeklyCapacityHours;
+
+  Worker({
+    required this.id,
+    required this.name,
+    required this.profession,
+    this.weeklyCapacityHours = 40,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'profession': profession,
+    'weeklyCapacityHours': weeklyCapacityHours,
+  };
+
+  factory Worker.fromJson(Map<String, dynamic> json) => Worker(
+    id: json['id'],
+    name: json['name'],
+    profession: json['profession'],
+    weeklyCapacityHours: (json['weeklyCapacityHours'] as num?)?.toDouble() ?? 40,
   );
 }

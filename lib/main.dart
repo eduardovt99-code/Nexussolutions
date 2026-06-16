@@ -10,6 +10,7 @@ import 'screens/login_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/worksite_detail_screen.dart';
 import 'screens/pro_calculator_screen.dart';
+import 'screens/planning_screen.dart';
 
 const Color _cardBorder = Color(0xFFE6EAF2);
 
@@ -69,8 +70,10 @@ class _MainShellState extends State<MainShell> {
       case 1:
         return const ProjectsScreen();
       case 2:
-        return const ProCalculatorScreen();
+        return const PlanningScreen();
       case 3:
+        return const ProCalculatorScreen();
+      case 4:
         return const FinancesScreen();
       default:
         return DashboardScreen(onNavigateTab: _goToTab);
@@ -93,8 +96,8 @@ class _MainShellState extends State<MainShell> {
           backgroundColor: AppTheme.surfaceLight,
           selectedItemColor: AppTheme.brandBlack,
           unselectedItemColor: AppTheme.textSecondary,
-          selectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1),
-          unselectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1),
+          selectedLabelStyle: const TextStyle(fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+          unselectedLabelStyle: const TextStyle(fontSize: 9, fontWeight: FontWeight.w600, letterSpacing: 0.5),
           elevation: 0,
           items: [
             const BottomNavigationBarItem(
@@ -106,6 +109,11 @@ class _MainShellState extends State<MainShell> {
               icon: Icon(Icons.construction_outlined),
               activeIcon: Icon(Icons.construction),
               label: 'OBRAS',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_view_week_outlined),
+              activeIcon: Icon(Icons.calendar_view_week),
+              label: 'PLAN',
             ),
             const BottomNavigationBarItem(
               icon: Icon(Icons.calculate_outlined),

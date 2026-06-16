@@ -2,6 +2,10 @@ import '../models/models.dart';
 
 /// Datos de demostración: reformas reales de un negocio madrileño de 1–15 personas.
 class MockData {
+  static final DateTime _today = DateTime.now();
+  static DateTime _daysAgo(int d) => DateTime(_today.year, _today.month, _today.day).subtract(Duration(days: d));
+  static DateTime _daysAhead(int d) => DateTime(_today.year, _today.month, _today.day).add(Duration(days: d));
+
   static final List<Worksite> worksites = [
     Worksite(
       id: 'ws_001',
@@ -11,7 +15,9 @@ class MockData {
       locationLat: 40.4262,
       locationLng: -3.6857,
       status: 'active',
-      createdAt: DateTime.now().subtract(const Duration(days: 15)),
+      createdAt: _daysAgo(15),
+      plannedStart: _daysAgo(10),
+      plannedEnd: _daysAhead(8),
     ),
     Worksite(
       id: 'ws_002',
@@ -21,7 +27,9 @@ class MockData {
       locationLat: 40.4334,
       locationLng: -3.7016,
       status: 'active',
-      createdAt: DateTime.now().subtract(const Duration(days: 5)),
+      createdAt: _daysAgo(5),
+      plannedStart: _daysAgo(3),
+      plannedEnd: _daysAhead(18),
     ),
     Worksite(
       id: 'ws_003',
@@ -31,7 +39,9 @@ class MockData {
       locationLat: 40.4486,
       locationLng: -3.7038,
       status: 'quoting',
-      createdAt: DateTime.now().subtract(const Duration(days: 2)),
+      createdAt: _daysAgo(2),
+      plannedStart: _daysAhead(5),
+      plannedEnd: _daysAhead(22),
     ),
   ];
 
@@ -74,13 +84,22 @@ class MockData {
     ),
   ];
 
+  static final List<Worker> workers = [
+    Worker(id: 'wrk_001', name: 'Andrés Gómez', profession: WorkerProfession.albanileria, weeklyCapacityHours: 40),
+    Worker(id: 'wrk_002', name: 'Luis Martín', profession: WorkerProfession.albanileria, weeklyCapacityHours: 40),
+    Worker(id: 'wrk_003', name: 'Karim Bensaïd', profession: WorkerProfession.fontaneria, weeklyCapacityHours: 40),
+    Worker(id: 'wrk_004', name: 'Miguel Torres', profession: WorkerProfession.electricidad, weeklyCapacityHours: 36),
+    Worker(id: 'wrk_005', name: 'Sandra León', profession: WorkerProfession.pintura, weeklyCapacityHours: 32),
+    Worker(id: 'wrk_006', name: 'Jorge Ruiz', profession: WorkerProfession.general, weeklyCapacityHours: 40),
+  ];
+
   static final List<TimeLog> timeLogs = [
     TimeLog(
       id: 'tl_001',
       userId: 'Andrés Gómez',
       worksiteId: 'ws_001',
-      checkIn: DateTime.now().subtract(const Duration(hours: 6)),
-      checkOut: DateTime.now().subtract(const Duration(hours: 1)),
+      checkIn: _today.subtract(const Duration(hours: 6)),
+      checkOut: _today.subtract(const Duration(hours: 1)),
       checkInLat: 40.4262,
       checkInLng: -3.6857,
       laborCostCalculated: 5 * 22.0,
@@ -89,8 +108,8 @@ class MockData {
       id: 'tl_002',
       userId: 'Luis Martín',
       worksiteId: 'ws_001',
-      checkIn: DateTime.now().subtract(const Duration(days: 1, hours: 9)),
-      checkOut: DateTime.now().subtract(const Duration(days: 1, hours: 1)),
+      checkIn: _today.subtract(const Duration(days: 1, hours: 9)),
+      checkOut: _today.subtract(const Duration(days: 1, hours: 1)),
       checkInLat: 40.4262,
       checkInLng: -3.6857,
       laborCostCalculated: 8 * 22.0,
@@ -99,11 +118,51 @@ class MockData {
       id: 'tl_003',
       userId: 'Karim Bensaïd',
       worksiteId: 'ws_002',
-      checkIn: DateTime.now().subtract(const Duration(hours: 4)),
+      checkIn: _today.subtract(const Duration(hours: 4)),
       checkOut: null,
       checkInLat: 40.4334,
       checkInLng: -3.7016,
       laborCostCalculated: 0.0,
+    ),
+    TimeLog(
+      id: 'tl_004',
+      userId: 'Miguel Torres',
+      worksiteId: 'ws_002',
+      checkIn: _today.subtract(const Duration(days: 2, hours: 8)),
+      checkOut: _today.subtract(const Duration(days: 2, hours: 0)),
+      checkInLat: 40.4334,
+      checkInLng: -3.7016,
+      laborCostCalculated: 8 * 24.0,
+    ),
+    TimeLog(
+      id: 'tl_005',
+      userId: 'Jorge Ruiz',
+      worksiteId: 'ws_001',
+      checkIn: _today.subtract(const Duration(days: 3, hours: 9)),
+      checkOut: _today.subtract(const Duration(days: 3, hours: 2)),
+      checkInLat: 40.4262,
+      checkInLng: -3.6857,
+      laborCostCalculated: 7 * 20.0,
+    ),
+    TimeLog(
+      id: 'tl_006',
+      userId: 'Sandra León',
+      worksiteId: 'ws_002',
+      checkIn: _today.subtract(const Duration(days: 4, hours: 10)),
+      checkOut: _today.subtract(const Duration(days: 4, hours: 4)),
+      checkInLat: 40.4334,
+      checkInLng: -3.7016,
+      laborCostCalculated: 6 * 21.0,
+    ),
+    TimeLog(
+      id: 'tl_007',
+      userId: 'Andrés Gómez',
+      worksiteId: 'ws_001',
+      checkIn: _today.subtract(const Duration(days: 5, hours: 8)),
+      checkOut: _today.subtract(const Duration(days: 5, hours: 1)),
+      checkInLat: 40.4262,
+      checkInLng: -3.6857,
+      laborCostCalculated: 7 * 22.0,
     ),
   ];
 }
