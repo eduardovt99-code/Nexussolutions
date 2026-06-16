@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 import '../models/models.dart';
 import '../data/database_service.dart';
+import '../data/crew_capacity.dart';
 import 'worksite_detail_screen.dart';
 import 'login_screen.dart';
 
@@ -792,11 +793,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // ── CREAR OBRA ──
 
-  void _showCreateWorksiteModal() {
+  void _showCreateWorksiteModal() async {
     HapticFeedback.mediumImpact();
+    final workers = await DatabaseService().getWorkers();
+    final logs = await DatabaseService().getAllTimeLogs();
+    if (!mounted) return;
+
+    final (weekStart, weekEnd) = CrewCapacity.currentWeekBounds();
     final nameController = TextEditingController();
     final clientController = TextEditingController();
     final addressController = TextEditingController();
+    var selectedProfession = WorkerProfession.albanileria;
 
     showModalBottomSheet(
       context: context,
@@ -806,67 +813,207 @@ class _DashboardScreenState extends State<DashboardScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
       ),
       builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 24.0,
-            right: 24.0,
-            top: 24.0,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text('NUEVA OBRA', style: TextStyle(color: AppTheme.textPrimary, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
-              const SizedBox(height: 24),
-              TextField(
-                controller: nameController,
-                style: const TextStyle(color: AppTheme.textPrimary),
-                decoration: const InputDecoration(labelText: 'NOMBRE DE LA OBRA', prefixIcon: Icon(Icons.construction, color: AppTheme.textSecondary)),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: clientController,
-                style: const TextStyle(color: AppTheme.textPrimary),
-                decoration: const InputDecoration(labelText: 'CLIENTE', prefixIcon: Icon(Icons.person, color: AppTheme.textSecondary)),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: addressController,
-                style: const TextStyle(color: AppTheme.textPrimary),
-                decoration: const InputDecoration(labelText: 'DIRECCIÓN', prefixIcon: Icon(Icons.location_on_outlined, color: AppTheme.textSecondary)),
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: () async {
-                  if (nameController.text.isEmpty || clientController.text.isEmpty) return;
-                  HapticFeedback.mediumImpact();
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final capacity = CrewCapacity.forProfession(
+              selectedProfession,
+              workers: workers,
+              logs: logs,
+              periodStart: weekStart,
+              periodEnd: weekEnd,
+              workerCapacityInPeriod: (w) => w.weeklyCapacityHours,
+            );
+            final isFull = capacity?.isFull ?? false;
 
-                  final newWorksite = Worksite(
-                    id: 'ws_${DateTime.now().millisecondsSinceEpoch}',
-                    name: nameController.text,
-                    clientName: clientController.text,
-                    address: addressController.text,
-                    locationLat: 40.4168,
-                    locationLng: -3.7038,
-                    status: 'quoting',
-                    createdAt: DateTime.now(),
-                  );
-
-                  await DatabaseService().addWorksite(newWorksite);
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    _loadData();
-                  }
-                },
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 18)),
-                child: const Text('CREAR OBRA', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, letterSpacing: 1)),
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                left: 24.0,
+                right: 24.0,
+                top: 24.0,
               ),
-              const SizedBox(height: 24),
-            ],
-          ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text(
+                    'NUEVA OBRA',
+                    style: TextStyle(color: AppTheme.textPrimary, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1.5),
+                  ),
+                  const SizedBox(height: 24),
+                  TextField(
+                    controller: nameController,
+                    style: const TextStyle(color: AppTheme.textPrimary),
+                    decoration: const InputDecoration(
+                      labelText: 'NOMBRE DE LA OBRA',
+                      prefixIcon: Icon(Icons.construction, color: AppTheme.textSecondary),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: clientController,
+                    style: const TextStyle(color: AppTheme.textPrimary),
+                    decoration: const InputDecoration(
+                      labelText: 'CLIENTE',
+                      prefixIcon: Icon(Icons.person, color: AppTheme.textSecondary),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: addressController,
+                    style: const TextStyle(color: AppTheme.textPrimary),
+                    decoration: const InputDecoration(
+                      labelText: 'DIRECCIÓN',
+                      prefixIcon: Icon(Icons.location_on_outlined, color: AppTheme.textSecondary),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: selectedProfession,
+                    decoration: const InputDecoration(
+                      labelText: 'OFICIO PRINCIPAL',
+                      prefixIcon: Icon(Icons.groups_outlined, color: AppTheme.textSecondary),
+                    ),
+                    items: WorkerProfession.labels.entries
+                        .map(
+                          (e) => DropdownMenuItem(
+                            value: e.key,
+                            child: Text(e.value),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setModalState(() => selectedProfession = value);
+                    },
+                  ),
+                  if (capacity != null) ...[
+                    const SizedBox(height: 14),
+                    _buildCapacityStatusBox(capacity),
+                  ],
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (nameController.text.isEmpty || clientController.text.isEmpty) return;
+
+                      if (isFull && capacity != null) {
+                        _showNoCapacityDialog(context, capacity);
+                        return;
+                      }
+
+                      HapticFeedback.mediumImpact();
+
+                      final newWorksite = Worksite(
+                        id: 'ws_${DateTime.now().millisecondsSinceEpoch}',
+                        name: nameController.text,
+                        clientName: clientController.text,
+                        address: addressController.text,
+                        locationLat: 40.4168,
+                        locationLng: -3.7038,
+                        status: 'quoting',
+                        createdAt: DateTime.now(),
+                        plannedStart: DateTime.now().add(const Duration(days: 7)),
+                        plannedEnd: DateTime.now().add(const Duration(days: 21)),
+                      );
+
+                      await DatabaseService().addWorksite(newWorksite);
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        _loadData();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      backgroundColor: isFull ? AppTheme.textSecondary : AppTheme.brandBlack,
+                    ),
+                    child: Text(
+                      isFull ? 'SIN CUADRILLA DISPONIBLE' : 'CREAR OBRA',
+                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15, letterSpacing: 1),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            );
+          },
         );
       },
+    );
+  }
+
+  Widget _buildCapacityStatusBox(ProfessionCapacity capacity) {
+    final isFull = capacity.isFull;
+    final color = isFull ? AppTheme.errorRed : AppTheme.successGreen;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(isFull ? Icons.warning_amber_rounded : Icons.check_circle_outline, color: color, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isFull
+                      ? '${capacity.label} sin capacidad esta semana'
+                      : '${capacity.availableWorkerCount} trabajador${capacity.availableWorkerCount == 1 ? '' : 'es'} de ${capacity.label} disponibles',
+                  style: const TextStyle(color: AppTheme.textPrimary, fontSize: 12, fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  isFull
+                      ? 'Quedan ${capacity.freeHours.toStringAsFixed(0)}h libres. No puedes abrir esta obra con este oficio hasta liberar cuadrilla o contratar.'
+                      : '${capacity.freeHours.toStringAsFixed(0)}h libres en ${capacity.label} (${(capacity.utilizationRatio * 100).toStringAsFixed(0)}% usado).',
+                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11, height: 1.35),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showNoCapacityDialog(BuildContext context, ProfessionCapacity capacity) {
+    HapticFeedback.heavyImpact();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.surfaceLight,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Icon(Icons.engineering, color: AppTheme.errorRed),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '${capacity.label} al límite',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'No hay trabajadores de ${capacity.label.toLowerCase()} con horas libres esta semana '
+          '(${capacity.availableWorkerCount}/${capacity.workerCount} disponibles).\n\n'
+          'Ve a PLAN para revisar la cuadrilla, replanifica obras o contrata personal antes de crear esta obra.',
+          style: const TextStyle(color: AppTheme.textSecondary, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('ENTENDIDO', style: TextStyle(fontWeight: FontWeight.w800)),
+          ),
+        ],
+      ),
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../data/database_service.dart';
+import '../data/crew_capacity.dart';
 import '../models/models.dart';
 import '../theme/app_theme.dart';
 
@@ -232,6 +233,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                 children: [
                   _buildViewSwitcher(),
                   _buildPeriodNavigator(),
+                  _buildCapacityAlerts(periodStart, periodEnd),
                   _buildLegend(),
                   _buildGanttCard(periodStart, periodEnd),
                   _buildCrewSection(periodStart, periodEnd),
@@ -313,6 +315,67 @@ class _PlanningScreenState extends State<PlanningScreen> {
             onPressed: () => _shiftPeriod(1),
             icon: const Icon(Icons.chevron_right, color: AppTheme.brandBlack),
           ),
+        ],
+      ),
+    );
+  }
+
+  List<ProfessionCapacity> _professionCapacities(DateTime start, DateTime end) {
+    return CrewCapacity.byProfession(
+      workers: _workers,
+      logs: _logs,
+      periodStart: start,
+      periodEnd: end,
+      workerCapacityInPeriod: (w) => _periodCapacity(w, _view, _anchor),
+    );
+  }
+
+  Widget _buildCapacityAlerts(DateTime periodStart, DateTime periodEnd) {
+    final saturated = _professionCapacities(periodStart, periodEnd).where((p) => p.isFull).toList();
+    if (saturated.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ...saturated.map((cap) => Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppTheme.errorRed.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.errorRed.withValues(alpha: 0.45)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.warning_amber_rounded, color: AppTheme.errorRed, size: 22),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${cap.label} sin capacidad',
+                            style: const TextStyle(
+                              color: AppTheme.textPrimary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '0 trabajadores libres (${cap.freeHours.toStringAsFixed(0)}h restantes de ${cap.capacityHours.toStringAsFixed(0)}h). '
+                            'Contrata personal o replanifica obras antes de asignar más trabajo de ${cap.label.toLowerCase()}.',
+                            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12, height: 1.35),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )),
         ],
       ),
     );
@@ -789,7 +852,16 @@ class _PlanningScreenState extends State<PlanningScreen> {
             ],
           ),
           const SizedBox(height: 10),
-          ...professionEntries.map((entry) => _buildProfessionCard(entry.key, entry.value, periodStart, periodEnd)),
+          ...professionEntries.map((entry) {
+            ProfessionCapacity? cap;
+            for (final p in _professionCapacities(periodStart, periodEnd)) {
+              if (p.profession == entry.key) {
+                cap = p;
+                break;
+              }
+            }
+            return _buildProfessionCard(entry.key, entry.value, periodStart, periodEnd, cap);
+          }),
           const SizedBox(height: 8),
           const Text(
             'TRABAJADORES',
@@ -802,15 +874,28 @@ class _PlanningScreenState extends State<PlanningScreen> {
     );
   }
 
-  Widget _buildProfessionCard(String profession, List<Worker> members, DateTime start, DateTime end) {
+  Widget _buildProfessionCard(
+    String profession,
+    List<Worker> members,
+    DateTime start,
+    DateTime end,
+    ProfessionCapacity? capacity,
+  ) {
     double used = 0;
-    double capacity = 0;
+    double capTotal = 0;
     for (final w in members) {
       used += _workerHoursInPeriod(w, start, end);
-      capacity += _periodCapacity(w, _view, _anchor);
+      capTotal += _periodCapacity(w, _view, _anchor);
     }
-    final free = (capacity - used).clamp(0.0, capacity);
-    final ratio = capacity <= 0 ? 0.0 : used / capacity;
+    final free = (capTotal - used).clamp(0.0, capTotal);
+    final ratio = capTotal <= 0 ? 0.0 : used / capTotal;
+    final isFull = capacity?.isFull ?? (free < 1 || ratio >= CrewCapacity.fullRatio);
+    final available = capacity?.availableWorkerCount ??
+        members.where((w) {
+          final wUsed = _workerHoursInPeriod(w, start, end);
+          final wCap = _periodCapacity(w, _view, _anchor);
+          return (wCap - wUsed) >= CrewCapacity.minShiftHours;
+        }).length;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -818,11 +903,32 @@ class _PlanningScreenState extends State<PlanningScreen> {
       decoration: BoxDecoration(
         color: AppTheme.surfaceLight,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: _cardBorder),
+        border: Border.all(color: isFull ? AppTheme.errorRed.withValues(alpha: 0.55) : _cardBorder, width: isFull ? 1.5 : 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (isFull)
+            Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppTheme.errorRed.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.block, size: 14, color: AppTheme.errorRed),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'SIN TRABAJADORES LIBRES · $available/${members.length} disponibles',
+                      style: TextStyle(color: AppTheme.errorRed, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Row(
             children: [
               Container(
