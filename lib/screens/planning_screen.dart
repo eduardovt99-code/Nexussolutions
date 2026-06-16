@@ -744,6 +744,30 @@ class _PlanningScreenState extends State<PlanningScreen> {
       byProfession.putIfAbsent(w.profession, () => []).add(w);
     }
 
+    final sortedWorkers = List<Worker>.from(_workers)
+      ..sort((a, b) {
+        final capA = _periodCapacity(a, _view, _anchor);
+        final capB = _periodCapacity(b, _view, _anchor);
+        final ratioA = capA <= 0 ? 0 : _workerHoursInPeriod(a, periodStart, periodEnd) / capA;
+        final ratioB = capB <= 0 ? 0 : _workerHoursInPeriod(b, periodStart, periodEnd) / capB;
+        return ratioB.compareTo(ratioA);
+      });
+
+    final professionEntries = byProfession.entries.toList()
+      ..sort((a, b) {
+        double ratioFor(List<Worker> members) {
+          var used = 0.0;
+          var capacity = 0.0;
+          for (final w in members) {
+            used += _workerHoursInPeriod(w, periodStart, periodEnd);
+            capacity += _periodCapacity(w, _view, _anchor);
+          }
+          return capacity <= 0 ? 0 : used / capacity;
+        }
+
+        return ratioFor(b.value).compareTo(ratioFor(a.value));
+      });
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       child: Column(
@@ -752,9 +776,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'CUADRILLA',
-                style: TextStyle(color: AppTheme.textSecondary, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 2),
+              Text(
+                'CUADRILLA · ${_workers.length} TRABAJADORES',
+                style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 2),
               ),
               Text(
                 _view == PlanningView.day
@@ -765,14 +789,14 @@ class _PlanningScreenState extends State<PlanningScreen> {
             ],
           ),
           const SizedBox(height: 10),
-          ...byProfession.entries.map((entry) => _buildProfessionCard(entry.key, entry.value, periodStart, periodEnd)),
+          ...professionEntries.map((entry) => _buildProfessionCard(entry.key, entry.value, periodStart, periodEnd)),
           const SizedBox(height: 8),
           const Text(
             'TRABAJADORES',
             style: TextStyle(color: AppTheme.textSecondary, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 2),
           ),
           const SizedBox(height: 8),
-          ..._workers.map((w) => _buildWorkerRow(w, periodStart, periodEnd)),
+          ...sortedWorkers.map((w) => _buildWorkerRow(w, periodStart, periodEnd)),
         ],
       ),
     );

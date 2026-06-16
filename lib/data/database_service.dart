@@ -11,7 +11,7 @@ class DatabaseService {
   SharedPreferences? _prefs;
 
   /// Versión de los datos de demo: al subirla se reemplazan los datos antiguos.
-  static const int _seedVersion = 3;
+  static const int _seedVersion = 4;
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
