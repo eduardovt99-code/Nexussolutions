@@ -39,20 +39,20 @@
   <script>
     // Fuerza datos frescos cuando publicamos una nueva demo (debe coincidir con DemoVersion.build).
     (function () {
-      var BUILD = '12';
+      var BUILD = '13';
       var KEY = 'nexus_demo_build';
       try {
         var stored = localStorage.getItem(KEY);
-        if (stored !== BUILD) {
-          localStorage.clear();
-          sessionStorage.clear();
-          localStorage.setItem(KEY, BUILD);
-          var url = new URL(window.location.href);
-          if (url.searchParams.get('b') !== BUILD) {
-            url.searchParams.set('b', BUILD);
-            window.location.replace(url.toString());
-            return;
+        var url = new URL(window.location.href);
+        if (url.searchParams.get('b') !== BUILD) {
+          if (stored !== BUILD) {
+            localStorage.clear();
+            sessionStorage.clear();
           }
+          localStorage.setItem(KEY, BUILD);
+          url.searchParams.set('b', BUILD);
+          window.location.replace(url.toString());
+          return;
         }
       } catch (e) {}
     })();
@@ -62,6 +62,6 @@
       });
     }
   </script>
-  <script src="flutter_bootstrap.js?v=12" async></script>
+  <script src="flutter_bootstrap.js?v=13" async></script>
 </body>
 </html>

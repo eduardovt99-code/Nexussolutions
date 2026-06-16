@@ -33,6 +33,13 @@ jobs:
       - name: Build web
         run: flutter build web --release --base-href "/Nexussolutions/" --pwa-strategy=none
 
+      - name: Cache bust JS bundle
+        run: |
+          BUILD=$(grep "static const String build" lib/demo_version.dart | sed "s/.*'\([^']*\)'.*/\1/")
+          sed -i "s|\"mainJsPath\":\"main.dart.js\"|\"mainJsPath\":\"main.dart.js?v=${BUILD}\"|g" build/web/flutter_bootstrap.js
+          sed -i "s|flutter_bootstrap.js?v=[0-9]*|flutter_bootstrap.js?v=${BUILD}|g" build/web/index.html
+          sed -i "s|var BUILD = '[0-9]*'|var BUILD = '${BUILD}'|g" build/web/index.html
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
