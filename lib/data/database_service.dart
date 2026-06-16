@@ -11,12 +11,17 @@ class DatabaseService {
   SharedPreferences? _prefs;
 
   /// Versión de los datos de demo: al subirla se reemplazan los datos antiguos.
-  static const int _seedVersion = 4;
+  static const int _seedVersion = 5;
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
 
-    if (_prefs!.getInt('seed_version') != _seedVersion) {
+    final storedVersion = _prefs!.getInt('seed_version');
+    final workersJson = _prefs!.getString('workers');
+    final hasFullCrew = workersJson != null &&
+        (jsonDecode(workersJson) as List).length >= MockData.workers.length;
+
+    if (storedVersion != _seedVersion || !hasFullCrew) {
       await saveWorksites(MockData.worksites);
       await saveBudgets(MockData.budgets);
       await saveTimeLogs(MockData.timeLogs);
