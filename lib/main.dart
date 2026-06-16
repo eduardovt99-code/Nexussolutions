@@ -11,6 +11,7 @@ import 'screens/dashboard_screen.dart';
 import 'screens/worksite_detail_screen.dart';
 import 'screens/pro_calculator_screen.dart';
 import 'screens/planning_screen.dart';
+import 'demo_version.dart';
 
 const Color _cardBorder = Color(0xFFE6EAF2);
 
@@ -83,7 +84,26 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _buildActiveTab(),
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            color: AppTheme.brandYellowMuted,
+            child: Text(
+              DemoVersion.label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppTheme.brandYellowDark,
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ),
+          Expanded(child: _buildActiveTab()),
+        ],
+      ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: AppTheme.surfaceLight,

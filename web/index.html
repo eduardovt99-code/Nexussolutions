@@ -37,7 +37,16 @@
 </head>
 <body>
   <script>
-    // Limpia service workers antiguos que bloqueaban actualizaciones en GitHub Pages.
+    // Fuerza datos frescos cuando publicamos una nueva demo (debe coincidir con DemoVersion.build).
+    (function () {
+      var BUILD = '8';
+      try {
+        if (localStorage.getItem('nexus_demo_build') !== BUILD) {
+          localStorage.clear();
+          localStorage.setItem('nexus_demo_build', BUILD);
+        }
+      } catch (e) {}
+    })();
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(function (regs) {
         for (var i = 0; i < regs.length; i++) regs[i].unregister();

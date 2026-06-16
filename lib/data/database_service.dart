@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
 import '../data/mock_data.dart';
+import '../demo_version.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -11,10 +12,16 @@ class DatabaseService {
   SharedPreferences? _prefs;
 
   /// Versión de los datos de demo: al subirla se reemplazan los datos antiguos.
-  static const int _seedVersion = 7;
+  static const int _seedVersion = 8;
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
+
+    final storedBuild = _prefs!.getString('app_build_id');
+    if (storedBuild != DemoVersion.build) {
+      await _prefs!.clear();
+      await _prefs!.setString('app_build_id', DemoVersion.build);
+    }
 
     final storedVersion = _prefs!.getInt('seed_version');
     final workersJson = _prefs!.getString('workers');
