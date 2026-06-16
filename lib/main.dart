@@ -232,7 +232,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator(color: AppTheme.deepCyan))
             : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const SizedBox(height: 12),
                   // Filtros por estado
                   SizedBox(
                     height: 44,
@@ -270,7 +272,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   Expanded(
                     child: filtered.isEmpty
                         ? Center(
