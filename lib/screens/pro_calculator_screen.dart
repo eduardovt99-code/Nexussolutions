@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../theme/app_theme.dart';
 import '../models/models.dart';
+import '../data/crew_capacity.dart';
 import '../data/database_service.dart';
 
 /// Coste hora estándar de la cuadrilla (EUR/hora). Editable en pantalla.
@@ -96,6 +97,17 @@ extension TradePresetMeta on TradePreset {
         return 0.35;
       case TradePreset.demolition:
         return 0.7;
+    }
+  }
+
+  /// Profesión de cuadrilla asociada al preset (para avisos de capacidad).
+  String get requiredProfession {
+    switch (this) {
+      case TradePreset.wallPainting:
+      case TradePreset.ceilingPainting:
+        return WorkerProfession.pintura;
+      default:
+        return WorkerProfession.albanileria;
     }
   }
 }
@@ -298,6 +310,8 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
 
   // Destino del presupuesto: se pide desde el inicio.
   List<Worksite> _worksites = [];
+  List<Worker> _workers = [];
+  List<TimeLog> _logs = [];
   String? _selectedWorksiteId;
   bool _loadingWorksites = true;
 
@@ -328,7 +342,7 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
     _widthController = TextEditingController(text: _width.toStringAsFixed(2));
     _heightController = TextEditingController(text: _height.toStringAsFixed(2));
     _regenerateLines();
-    _loadWorksites();
+    _loadData();
   }
 
   @override
@@ -344,14 +358,37 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
     super.dispose();
   }
 
-  Future<void> _loadWorksites() async {
-    final worksites = await DatabaseService().getWorksites();
+  Future<void> _loadData() async {
+    final db = DatabaseService();
+    final worksites = await db.getWorksites();
+    final workers = await db.getWorkers();
+    final logs = await db.getAllTimeLogs();
     if (!mounted) return;
     setState(() {
       _worksites = worksites;
+      _workers = workers;
+      _logs = logs;
       _loadingWorksites = false;
     });
   }
+
+  ProfessionCapacity? _capacityForProfession(String profession) {
+    if (_workers.isEmpty) return null;
+    final (start, end) = CrewCapacity.currentWeekBounds();
+    return CrewCapacity.forProfession(
+      profession,
+      workers: _workers,
+      logs: _logs,
+      periodStart: start,
+      periodEnd: end,
+      workerCapacityInPeriod: (w) => w.weeklyCapacityHours,
+    );
+  }
+
+  ProfessionCapacity? get _presetCapacity =>
+      _capacityForProfession(_preset.requiredProfession);
+
+  bool get _presetCrewBlocked => _presetCapacity?.isFull ?? false;
 
   Worksite? get _selectedWorksite {
     for (final w in _worksites) {
@@ -462,6 +499,7 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
         }
 
         final pricedLines = _lines.where((l) => l.unitPrice > 0 && l.quantity > 0).length;
+        final crewBlocked = _presetCrewBlocked;
 
         return SafeArea(
           child: Padding(
@@ -509,6 +547,10 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
                     ],
                   ),
                 ),
+                if (crewBlocked) ...[
+                  const SizedBox(height: 12),
+                  _buildCapacityAlertBox(_presetCapacity!, compact: true),
+                ],
                 const SizedBox(height: 20),
                 DecoratedBox(
                   decoration: BoxDecoration(
@@ -589,7 +631,8 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool canExport = _selectedWorksiteId != null && _grandTotal > 0;
+    final bool canExport =
+        _selectedWorksiteId != null && _grandTotal > 0 && !_presetCrewBlocked;
 
     return Scaffold(
       appBar: AppBar(
@@ -706,6 +749,15 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
                   'Selecciona primero la obra de destino para poder exportar.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: AppTheme.warningAmber, fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              )
+            else if (_presetCrewBlocked)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text(
+                  'Sin cuadrilla de ${WorkerProfession.label(_preset.requiredProfession)} disponible esta semana.',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: AppTheme.errorRed, fontSize: 12, fontWeight: FontWeight.w700),
                 ),
               ),
           ],
@@ -1203,6 +1255,54 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
           Text(
             'Equivale a ${(_laborHours / 8).toStringAsFixed(1)} jornadas de 8 h.',
             style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11, fontStyle: FontStyle.italic),
+          ),
+          if (_presetCapacity?.isFull ?? false) ...[
+            const SizedBox(height: 12),
+            _buildCapacityAlertBox(_presetCapacity!, compact: true),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCapacityAlertBox(ProfessionCapacity capacity, {bool compact = false}) {
+    return Container(
+      padding: EdgeInsets.all(compact ? 12 : 14),
+      decoration: BoxDecoration(
+        color: AppTheme.errorRed.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(compact ? 12 : 16),
+        border: Border.all(color: AppTheme.errorRed.withValues(alpha: 0.45)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.warning_amber_rounded, color: AppTheme.errorRed, size: compact ? 20 : 22),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${capacity.label} sin capacidad esta semana',
+                  style: TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: compact ? 12 : 13,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${capacity.availableWorkerCount} trabajadores libres '
+                  '(${capacity.freeHours.toStringAsFixed(0)} h restantes de ${capacity.capacityHours.toStringAsFixed(0)} h). '
+                  'Revisa la pestaña PLAN o contrata personal antes de comprometer más trabajo de ${capacity.label.toLowerCase()}.',
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: compact ? 11 : 12,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
