@@ -7,7 +7,6 @@ import 'theme/app_theme.dart';
 import 'models/models.dart';
 import 'data/database_service.dart';
 import 'screens/login_screen.dart';
-import 'screens/dashboard_screen.dart';
 import 'screens/worksite_detail_screen.dart';
 import 'screens/pro_calculator_screen.dart';
 import 'screens/planning_screen.dart';
@@ -54,11 +53,6 @@ class _MainShellState extends State<MainShell> {
 
   void _onTabSelected(int index) {
     if (index == _currentIndex) return;
-    HapticFeedback.lightImpact();
-    setState(() => _currentIndex = index);
-  }
-
-  void _goToTab(int index) {
     HapticFeedback.lightImpact();
     setState(() => _currentIndex = index);
   }
