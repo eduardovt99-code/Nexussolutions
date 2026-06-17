@@ -96,9 +96,9 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
                   flex: 2,
                   child: Column(
                     children: [
-                      Expanded(child: _ModulesPanel(worksites: _worksites)),
+                      Expanded(flex: 3, child: _ModulesPanel(worksites: _worksites)),
                       const SizedBox(height: 16),
-                      const Expanded(child: _TeamStatusPanel()),
+                      const Expanded(flex: 5, child: _TeamStatusPanel()),
                     ],
                   ),
                 ),
@@ -155,12 +155,12 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
             
             // SIDE MODULES (Vertical)
             SizedBox(
-              height: 250,
+              height: 180,
               child: _ModulesPanel(worksites: _worksites),
             ),
             const SizedBox(height: 16),
             const SizedBox(
-              height: 350,
+              height: 420,
               child: _TeamStatusPanel(),
             ),
             const SizedBox(height: 16),
@@ -508,8 +508,12 @@ class _TeamStatusPanel extends StatelessWidget {
               children: [
                 _buildProfessionBar('Fontanería', 0.95, AppTheme.errorRed),
                 _buildProfessionBar('Pintura', 0.85, AppTheme.warningAmber),
+                _buildProfessionBar('Pladur', 0.75, AppTheme.warningAmber),
                 _buildProfessionBar('Electricidad', 0.60, AppTheme.brandYellow),
+                _buildProfessionBar('Carpintería', 0.55, AppTheme.brandYellow),
                 _buildProfessionBar('Albañilería', 0.40, AppTheme.successGreen),
+                _buildProfessionBar('Climatización', 0.35, AppTheme.successGreen),
+                _buildProfessionBar('Limpieza Fin de Obra', 0.20, AppTheme.successGreen),
               ],
             ),
           ),
