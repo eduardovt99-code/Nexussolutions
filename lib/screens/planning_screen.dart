@@ -854,417 +854,566 @@ class _PlanningScreenState extends State<PlanningScreen> {
   }
 
   Widget _buildWeekGantt(DateTime weekStart) {
-    const double cellWidth = 38;
     final days = List.generate(7, (i) => weekStart.add(Duration(days: i)));
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 28),
-              ...() {
-                if (_selectedWorksiteId == null) {
-                  return _worksites
-                      .map(
-                        (site) => SizedBox(
-                          height: 52,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: _buildRowLabel(
-                              site.name,
-                              AppTheme.worksiteStatusLabel(site.status),
-                              subtitleColor: site.status == 'active'
-                                  ? AppTheme.brandYellowDark
-                                  : AppTheme.textSecondary,
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList();
-                } else {
-                  final site = _worksites.firstWhere(
-                    (w) => w.id == _selectedWorksiteId,
-                    orElse: () => _worksites.first,
-                  );
-                  final siteLogs = _logs
-                      .where((l) => l.worksiteId == site.id)
-                      .toList();
-                  final workerNames = siteLogs
-                      .map((l) => l.userId)
-                      .toSet()
-                      .toList();
-                  final activeWorkerNames = workerNames.isEmpty
-                      ? _workers.take(2).map((w) => w.name).toList()
-                      : workerNames;
-                  return activeWorkerNames.map((wName) {
-                    final worker = _workers.firstWhere(
-                      (w) => w.name == wName,
-                      orElse: () =>
-                          Worker(id: '', name: wName, profession: 'general'),
-                    );
-                    return SizedBox(
-                      height: 52,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: _buildRowLabel(
-                          wName,
-                          WorkerProfession.label(worker.profession),
-                          subtitleColor: AppTheme.brandYellowDark,
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 108),
+          child: Row(
+            children: days.map((day) {
+              final isToday = _isSameDay(day, DateTime.now());
+              return Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  decoration: isToday
+                      ? BoxDecoration(
+                          color: AppTheme.brandYellow,
+                          borderRadius: BorderRadius.circular(4),
+                        )
+                      : null,
+                  child: Column(
+                    children: [
+                      Text(
+                        DateFormat(
+                          'E',
+                          'es_ES',
+                        ).format(day).substring(0, 1).toUpperCase(),
+                        style: TextStyle(
+                          color: isToday
+                              ? AppTheme.brandBlack
+                              : AppTheme.textSecondary,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                    );
-                  }).toList();
-                }
-              }(),
-            ],
-          ),
-          ...days.map((day) {
-            final isToday = _isSameDay(day, DateTime.now());
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: SizedBox(
-                    width: cellWidth,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      decoration: isToday
-                          ? BoxDecoration(
-                              color: AppTheme.brandYellow,
-                              borderRadius: BorderRadius.circular(8),
-                            )
-                          : null,
-                      child: Column(
-                        children: [
-                          Text(
-                            DateFormat(
-                              'E',
-                              'es_ES',
-                            ).format(day).substring(0, 1).toUpperCase(),
-                            style: TextStyle(
-                              color: isToday
-                                  ? AppTheme.brandBlack
-                                  : AppTheme.textSecondary,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            DateFormat('d').format(day),
-                            style: TextStyle(
-                              color: isToday
-                                  ? AppTheme.brandBlack
-                                  : AppTheme.textSecondary,
-                              fontSize: 9,
-                              fontWeight: isToday
-                                  ? FontWeight.w900
-                                  : FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                      const SizedBox(height: 2),
+                      Text(
+                        DateFormat('d').format(day),
+                        style: TextStyle(
+                          color: isToday
+                              ? AppTheme.brandBlack
+                              : AppTheme.textSecondary,
+                          fontSize: 9,
+                          fontWeight: isToday
+                              ? FontWeight.w900
+                              : FontWeight.w600,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
-                ...() {
-                  if (_selectedWorksiteId == null) {
-                    return _worksites.map((site) {
-                      final planned = _worksitePlannedOnDay(site, day);
-                      return Container(
-                        width: cellWidth,
-                        height: 52,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 2,
-                          vertical: 8,
-                        ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: planned
-                                ? _worksiteBarColor(
-                                    site.status,
-                                    plannedOnly: false,
-                                  )
-                                : AppTheme.backgroundDark,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: _cardBorder),
-                          ),
-                        ),
-                      );
-                    }).toList();
-                  } else {
-                    final site = _worksites.firstWhere(
-                      (w) => w.id == _selectedWorksiteId,
-                      orElse: () => _worksites.first,
-                    );
-                    final siteLogs = _logs
-                        .where((l) => l.worksiteId == site.id)
-                        .toList();
-                    final workerNames = siteLogs
-                        .map((l) => l.userId)
-                        .toSet()
-                        .toList();
-                    final activeWorkerNames = workerNames.isEmpty
-                        ? _workers.take(2).map((w) => w.name).toList()
-                        : workerNames;
-                    return activeWorkerNames.map((wName) {
-                      final worker = _workers.firstWhere(
-                        (w) => w.name == wName,
-                        orElse: () =>
-                            Worker(id: '', name: wName, profession: 'general'),
-                      );
-                      final dayLogs = siteLogs
-                          .where(
-                            (l) =>
-                                l.userId == wName &&
-                                l.checkIn.year == day.year &&
-                                l.checkIn.month == day.month &&
-                                l.checkIn.day == day.day,
-                          )
-                          .toList();
-                      return Container(
-                        width: cellWidth,
-                        height: 52,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 2,
-                          vertical: 8,
-                        ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: dayLogs.isNotEmpty
-                                ? AppTheme.brandYellow
-                                : AppTheme.backgroundDark,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: _cardBorder),
-                          ),
-                        ),
-                      );
-                    }).toList();
-                  }
-                }(),
-              ],
+              );
+            }).toList(),
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...() {
+          if (_selectedWorksiteId == null) {
+            return _worksites.map((site) {
+              final List<List<int>> segments = [];
+              int? startIdx;
+              for (int i = 0; i < 7; i++) {
+                final planned = _worksitePlannedOnDay(site, days[i]);
+                if (planned && startIdx == null)
+                  startIdx = i;
+                else if (!planned && startIdx != null) {
+                  segments.add([startIdx, i - 1]);
+                  startIdx = null;
+                }
+              }
+              if (startIdx != null) segments.add([startIdx, 6]);
+              final hasActivity = segments.isNotEmpty;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildRowLabel(
+                      site.name,
+                      AppTheme.worksiteStatusLabel(site.status),
+                      subtitleColor: site.status == 'active'
+                          ? AppTheme.brandYellowDark
+                          : AppTheme.textSecondary,
+                    ),
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final w = constraints.maxWidth;
+                          return Stack(
+                            children: [
+                              Container(
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.backgroundDark,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: _cardBorder),
+                                ),
+                              ),
+                              ...segments.map((seg) {
+                                final leftFrac = seg[0] / 7.0;
+                                final widthFrac = (seg[1] - seg[0] + 1) / 7.0;
+                                return Positioned(
+                                  left: w * leftFrac,
+                                  width: w * widthFrac,
+                                  top: 3,
+                                  bottom: 3,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: _worksiteBarColor(
+                                        site.status,
+                                        plannedOnly: false,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: AppTheme.backgroundDark,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                              if (!hasActivity)
+                                Positioned.fill(
+                                  child: Center(
+                                    child: Text(
+                                      '-',
+                                      style: TextStyle(
+                                        color: AppTheme.textSecondary
+                                            .withValues(alpha: 0.35),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList();
+          } else {
+            final site = _worksites.firstWhere(
+              (w) => w.id == _selectedWorksiteId,
+              orElse: () => _worksites.first,
             );
-          }),
-        ],
-      ),
+            final siteLogs = _logs
+                .where((l) => l.worksiteId == site.id)
+                .toList();
+            final workerNames = siteLogs.map((l) => l.userId).toSet().toList();
+            final activeWorkerNames = workerNames.isEmpty
+                ? _workers.take(2).map((w) => w.name).toList()
+                : workerNames;
+
+            return activeWorkerNames.map((wName) {
+              final worker = _workers.firstWhere(
+                (w) => w.name == wName,
+                orElse: () =>
+                    Worker(id: '', name: wName, profession: 'general'),
+              );
+
+              final List<List<int>> segments = [];
+              int? startIdx;
+              for (int i = 0; i < 7; i++) {
+                final day = days[i];
+                final dayLogs = siteLogs
+                    .where(
+                      (l) =>
+                          l.userId == wName &&
+                          l.checkIn.year == day.year &&
+                          l.checkIn.month == day.month &&
+                          l.checkIn.day == day.day,
+                    )
+                    .toList();
+                if (dayLogs.isNotEmpty && startIdx == null)
+                  startIdx = i;
+                else if (dayLogs.isEmpty && startIdx != null) {
+                  segments.add([startIdx, i - 1]);
+                  startIdx = null;
+                }
+              }
+              if (startIdx != null) segments.add([startIdx, 6]);
+              final hasActivity = segments.isNotEmpty;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildRowLabel(
+                      wName,
+                      WorkerProfession.label(worker.profession),
+                      subtitleColor: AppTheme.brandYellowDark,
+                    ),
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final w = constraints.maxWidth;
+                          return Stack(
+                            children: [
+                              Container(
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.backgroundDark,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: _cardBorder),
+                                ),
+                              ),
+                              ...segments.asMap().entries.map((entry) {
+                                final idx = entry.key;
+                                final seg = entry.value;
+                                final leftFrac = seg[0] / 7.0;
+                                final widthFrac = (seg[1] - seg[0] + 1) / 7.0;
+                                final blockColor = [
+                                  AppTheme.brandYellow,
+                                  AppTheme.brandYellowMuted,
+                                  AppTheme.brandYellowLight,
+                                ][idx % 3];
+
+                                return Positioned(
+                                  left: w * leftFrac,
+                                  width: w * widthFrac,
+                                  top: 3,
+                                  bottom: 3,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: blockColor,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: AppTheme.backgroundDark,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                    ),
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      WorkerProfession.label(worker.profession),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: AppTheme.brandBlack,
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                              if (!hasActivity)
+                                Positioned.fill(
+                                  child: Center(
+                                    child: Text(
+                                      '-',
+                                      style: TextStyle(
+                                        color: AppTheme.textSecondary
+                                            .withValues(alpha: 0.35),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList();
+          }
+        }(),
+      ],
     );
   }
 
   Widget _buildMonthGantt(DateTime monthStart) {
     final weeks = _weeksInMonth(monthStart);
-    const double cellWidth = 52;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 28),
-              ...() {
-                if (_selectedWorksiteId == null) {
-                  return _worksites
-                      .map(
-                        (site) => SizedBox(
-                          height: 52,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: _buildRowLabel(
-                              site.name,
-                              AppTheme.worksiteStatusLabel(site.status),
-                              subtitleColor: site.status == 'active'
-                                  ? AppTheme.brandYellowDark
-                                  : AppTheme.textSecondary,
-                            ),
-                          ),
-                        ),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 108),
+          child: Row(
+            children: weeks.map((week) {
+              return Expanded(
+                child: Column(
+                  children: [
+                    Text(
+                      'Sem ${weeks.indexOf(week) + 1}',
+                      style: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${week.day} - ${week.add(const Duration(days: 6)).day}',
+                      style: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 8,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...() {
+          if (_selectedWorksiteId == null) {
+            return _worksites.map((site) {
+              final List<List<int>> segments = [];
+              int? startIdx;
+              for (int i = 0; i < weeks.length; i++) {
+                final week = weeks[i];
+                bool activeWeek = false;
+                for (int d = 0; d < 7; d++) {
+                  if (_worksitePlannedOnDay(
+                    site,
+                    week.add(Duration(days: d)),
+                  )) {
+                    activeWeek = true;
+                    break;
+                  }
+                }
+
+                if (activeWeek && startIdx == null)
+                  startIdx = i;
+                else if (!activeWeek && startIdx != null) {
+                  segments.add([startIdx, i - 1]);
+                  startIdx = null;
+                }
+              }
+              if (startIdx != null) segments.add([startIdx, weeks.length - 1]);
+              final hasActivity = segments.isNotEmpty;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildRowLabel(
+                      site.name,
+                      AppTheme.worksiteStatusLabel(site.status),
+                      subtitleColor: site.status == 'active'
+                          ? AppTheme.brandYellowDark
+                          : AppTheme.textSecondary,
+                    ),
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final w = constraints.maxWidth;
+                          return Stack(
+                            children: [
+                              Container(
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.backgroundDark,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: _cardBorder),
+                                ),
+                              ),
+                              ...segments.map((seg) {
+                                final leftFrac = seg[0] / weeks.length;
+                                final widthFrac =
+                                    (seg[1] - seg[0] + 1) / weeks.length;
+                                return Positioned(
+                                  left: w * leftFrac,
+                                  width: w * widthFrac,
+                                  top: 3,
+                                  bottom: 3,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: _worksiteBarColor(
+                                        site.status,
+                                        plannedOnly: false,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: AppTheme.backgroundDark,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                              if (!hasActivity)
+                                Positioned.fill(
+                                  child: Center(
+                                    child: Text(
+                                      '-',
+                                      style: TextStyle(
+                                        color: AppTheme.textSecondary
+                                            .withValues(alpha: 0.35),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList();
+          } else {
+            final site = _worksites.firstWhere(
+              (w) => w.id == _selectedWorksiteId,
+              orElse: () => _worksites.first,
+            );
+            final siteLogs = _logs
+                .where((l) => l.worksiteId == site.id)
+                .toList();
+            final workerNames = siteLogs.map((l) => l.userId).toSet().toList();
+            final activeWorkerNames = workerNames.isEmpty
+                ? _workers.take(2).map((w) => w.name).toList()
+                : workerNames;
+
+            return activeWorkerNames.map((wName) {
+              final worker = _workers.firstWhere(
+                (w) => w.name == wName,
+                orElse: () =>
+                    Worker(id: '', name: wName, profession: 'general'),
+              );
+
+              final List<List<int>> segments = [];
+              int? startIdx;
+              for (int i = 0; i < weeks.length; i++) {
+                final week = weeks[i];
+                bool activeWeek = false;
+                for (int d = 0; d < 7; d++) {
+                  final day = week.add(Duration(days: d));
+                  final dayLogs = siteLogs
+                      .where(
+                        (l) =>
+                            l.userId == wName &&
+                            l.checkIn.year == day.year &&
+                            l.checkIn.month == day.month &&
+                            l.checkIn.day == day.day,
                       )
                       .toList();
-                } else {
-                  final site = _worksites.firstWhere(
-                    (w) => w.id == _selectedWorksiteId,
-                    orElse: () => _worksites.first,
-                  );
-                  final siteLogs = _logs
-                      .where((l) => l.worksiteId == site.id)
-                      .toList();
-                  final workerNames = siteLogs
-                      .map((l) => l.userId)
-                      .toSet()
-                      .toList();
-                  final activeWorkerNames = workerNames.isEmpty
-                      ? _workers.take(2).map((w) => w.name).toList()
-                      : workerNames;
-                  return activeWorkerNames.map((wName) {
-                    final worker = _workers.firstWhere(
-                      (w) => w.name == wName,
-                      orElse: () =>
-                          Worker(id: '', name: wName, profession: 'general'),
-                    );
-                    return SizedBox(
-                      height: 52,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: _buildRowLabel(
-                          wName,
-                          WorkerProfession.label(worker.profession),
-                          subtitleColor: AppTheme.brandYellowDark,
-                        ),
-                      ),
-                    );
-                  }).toList();
-                }
-              }(),
-            ],
-          ),
-          ...weeks.map((week) {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: SizedBox(
-                    width: cellWidth,
-                    child: Column(
-                      children: [
-                        Text(
-                          'Sem ${weeks.indexOf(week) + 1}',
-                          style: const TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${week.day} - ${week.add(const Duration(days: 6)).day}',
-                          style: const TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: 8,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                ...() {
-                  if (_selectedWorksiteId == null) {
-                    return _worksites.map((site) {
-                      int plannedDays = 0;
-                      for (int i = 0; i < 7; i++) {
-                        final d = week.add(Duration(days: i));
-                        if (_worksitePlannedOnDay(site, d)) plannedDays++;
-                      }
-                      return Container(
-                        width: cellWidth,
-                        height: 52,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 2,
-                          vertical: 8,
-                        ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: plannedDays > 0
-                                ? _worksiteBarColor(
-                                    site.status,
-                                    plannedOnly: false,
-                                  )
-                                : AppTheme.backgroundDark,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: _cardBorder),
-                          ),
-                          alignment: Alignment.center,
-                          child: plannedDays > 0
-                              ? Text(
-                                  '${plannedDays}d',
-                                  style: const TextStyle(
-                                    color: AppTheme.brandBlack,
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                )
-                              : null,
-                        ),
-                      );
-                    }).toList();
-                  } else {
-                    final site = _worksites.firstWhere(
-                      (w) => w.id == _selectedWorksiteId,
-                      orElse: () => _worksites.first,
-                    );
-                    final siteLogs = _logs
-                        .where((l) => l.worksiteId == site.id)
-                        .toList();
-                    final workerNames = siteLogs
-                        .map((l) => l.userId)
-                        .toSet()
-                        .toList();
-                    final activeWorkerNames = workerNames.isEmpty
-                        ? _workers.take(2).map((w) => w.name).toList()
-                        : workerNames;
-                    return activeWorkerNames.map((wName) {
-                      final worker = _workers.firstWhere(
-                        (w) => w.name == wName,
-                        orElse: () =>
-                            Worker(id: '', name: wName, profession: 'general'),
-                      );
-                      int activeDays = 0;
-                      for (int i = 0; i < 7; i++) {
-                        final d = week.add(Duration(days: i));
-                        final dayLogs = siteLogs
-                            .where(
-                              (l) =>
-                                  l.userId == wName &&
-                                  l.checkIn.year == d.year &&
-                                  l.checkIn.month == d.month &&
-                                  l.checkIn.day == d.day,
-                            )
-                            .toList();
-                        if (dayLogs.isNotEmpty) activeDays++;
-                      }
-                      return Container(
-                        width: cellWidth,
-                        height: 52,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 2,
-                          vertical: 8,
-                        ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: activeDays > 0
-                                ? AppTheme.brandYellow
-                                : AppTheme.backgroundDark,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: _cardBorder),
-                          ),
-                          alignment: Alignment.center,
-                          child: activeDays > 0
-                              ? Text(
-                                  '${activeDays}d',
-                                  style: const TextStyle(
-                                    color: AppTheme.brandBlack,
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                )
-                              : null,
-                        ),
-                      );
-                    }).toList();
+                  if (dayLogs.isNotEmpty) {
+                    activeWeek = true;
+                    break;
                   }
-                }(),
-              ],
-            );
-          }),
-        ],
-      ),
+                }
+
+                if (activeWeek && startIdx == null)
+                  startIdx = i;
+                else if (!activeWeek && startIdx != null) {
+                  segments.add([startIdx, i - 1]);
+                  startIdx = null;
+                }
+              }
+              if (startIdx != null) segments.add([startIdx, weeks.length - 1]);
+              final hasActivity = segments.isNotEmpty;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildRowLabel(
+                      wName,
+                      WorkerProfession.label(worker.profession),
+                      subtitleColor: AppTheme.brandYellowDark,
+                    ),
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final w = constraints.maxWidth;
+                          return Stack(
+                            children: [
+                              Container(
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.backgroundDark,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: _cardBorder),
+                                ),
+                              ),
+                              ...segments.asMap().entries.map((entry) {
+                                final idx = entry.key;
+                                final seg = entry.value;
+                                final leftFrac = seg[0] / weeks.length;
+                                final widthFrac =
+                                    (seg[1] - seg[0] + 1) / weeks.length;
+                                final blockColor = [
+                                  AppTheme.brandYellow,
+                                  AppTheme.brandYellowMuted,
+                                  AppTheme.brandYellowLight,
+                                ][idx % 3];
+
+                                return Positioned(
+                                  left: w * leftFrac,
+                                  width: w * widthFrac,
+                                  top: 3,
+                                  bottom: 3,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: blockColor,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: AppTheme.backgroundDark,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                    ),
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      WorkerProfession.label(worker.profession),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: AppTheme.brandBlack,
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                              if (!hasActivity)
+                                Positioned.fill(
+                                  child: Center(
+                                    child: Text(
+                                      '-',
+                                      style: TextStyle(
+                                        color: AppTheme.textSecondary
+                                            .withValues(alpha: 0.35),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList();
+          }
+        }(),
+      ],
     );
   }
 
