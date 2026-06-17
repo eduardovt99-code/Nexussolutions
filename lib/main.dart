@@ -11,6 +11,7 @@ import 'screens/dashboard_screen.dart';
 import 'screens/worksite_detail_screen.dart';
 import 'screens/pro_calculator_screen.dart';
 import 'screens/planning_screen.dart';
+import 'screens/advanced_dashboard_screen.dart';
 import 'demo_version.dart';
 
 const Color _cardBorder = Color(0xFFE6EAF2);
@@ -83,6 +84,11 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    // Si la pantalla es ancha (desktop/tablet landscape), mostramos el Advanced Dashboard
+    if (MediaQuery.of(context).size.width > 900) {
+      return const AdvancedDashboardScreen();
+    }
+
     return Scaffold(
       body: Column(
         children: [
