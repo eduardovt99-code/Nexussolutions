@@ -65,19 +65,19 @@ class _MainShellState extends State<MainShell> {
   Widget _buildActiveTab() {
     switch (_currentIndex) {
       case 0:
-        return DashboardScreen(onNavigateTab: _goToTab);
-      case 1:
-        return const ProjectsScreen();
-      case 2:
-        return const PlanningScreen();
-      case 3:
-        return const ProCalculatorScreen();
-      case 4:
-        return const FinancesScreen();
-      case 5:
         return const AdvancedDashboardScreen();
-      default:
+      case 1:
         return DashboardScreen(onNavigateTab: _goToTab);
+      case 2:
+        return const ProjectsScreen();
+      case 3:
+        return const PlanningScreen();
+      case 4:
+        return const ProCalculatorScreen();
+      case 5:
+        return const FinancesScreen();
+      default:
+        return const AdvancedDashboardScreen();
     }
   }
 
@@ -95,7 +95,7 @@ class _MainShellState extends State<MainShell> {
               onTabSelected: _onTabSelected,
             ),
             Expanded(
-              child: _currentIndex == 5 
+              child: _currentIndex == 0 
                 ? const AdvancedDashboardScreen() 
                 : Container(
                     color: AppTheme.backgroundLight,
@@ -142,6 +142,11 @@ class _MainShellState extends State<MainShell> {
           height: 68,
           destinations: [
             const NavigationDestination(
+              icon: Icon(Icons.dashboard_outlined),
+              selectedIcon: Icon(Icons.dashboard),
+              label: 'DASHBOARD',
+            ),
+            const NavigationDestination(
               icon: Icon(Icons.home_outlined),
               selectedIcon: Icon(Icons.home),
               label: 'OBRAS',
@@ -165,11 +170,6 @@ class _MainShellState extends State<MainShell> {
               icon: Icon(Icons.payments_outlined),
               selectedIcon: Icon(Icons.payments),
               label: 'CAJA',
-            ),
-            const NavigationDestination(
-              icon: Icon(Icons.dashboard_outlined),
-              selectedIcon: Icon(Icons.dashboard),
-              label: 'DASHBOARD',
             ),
           ],
         ),
