@@ -199,20 +199,9 @@ class AdvancedSidebar extends StatelessWidget {
           Center(
             child: GestureDetector(
               onTap: () => onTabSelected(0),
-              child: Column(
-                children: [
-                  Image.asset('assets/images/logo_tajo.png', height: 64),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'TAJO',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 4,
-                    ),
-                  ),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Image.asset('assets/images/TAJO.png', height: 80, fit: BoxFit.contain),
               ),
             ),
           ),
