@@ -621,25 +621,36 @@ class _PlanningScreenState extends State<PlanningScreen> {
                   final isToday = _isSameDay(day, DateTime.now());
                   return SizedBox(
                     width: cellWidth,
-                    child: Column(
-                      children: [
-                        Text(
-                          DateFormat('E', 'es_ES').format(day).substring(0, 1).toUpperCase(),
-                          style: TextStyle(
-                            color: isToday ? AppTheme.brandYellowDark : AppTheme.textSecondary,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: isToday
+                          ? BoxDecoration(
+                              color: AppTheme.brandYellow,
+                              borderRadius: BorderRadius.circular(8),
+                            )
+                          : null,
+                      child: Column(
+                        children: [
+                          Text(
+                            DateFormat('E', 'es_ES').format(day).substring(0, 1).toUpperCase(),
+                            style: TextStyle(
+                              color: isToday ? AppTheme.brandBlack : AppTheme.textSecondary,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
-                        ),
-                        Text(
-                          DateFormat('d').format(day),
-                          style: TextStyle(
-                            color: isToday ? AppTheme.brandBlack : AppTheme.textSecondary,
-                            fontSize: 9,
-                            fontWeight: isToday ? FontWeight.w900 : FontWeight.w600,
+                          const SizedBox(height: 2),
+                          Text(
+                            DateFormat('d').format(day),
+                            style: TextStyle(
+                              color: isToday ? AppTheme.brandBlack : AppTheme.textSecondary,
+                              fontSize: 9,
+                              fontWeight: isToday ? FontWeight.w900 : FontWeight.w600,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 }).toList(),
