@@ -7,6 +7,7 @@ import 'theme/app_theme.dart';
 import 'models/models.dart';
 import 'data/database_service.dart';
 import 'screens/login_screen.dart';
+import 'screens/dashboard_screen.dart';
 import 'screens/worksite_detail_screen.dart';
 import 'screens/pro_calculator_screen.dart';
 import 'screens/planning_screen.dart';
@@ -57,12 +58,14 @@ class _MainShellState extends State<MainShell> {
     setState(() => _currentIndex = index);
   }
 
+  void _goToTab(int index) => _onTabSelected(index);
+
   // Cada pestaña se reconstruye al seleccionarla para que sus datos
   // estén siempre frescos tras editar en otras pestañas.
   Widget _buildActiveTab() {
     switch (_currentIndex) {
       case 0:
-        return const AdvancedDashboardScreen();
+        return DashboardScreen(onNavigateTab: _goToTab);
       case 1:
         return const ProjectsScreen();
       case 2:
@@ -71,8 +74,10 @@ class _MainShellState extends State<MainShell> {
         return const ProCalculatorScreen();
       case 4:
         return const FinancesScreen();
-      default:
+      case 5:
         return const AdvancedDashboardScreen();
+      default:
+        return DashboardScreen(onNavigateTab: _goToTab);
     }
   }
 
@@ -90,7 +95,7 @@ class _MainShellState extends State<MainShell> {
               onTabSelected: _onTabSelected,
             ),
             Expanded(
-              child: _currentIndex == 0 
+              child: _currentIndex == 5 
                 ? const AdvancedDashboardScreen() 
                 : Container(
                     color: AppTheme.backgroundLight,
@@ -137,9 +142,9 @@ class _MainShellState extends State<MainShell> {
           height: 68,
           destinations: [
             const NavigationDestination(
-              icon: Icon(Icons.grid_view_outlined),
-              selectedIcon: Icon(Icons.grid_view),
-              label: 'PANEL',
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home),
+              label: 'INICIO',
             ),
             const NavigationDestination(
               icon: Icon(Icons.construction_outlined),
@@ -160,6 +165,11 @@ class _MainShellState extends State<MainShell> {
               icon: Icon(Icons.payments_outlined),
               selectedIcon: Icon(Icons.payments),
               label: 'CAJA',
+            ),
+            const NavigationDestination(
+              icon: Icon(Icons.dashboard_outlined),
+              selectedIcon: Icon(Icons.dashboard),
+              label: 'DASHBOARD',
             ),
           ],
         ),
