@@ -76,7 +76,7 @@ class AppTheme {
   static Color worksiteStatusColor(String status) {
     switch (status) {
       case 'quoting':
-        return brandBlack;
+        return pureWhite;
       case 'active':
         return brandYellow;
       case 'completed':
