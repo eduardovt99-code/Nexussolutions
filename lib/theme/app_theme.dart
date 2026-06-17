@@ -283,7 +283,7 @@ class TajoLogo extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: Image.asset(
-        'assets/images/logo_tajo.png',
+        'assets/images/TAJO.png',
         height: fontSize > iconSize ? fontSize * 1.2 : iconSize * 1.2,
         fit: BoxFit.contain,
       ),
