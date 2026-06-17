@@ -54,30 +54,19 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // HEADER
-            Row(
-              children: [
-                const Text(
-                  'Suite Avanzada de Gestión de Construcciones ',
-                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w400),
-                ),
-                const Text(
-                  'TAJO',
-                  style: TextStyle(color: AppTheme.brandYellow, fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: 1.5),
-                ),
-                const Spacer(),
-                // Window controls placeholder
-                const Row(
-                  children: [
-                    Icon(Icons.remove, color: _textMuted, size: 20),
-                    SizedBox(width: 16),
-                    Icon(Icons.crop_square, color: _textMuted, size: 20),
-                    SizedBox(width: 16),
-                    Icon(Icons.close, color: _textMuted, size: 20),
-                  ],
-                ),
-              ],
-            ),
+              // HEADER
+              Row(
+                children: [
+                  const Text(
+                    'Suite Avanzada de Gestión de Construcciones ',
+                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w400),
+                  ),
+                  const Text(
+                    'TAJO',
+                    style: TextStyle(color: AppTheme.brandYellow, fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: 1.5),
+                  ),
+                ],
+              ),
             const SizedBox(height: 24),
             
             // GANTT & SIDE MODULES
