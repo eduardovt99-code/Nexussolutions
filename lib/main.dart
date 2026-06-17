@@ -144,7 +144,7 @@ class _MainShellState extends State<MainShell> {
             const NavigationDestination(
               icon: Icon(Icons.home_outlined),
               selectedIcon: Icon(Icons.home),
-              label: 'INICIO',
+              label: 'OBRAS',
             ),
             const NavigationDestination(
               icon: Icon(Icons.construction_outlined),

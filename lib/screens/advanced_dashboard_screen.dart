@@ -222,7 +222,7 @@ class AdvancedSidebar extends StatelessWidget {
           const SizedBox(height: 40),
           _NavItem(
             icon: Icons.home, 
-            label: 'Inicio', 
+            label: 'Obras', 
             isSelected: currentIndex == 0,
             onTap: () => onTabSelected(0),
           ),

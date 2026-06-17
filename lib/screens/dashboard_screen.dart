@@ -173,8 +173,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   children: [
                     _buildGreeting(),
                     _buildKpiHero(),
-                    _buildQuickActions(),
-                    const SizedBox(height: 16),
+                    _buildNewWorksiteCta(),
                     _buildAttentionSection(),
                     _buildWeekActivity(),
                     _buildActiveWorksites(),
@@ -1061,49 +1060,77 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
     );
   }
-  Widget _buildQuickActions() {
-    Widget action(IconData icon, String label, VoidCallback onTap) {
-      return Expanded(
+  // ── NUEVA OBRA (CTA principal) ──
+
+  Widget _buildNewWorksiteCta() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Material(
+        color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            HapticFeedback.lightImpact();
-            onTap();
+            HapticFeedback.mediumImpact();
+            _showCreateWorksiteModal();
           },
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 14),
+          borderRadius: BorderRadius.circular(18),
+          child: Ink(
             decoration: BoxDecoration(
-              color: AppTheme.surfaceLight,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.borderDark),
-            ),
-            child: Column(
-              children: [
-                Icon(icon, size: 22, color: AppTheme.brandBlack),
-                const SizedBox(height: 6),
-                Text(
-                  label,
-                  style: const TextStyle(color: AppTheme.textPrimary, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+              color: AppTheme.brandYellow,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: AppTheme.brandBlack, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.brandBlack.withValues(alpha: 0.18),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
                 ),
               ],
             ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: AppTheme.brandBlack,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Icon(Icons.add_business, color: AppTheme.brandYellow, size: 26),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'NUEVA OBRA',
+                          style: TextStyle(
+                            color: AppTheme.brandBlack,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Añadir cliente y obra al panel',
+                          style: TextStyle(
+                            color: AppTheme.brandBlack,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_rounded, color: AppTheme.brandBlack, size: 24),
+                ],
+              ),
+            ),
           ),
         ),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Row(
-        children: [
-          action(Icons.add_business_outlined, 'NUEVA OBRA', _showCreateWorksiteModal),
-          const SizedBox(width: 10),
-          action(Icons.construction_outlined, 'OBRAS', () => widget.onNavigateTab?.call(1)),
-          const SizedBox(width: 10),
-          action(Icons.calculate_outlined, 'PRO-CALC', () => widget.onNavigateTab?.call(3)),
-          const SizedBox(width: 10),
-          action(Icons.payments_outlined, 'FINANZAS', () => widget.onNavigateTab?.call(4)),
-        ],
       ),
     );
   }
