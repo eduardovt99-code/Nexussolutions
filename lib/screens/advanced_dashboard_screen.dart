@@ -302,8 +302,8 @@ class _GanttChartPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Tomar solo obras activas o completadas para no saturar si hay muchas (o maximo 8)
-    final displaySites = worksites.where((w) => w.status != 'quoting').take(12).toList();
+    // Tomar las últimas 12 obras sin importar estado para mostrar en el gráfico
+    final displaySites = worksites.take(12).toList();
     if (displaySites.isEmpty) {
       displaySites.add(Worksite(
         id: 'mock', 
@@ -337,7 +337,16 @@ class _GanttChartPanel extends StatelessWidget {
             child: Row(
               children: [
                 const SizedBox(width: 30),
-                const SizedBox(width: 150, child: Text('Obras Activas', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                const SizedBox(width: 120, child: Text('Obras', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                Row(
+                  children: [
+                    _legendDot(AppTheme.brandYellow, 'En curso'),
+                    const SizedBox(width: 12),
+                    _legendDot(const Color(0xFF8E8E93), 'Presupuesto'),
+                    const SizedBox(width: 12),
+                    _legendDot(const Color(0xFF3A3A3C), 'Completada'),
+                  ],
+                ),
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -392,7 +401,11 @@ class _GanttChartPanel extends StatelessWidget {
                               width: 80.0 + (index * 15.0),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: site.status == 'completed' ? AppTheme.successGreen : AppTheme.brandYellow,
+                                  color: site.status == 'active'
+                                      ? AppTheme.brandYellow
+                                      : site.status == 'completed'
+                                          ? const Color(0xFF3A3A3C)
+                                          : const Color(0xFF8E8E93),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
@@ -417,6 +430,16 @@ class _GanttChartPanel extends StatelessWidget {
         Text(year, style: const TextStyle(color: _textMuted, fontSize: 12)),
         const SizedBox(height: 4),
         const Text('E F M A M J J A S O N D', style: TextStyle(color: _textMuted, fontSize: 8, letterSpacing: 4)),
+      ],
+    );
+  }
+
+  Widget _legendDot(Color color, String label) {
+    return Row(
+      children: [
+        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        const SizedBox(width: 4),
+        Text(label, style: const TextStyle(color: _textMuted, fontSize: 10)),
       ],
     );
   }
