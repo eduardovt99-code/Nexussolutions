@@ -14,7 +14,7 @@ const double kLaborRate = 22.0;
 const TextStyle kSpecNumberStyle = TextStyle(
   fontFamily: 'monospace',
   fontFeatures: [FontFeature.tabularFigures()],
-  color: AppTheme.brandBlack,
+  color: AppTheme.pureWhite,
   fontWeight: FontWeight.w700,
 );
 
