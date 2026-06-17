@@ -115,7 +115,7 @@ class AppTheme {
       case 'approved':
         return brandYellow;
       case 'invoiced':
-        return brandBlack;
+        return pureWhite;
       case 'paid':
         return successGreen;
       case 'rejected':
