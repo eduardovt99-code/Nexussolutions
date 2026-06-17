@@ -7,7 +7,7 @@ import '../data/crew_capacity.dart';
 import '../models/models.dart';
 import '../theme/app_theme.dart';
 
-const Color _cardBorder = Color(0xFFE6EAF2);
+const Color _cardBorder = AppTheme.borderDark;
 
 enum PlanningView { day, week, month }
 
@@ -249,7 +249,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: const Color(0xFFF4F5F7),
+          color: AppTheme.backgroundDark,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: _cardBorder),
         ),
@@ -515,7 +515,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                           Container(
                             height: 36,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF7F8FA),
+                              color: AppTheme.backgroundDark,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: _cardBorder),
                             ),
@@ -553,9 +553,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
                             final List<Color> palette = site.status == 'active'
                                 ? [
                                     AppTheme.brandYellow,
-                                    const Color(0xFFE8E8E8), // Gris suave
+                                    AppTheme.borderDark, // Gris suave -> oscuro
                                     AppTheme.brandYellowMuted,
-                                    const Color(0xFFD0D0D0), // Gris medio
+                                    AppTheme.surfaceLight, // Gris medio -> oscuro
                                     AppTheme.brandYellowLight,
                                   ]
                                 : [
@@ -573,7 +573,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                                 decoration: BoxDecoration(
                                   color: blockColor,
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: const Color(0xFFF7F8FA), width: 1.5),
+                                  border: Border.all(color: AppTheme.backgroundDark, width: 1.5),
                                 ),
                                 padding: const EdgeInsets.symmetric(horizontal: 4),
                                 alignment: Alignment.centerLeft,
@@ -693,7 +693,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                             decoration: BoxDecoration(
                               color: active
                                   ? _worksiteBarColor(site.status, plannedOnly: false)
-                                  : (planned ? _worksiteBarColor(site.status, plannedOnly: true) : const Color(0xFFF7F8FA)),
+                                  : (planned ? _worksiteBarColor(site.status, plannedOnly: true) : AppTheme.backgroundDark),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: planned && !active
@@ -792,7 +792,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                             decoration: BoxDecoration(
                               color: hours > 0
                                   ? AppTheme.brandYellow.withValues(alpha: 0.35 + intensity * 0.65)
-                                  : (planned ? AppTheme.brandYellowMuted : const Color(0xFFF7F8FA)),
+                                  : (planned ? AppTheme.brandYellowMuted : AppTheme.backgroundDark),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(color: _cardBorder),
                             ),
@@ -1012,7 +1012,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                   ),
                   Expanded(
                     flex: ((1 - ratio) * 100).round().clamp(1, 100),
-                    child: Container(color: const Color(0xFFE8E8E8)),
+                    child: Container(color: AppTheme.borderDark),
                   ),
                 ],
               ),
@@ -1096,7 +1096,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                         ),
                         Expanded(
                           flex: ((1 - ratio) * 100).round().clamp(1, 100),
-                          child: Container(color: const Color(0xFFE8E8E8)),
+                          child: Container(color: AppTheme.borderDark),
                         ),
                       ],
                     ),

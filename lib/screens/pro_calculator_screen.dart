@@ -18,7 +18,7 @@ const TextStyle kSpecNumberStyle = TextStyle(
   fontWeight: FontWeight.w700,
 );
 
-const Color _cardBorder = Color(0xFFE6EAF2);
+const Color _cardBorder = AppTheme.borderDark;
 
 // ─────────────────────────────────────────────────────────────
 // MOTOR DE CÁLCULO — 8 oficios con rendimientos de obra reales

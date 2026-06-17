@@ -13,7 +13,7 @@ import 'screens/planning_screen.dart';
 import 'screens/advanced_dashboard_screen.dart';
 import 'demo_version.dart';
 
-const Color _cardBorder = Color(0xFFE6EAF2);
+const Color _cardBorder = AppTheme.borderDark;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

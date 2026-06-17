@@ -14,11 +14,11 @@ class AppTheme {
 
   // ── Base ──
   static const Color pureWhite = Color(0xFFFFFFFF);
-  static const Color backgroundLight = Color(0xFFFFFFFF);
-  static const Color surfaceLight = Color(0xFFFFFFFF);
+  static const Color backgroundLight = Color(0xFF141416); // Re-mapped to dark
+  static const Color surfaceLight = Color(0xFF1E1E20); // Re-mapped to dark
 
-  static const Color textPrimary = brandBlack;
-  static const Color textSecondary = Color(0xFF666666);
+  static const Color textPrimary = pureWhite; // Re-mapped to white
+  static const Color textSecondary = Color(0xFF8E8E93);
 
   // Alias heredados (mapeados a la nueva paleta)
   static const Color accentCyan = brandYellow;
@@ -36,8 +36,10 @@ class AppTheme {
   static const Color darkGrey = Color(0xFFE8E8E8);
   static const Color neonGreen = successGreen;
   static const Color primaryAction = brandBlack;
-  static const Color backgroundDark = backgroundLight;
-  static const Color surfaceDark = surfaceLight;
+  static const Color backgroundDark = Color(0xFF141416);
+  static const Color surfaceDark = Color(0xFF1E1E20);
+  static const Color borderDark = Color(0xFF2C2C2E);
+  static const Color textMutedDark = Color(0xFF8E8E93);
 
   static const LinearGradient cyberGradient = LinearGradient(
     colors: [brandYellow, brandYellowLight],
@@ -125,17 +127,17 @@ class AppTheme {
 
   static ThemeData get lightTheme {
     return ThemeData(
-      brightness: Brightness.light,
+      brightness: Brightness.dark,
       scaffoldBackgroundColor: backgroundLight,
       primaryColor: brandYellow,
       splashFactory: InkRipple.splashFactory,
-      colorScheme: const ColorScheme.light(
+      colorScheme: const ColorScheme.dark(
         primary: brandYellow,
-        secondary: brandBlack,
+        secondary: brandYellow,
         surface: surfaceLight,
         error: errorRed,
         onPrimary: brandBlack,
-        onSecondary: pureWhite,
+        onSecondary: brandBlack,
         onSurface: textPrimary,
       ),
       appBarTheme: const AppBarTheme(
@@ -158,10 +160,10 @@ class AppTheme {
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
-          side: const BorderSide(color: Color(0xFFE8E8E8)),
+          side: const BorderSide(color: borderDark),
         ),
       ),
-      dividerTheme: const DividerThemeData(color: Color(0xFFE8E8E8), thickness: 1),
+      dividerTheme: const DividerThemeData(color: borderDark, thickness: 1),
       textTheme: const TextTheme(
         displayLarge: TextStyle(color: textPrimary, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'Inter', letterSpacing: -0.5),
         displayMedium: TextStyle(color: textPrimary, fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Inter', letterSpacing: -0.3),
@@ -197,15 +199,15 @@ class AppTheme {
         fillColor: surfaceLight,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14.0),
-          borderSide: const BorderSide(color: Color(0xFFD0D0D0)),
+          borderSide: const BorderSide(color: borderDark),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14.0),
-          borderSide: const BorderSide(color: Color(0xFFD0D0D0)),
+          borderSide: const BorderSide(color: borderDark),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14.0),
-          borderSide: const BorderSide(color: brandBlack, width: 2),
+          borderSide: const BorderSide(color: brandYellow, width: 2),
         ),
         labelStyle: const TextStyle(color: textSecondary, fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 0.5),
         hintStyle: const TextStyle(color: textSecondary),
