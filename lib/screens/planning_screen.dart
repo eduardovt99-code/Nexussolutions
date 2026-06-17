@@ -550,12 +550,18 @@ class _PlanningScreenState extends State<PlanningScreen> {
                             final leftFrac = ((startHour - timelineStartHour) / timelineHours).clamp(0.0, 1.0);
                             final widthFrac = ((endHour - startHour) / timelineHours).clamp(0.05, 1.0 - leftFrac);
                             
-                            final baseColor = _worksiteBarColor(site.status, plannedOnly: false);
-                            final List<Color> palette = [
-                              baseColor,
-                              baseColor.withValues(alpha: 0.55),
-                              baseColor.withValues(alpha: 0.3),
-                            ];
+                            final List<Color> palette = site.status == 'active'
+                                ? [
+                                    AppTheme.brandYellow,
+                                    const Color(0xFFE8E8E8), // Gris suave
+                                    AppTheme.brandYellowMuted,
+                                    const Color(0xFFD0D0D0), // Gris medio
+                                    AppTheme.brandYellowLight,
+                                  ]
+                                : [
+                                    _worksiteBarColor(site.status, plannedOnly: false),
+                                    _worksiteBarColor(site.status, plannedOnly: false).withValues(alpha: 0.6),
+                                  ];
                             final blockColor = palette[idx % palette.length];
 
                             return Positioned(
