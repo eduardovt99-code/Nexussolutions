@@ -76,14 +76,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   double get _collected =>
       _budgets.where((b) => b.status == 'paid').fold(0.0, (sum, b) => sum + b.totalAmount);
 
-  double _hoursOn(DateTime day) {
-    return _logs.where((l) {
-      return l.checkIn.year == day.year && l.checkIn.month == day.month && l.checkIn.day == day.day;
-    }).fold(0.0, (sum, l) {
-      final end = l.checkOut ?? DateTime.now();
-      return sum + (end.difference(l.checkIn).inMinutes / 60.0);
-    });
-  }
+
 
   double get _hoursToday => _weekHours.last.$2;
 
