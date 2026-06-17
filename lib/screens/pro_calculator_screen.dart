@@ -335,6 +335,10 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
   final TextEditingController _laborRateController =
       TextEditingController(text: kLaborRate.toStringAsFixed(0));
 
+  // Margen y IVA
+  final TextEditingController _marginController = TextEditingController(text: '30');
+  static const double kIvaRate = 0.21;
+
   @override
   void initState() {
     super.initState();
@@ -352,6 +356,7 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
     _heightController.dispose();
     _laborHoursController.dispose();
     _laborRateController.dispose();
+    _marginController.dispose();
     for (final line in _lines) {
       line.dispose();
     }
@@ -420,9 +425,16 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
       double.tryParse(_laborHoursController.text.replaceAll(',', '.')) ?? 0.0;
   double get _laborRate =>
       double.tryParse(_laborRateController.text.replaceAll(',', '.')) ?? 0.0;
+  double get _margin =>
+      double.tryParse(_marginController.text.replaceAll(',', '.')) ?? 0.0;
+
   double get _laborCost => _laborHours * _laborRate;
   double get _materialCost => _lines.fold(0.0, (sum, l) => sum + l.subtotal);
-  double get _grandTotal => _materialCost + _laborCost;
+  double get _baseCost => _materialCost + _laborCost;
+  double get _marginAmount => _baseCost * (_margin / 100);
+  double get _subtotal => _baseCost + _marginAmount;
+  double get _ivaAmount => _subtotal * kIvaRate;
+  double get _grandTotal => _subtotal + _ivaAmount;
 
   double get _floorArea => _length * _width;
   double get _wallArea => 2 * (_length + _width) * _height;
@@ -540,10 +552,14 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
                       row('DIMENSIONES', '${_length.toStringAsFixed(2)} × ${_width.toStringAsFixed(2)} × ${_height.toStringAsFixed(2)} m'),
                       row('SUPERFICIE', '${_autoResult.workingArea.toStringAsFixed(2)} m²'),
                       const Divider(height: 16),
-                      row('MATERIAL', '$pricedLines partidas · ${_currency.format(_materialCost)}'),
-                      row('MANO DE OBRA', '${_laborHours.toStringAsFixed(1)} h × ${_laborRate.toStringAsFixed(0)} €/h · ${_currency.format(_laborCost)}'),
+                      row('COSTE MATERIAL', '$pricedLines partidas · ${_currency.format(_materialCost)}'),
+                      row('COSTE MANO DE OBRA', '${_laborHours.toStringAsFixed(1)} h × ${_laborRate.toStringAsFixed(0)} €/h · ${_currency.format(_laborCost)}'),
                       const Divider(height: 16),
-                      row('TOTAL (SIN IVA)', _currency.format(_grandTotal), valueColor: AppTheme.deepCyan, bold: true),
+                      row('MARGEN BENEFICIO (${_margin.toStringAsFixed(0)}%)', _currency.format(_marginAmount)),
+                      row('BASE IMPONIBLE', _currency.format(_subtotal)),
+                      row('IVA (21%)', _currency.format(_ivaAmount)),
+                      const Divider(height: 16),
+                      row('TOTAL (CON IVA)', _currency.format(_grandTotal), valueColor: AppTheme.deepCyan, bold: true),
                     ],
                   ),
                 ),
@@ -602,6 +618,22 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
           unit: 'h',
           unitPrice: _laborRate,
           subtotal: _laborCost,
+        ),
+      if (_marginAmount > 0)
+        BudgetItem(
+          description: 'Margen de beneficio (${_margin.toStringAsFixed(0)}%)',
+          quantity: 1.0,
+          unit: 'ud',
+          unitPrice: _marginAmount,
+          subtotal: _marginAmount,
+        ),
+      if (_ivaAmount > 0)
+        BudgetItem(
+          description: 'IVA (21%)',
+          quantity: 1.0,
+          unit: 'ud',
+          unitPrice: _ivaAmount,
+          subtotal: _ivaAmount,
         ),
     ];
 
@@ -703,6 +735,8 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
             ),
             const SizedBox(height: 16),
             _buildLaborCard(),
+            const SizedBox(height: 16),
+            _buildMarginCard(),
             const SizedBox(height: 16),
             _buildTotalCard(),
             const SizedBox(height: 20),
@@ -1309,6 +1343,31 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
     );
   }
 
+  // ── MARGEN DE BENEFICIO ──
+
+  Widget _buildMarginCard() {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: _cardDecoration,
+      child: Row(
+        children: [
+          const Icon(Icons.trending_up, color: AppTheme.accentCyan, size: 18),
+          const SizedBox(width: 10),
+          const Expanded(
+            child: Text(
+              'MARGEN DE BENEFICIO',
+              style: TextStyle(color: AppTheme.textPrimary, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.2),
+            ),
+          ),
+          SizedBox(
+            width: 80,
+            child: _miniField(controller: _marginController, label: '%', suffix: '%'),
+          ),
+        ],
+      ),
+    );
+  }
+
   // ── TOTAL GENERAL ──
 
   Widget _buildTotalCard() {
@@ -1346,13 +1405,20 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
       ),
       child: Column(
         children: [
-          row('MATERIAL', _currency.format(_materialCost)),
-          row('MANO DE OBRA', _currency.format(_laborCost)),
+          row('COSTE MATERIAL', _currency.format(_materialCost)),
+          row('COSTE MANO DE OBRA', _currency.format(_laborCost)),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
             child: Divider(color: Colors.white12, height: 1),
           ),
-          row('TOTAL ESTIMADO (SIN IVA)', _currency.format(_grandTotal), emphasize: true),
+          row('MARGEN (${_margin.toStringAsFixed(0)}%)', _currency.format(_marginAmount)),
+          row('BASE IMPONIBLE', _currency.format(_subtotal)),
+          row('IVA (21%)', _currency.format(_ivaAmount)),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Divider(color: Colors.white12, height: 1),
+          ),
+          row('TOTAL ESTIMADO (CON IVA)', _currency.format(_grandTotal), emphasize: true),
         ],
       ),
     );
