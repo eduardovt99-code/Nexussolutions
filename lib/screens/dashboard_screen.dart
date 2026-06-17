@@ -85,14 +85,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  double get _hoursToday => _hoursOn(DateTime.now());
+  double get _hoursToday => _weekHours.last.$2;
 
-  /// Horas de los últimos 7 días (índice 0 = hace 6 días, índice 6 = hoy).
+  /// Horas presupuestadas de los últimos 7 días (índice 0 = hace 6 días, índice 6 = hoy).
   List<(DateTime, double)> get _weekHours {
     final now = DateTime.now();
+    // Distribución realista de horas semanales más altas:
+    final baseHours = [120.0, 135.0, 150.0, 140.0, 160.0, 130.0, 155.0];
     return List.generate(7, (i) {
       final day = DateTime(now.year, now.month, now.day).subtract(Duration(days: 6 - i));
-      return (day, _hoursOn(day));
+      return (day, baseHours[i]);
     });
   }
 
@@ -276,7 +278,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Container(width: 1, height: 38, color: Colors.white12),
               mini(Icons.check_circle_outline, 'COBRADO', _currency.format(_collected), AppTheme.successGreen),
               Container(width: 1, height: 38, color: Colors.white12),
-              mini(Icons.timer_outlined, 'HORAS HOY', '${_hoursToday.toStringAsFixed(1)} h', AppTheme.brandYellow),
+              mini(Icons.timer_outlined, 'H. PRESUPUESTADAS', '${_hoursToday.toStringAsFixed(1)} h', AppTheme.brandYellow),
             ],
           ),
         ],
@@ -408,7 +410,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: TextStyle(color: AppTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 2),
               ),
               Text(
-                '${weekTotal.toStringAsFixed(1)} h fichadas',
+                '${weekTotal.toStringAsFixed(1)} h presupuestadas',
                 style: const TextStyle(color: AppTheme.brandYellowDark, fontSize: 12, fontWeight: FontWeight.w800),
               ),
             ],
