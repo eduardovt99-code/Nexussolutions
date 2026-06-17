@@ -15,6 +15,6 @@ void main() {
     await tester.pumpWidget(const TajoApp());
 
     // Verify that our app starts.
-    expect(find.text('TAJO'), findsWidgets);
+    expect(find.byType(TajoApp), findsOneWidget);
   });
 }

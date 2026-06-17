@@ -276,40 +276,16 @@ class TajoLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icon = Icon(Icons.engineering, size: iconSize, color: foregroundColor);
-
-    if (!showLabel) {
-      return Container(
-        padding: padding,
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(borderRadius),
-        ),
-        child: icon,
-      );
-    }
-
     return Container(
       padding: padding,
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(borderRadius),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          icon,
-          SizedBox(width: iconSize * 0.35),
-          Text(
-            'TAJO',
-            style: TextStyle(
-              color: foregroundColor,
-              fontSize: fontSize,
-              fontWeight: FontWeight.w900,
-              letterSpacing: fontSize * 0.12,
-            ),
-          ),
-        ],
+      child: Image.asset(
+        'assets/images/logo_tajo.png',
+        height: fontSize > iconSize ? fontSize * 1.2 : iconSize * 1.2,
+        fit: BoxFit.contain,
       ),
     );
   }
