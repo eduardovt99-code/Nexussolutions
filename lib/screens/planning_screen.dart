@@ -541,12 +541,25 @@ class _PlanningScreenState extends State<PlanningScreen> {
                                 ),
                               ),
                             ),
-                          ...dayLogs.map((log) {
+                          ...dayLogs.asMap().entries.map((entry) {
+                            final idx = entry.key;
+                            final log = entry.value;
                             final end = log.checkOut ?? DateTime.now();
                             final startHour = log.checkIn.hour + log.checkIn.minute / 60.0;
                             final endHour = end.hour + end.minute / 60.0;
                             final leftFrac = ((startHour - timelineStartHour) / timelineHours).clamp(0.0, 1.0);
                             final widthFrac = ((endHour - startHour) / timelineHours).clamp(0.05, 1.0 - leftFrac);
+                            
+                            final List<Color> palette = [
+                              AppTheme.brandYellow,
+                              const Color(0xFF90CAF9), // Light Blue
+                              const Color(0xFFA5D6A7), // Light Green
+                              const Color(0xFFCE93D8), // Light Purple
+                              const Color(0xFFFFCC80), // Light Orange
+                              const Color(0xFF80CBC4), // Teal
+                            ];
+                            final blockColor = palette[idx % palette.length];
+
                             return Positioned(
                               left: w * leftFrac,
                               width: w * widthFrac,
@@ -554,7 +567,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                               bottom: 3,
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: _worksiteBarColor(site.status, plannedOnly: false),
+                                  color: blockColor,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(color: const Color(0xFFF7F8FA), width: 1.5),
                                 ),
