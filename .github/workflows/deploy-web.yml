@@ -38,7 +38,7 @@ jobs:
           BUILD=$(grep "static const String build" lib/demo_version.dart | sed "s/.*'\([^']*\)'.*/\1/")
           echo "{\"build\":\"${BUILD}\"}" > build/web/version.json
           sed -i "s|\"mainJsPath\":\"main.dart.js\"|\"mainJsPath\":\"main.dart.js?v=${BUILD}\"|g" build/web/flutter_bootstrap.js
-          sed -i "s|name=\"nexus-demo-build\" content=\"[0-9]*\"|name=\"nexus-demo-build\" content=\"${BUILD}\"|g" build/web/index.html
+          sed -i "s|name=\"tajo-demo-build\" content=\"[0-9]*\"|name=\"tajo-demo-build\" content=\"${BUILD}\"|g" build/web/index.html
           sed -i "s|flutter_bootstrap.js?v=[0-9]*|flutter_bootstrap.js?v=${BUILD}|g" build/web/index.html || true
 
       - name: Upload artifact

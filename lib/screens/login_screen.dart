@@ -70,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   // Logo
                   const Center(
-                    child: NexusLogo.onYellow(
+                    child: TajoLogo.onYellow(
                       iconSize: 40,
                       fontSize: 36,
                       borderRadius: 16,

@@ -12,9 +12,9 @@ import 'package:nexus/main.dart';
 void main() {
   testWidgets('Smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const NexusApp());
+    await tester.pumpWidget(const TajoApp());
 
     // Verify that our app starts.
-    expect(find.text('NEXUS'), findsWidgets);
+    expect(find.text('TAJO'), findsWidgets);
   });
 }

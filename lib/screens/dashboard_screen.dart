@@ -152,7 +152,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: const NexusLogo.inline(),
+        title: const TajoLogo.inline(),
         elevation: 0,
         actions: [
           IconButton(

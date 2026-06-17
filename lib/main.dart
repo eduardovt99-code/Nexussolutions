@@ -19,16 +19,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('es_ES');
   await DatabaseService().init();
-  runApp(const NexusApp());
+  runApp(const TajoApp());
 }
 
-class NexusApp extends StatelessWidget {
-  const NexusApp({super.key});
+class TajoApp extends StatelessWidget {
+  const TajoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'NEXUS — El sistema operativo de tu reforma',
+      title: 'TAJO — El sistema operativo de tu reforma',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       home: const LoginScreen(),

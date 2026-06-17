@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// NEXUS — El sistema operativo de la reforma.
+/// TAJO — El sistema operativo de la reforma.
 /// Identidad: amarillo de seguridad, negro y blanco.
 class AppTheme {
   // ── Marca ──
@@ -220,8 +220,8 @@ class AppTheme {
   }
 }
 
-/// Logo de marca: casco de obra + NEXUS.
-class NexusLogo extends StatelessWidget {
+/// Logo de marca: casco de obra + TAJO.
+class TajoLogo extends StatelessWidget {
   final double iconSize;
   final double fontSize;
   final bool showLabel;
@@ -230,7 +230,7 @@ class NexusLogo extends StatelessWidget {
   final double borderRadius;
   final EdgeInsets padding;
 
-  const NexusLogo({
+  const TajoLogo({
     super.key,
     this.iconSize = 28,
     this.fontSize = 22,
@@ -242,7 +242,7 @@ class NexusLogo extends StatelessWidget {
   });
 
   /// Logo sobre fondo amarillo (tarjeta de marca).
-  const NexusLogo.onYellow({
+  const TajoLogo.onYellow({
     super.key,
     this.iconSize = 44,
     this.fontSize = 44,
@@ -253,7 +253,7 @@ class NexusLogo extends StatelessWidget {
         foregroundColor = AppTheme.brandBlack;
 
   /// Logo compacto para AppBar (sin caja de fondo).
-  const NexusLogo.inline({
+  const TajoLogo.inline({
     super.key,
     this.iconSize = 18,
     this.fontSize = 20,
@@ -264,7 +264,7 @@ class NexusLogo extends StatelessWidget {
         foregroundColor = AppTheme.brandBlack;
 
   /// Logo sobre fondo negro.
-  const NexusLogo.onBlack({
+  const TajoLogo.onBlack({
     super.key,
     this.iconSize = 28,
     this.fontSize = 22,
@@ -301,7 +301,7 @@ class NexusLogo extends StatelessWidget {
           icon,
           SizedBox(width: iconSize * 0.35),
           Text(
-            'NEXUS',
+            'TAJO',
             style: TextStyle(
               color: foregroundColor,
               fontSize: fontSize,

@@ -824,7 +824,7 @@ class _WorksiteDetailScreenState extends State<WorksiteDetailScreen> with Single
                     Text(
                       isPaid
                           ? 'Esta factura fue anticipada y cobrada.'
-                          : 'Cobra hoy mismo con el Anticipo NEXUS. La morosidad deja de ser tu problema.',
+                          : 'Cobra hoy mismo con el Anticipo TAJO. La morosidad deja de ser tu problema.',
                       style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                     ),
                     const SizedBox(height: 20),
@@ -847,7 +847,7 @@ class _WorksiteDetailScreenState extends State<WorksiteDetailScreen> with Single
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Comisión NEXUS (3 %)', style: TextStyle(color: AppTheme.errorRed, fontSize: 13)),
+                              const Text('Comisión TAJO (3 %)', style: TextStyle(color: AppTheme.errorRed, fontSize: 13)),
                               Text('− ${_currencyFormatter.format(fee)}', style: const TextStyle(color: AppTheme.errorRed, fontWeight: FontWeight.bold)),
                             ],
                           ),
