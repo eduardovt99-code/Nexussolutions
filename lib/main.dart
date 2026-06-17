@@ -68,7 +68,7 @@ class _MainShellState extends State<MainShell> {
   Widget _buildActiveTab() {
     switch (_currentIndex) {
       case 0:
-        return DashboardScreen(onNavigateTab: _goToTab);
+        return const AdvancedDashboardScreen();
       case 1:
         return const ProjectsScreen();
       case 2:
@@ -78,7 +78,7 @@ class _MainShellState extends State<MainShell> {
       case 4:
         return const FinancesScreen();
       default:
-        return DashboardScreen(onNavigateTab: _goToTab);
+        return const AdvancedDashboardScreen();
     }
   }
 

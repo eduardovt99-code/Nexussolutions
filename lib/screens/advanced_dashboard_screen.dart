@@ -49,56 +49,124 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
 
     return Scaffold(
       backgroundColor: _darkBg,
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth > 900) {
+            return _buildDesktopLayout();
+          } else {
+            return _buildMobileLayout();
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // HEADER
+          Row(
+            children: [
+              const Text(
+                'Suite Avanzada de Gestión de Construcciones ',
+                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w400),
+              ),
+              const Text(
+                'TAJO',
+                style: TextStyle(color: AppTheme.brandYellow, fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: 1.5),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          
+          // GANTT & SIDE MODULES
+          Expanded(
+            flex: 3,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // GANTT CHART
+                Expanded(flex: 7, child: _GanttChartPanel(worksites: _worksites)),
+                const SizedBox(width: 16),
+                // SIDE MODULES
+                Expanded(flex: 2, child: _ModulesPanel(worksites: _worksites)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // BOTTOM CARDS
+          Expanded(
+            flex: 2,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: _AvanceProyectoCard(worksites: _worksites)),
+                const SizedBox(width: 16),
+                Expanded(child: _PresupuestoObraCard(budgets: _budgets)),
+                const SizedBox(width: 16),
+                Expanded(child: _GestionCambioCard(worksites: _worksites)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileLayout() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-              // HEADER
-              Row(
-                children: [
-                  const Text(
-                    'Suite Avanzada de Gestión de Construcciones ',
-                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w400),
-                  ),
-                  const Text(
-                    'TAJO',
-                    style: TextStyle(color: AppTheme.brandYellow, fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: 1.5),
-                  ),
-                ],
-              ),
+            // HEADER (Mobile)
+            const Text(
+              'Suite Avanzada de Gestión\nde Construcciones TAJO',
+              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800, height: 1.2),
+            ),
             const SizedBox(height: 24),
             
-            // GANTT & SIDE MODULES
-            Expanded(
-              flex: 3,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // GANTT CHART
-                  Expanded(flex: 7, child: _GanttChartPanel(worksites: _worksites)),
-                  const SizedBox(width: 16),
-                  // SIDE MODULES
-                  Expanded(flex: 2, child: _ModulesPanel(worksites: _worksites)),
-                ],
+            // GANTT CHART (Scrollable horizontally)
+            SizedBox(
+              height: 350,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SizedBox(
+                  width: 800,
+                  child: _GanttChartPanel(worksites: _worksites),
+                ),
               ),
             ),
             const SizedBox(height: 16),
-
-            // BOTTOM CARDS
-            Expanded(
-              flex: 2,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(child: _AvanceProyectoCard(worksites: _worksites)),
-                  const SizedBox(width: 16),
-                  Expanded(child: _PresupuestoObraCard(budgets: _budgets)),
-                  const SizedBox(width: 16),
-                  Expanded(child: _GestionCambioCard(worksites: _worksites)),
-                ],
-              ),
+            
+            // SIDE MODULES (Vertical)
+            SizedBox(
+              height: 250,
+              child: _ModulesPanel(worksites: _worksites),
             ),
+            const SizedBox(height: 16),
+            
+            // BOTTOM CARDS (Stacked)
+            SizedBox(
+              height: 280,
+              child: _AvanceProyectoCard(worksites: _worksites),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 280,
+              child: _PresupuestoObraCard(budgets: _budgets),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 280,
+              child: _GestionCambioCard(worksites: _worksites),
+            ),
+            const SizedBox(height: 32),
           ],
         ),
       ),
