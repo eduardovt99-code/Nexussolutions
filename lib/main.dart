@@ -244,7 +244,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         centerTitle: false,
         title: const Text(
           'OBRAS',
-          style: TextStyle(color: AppTheme.textPrimary, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 3),
+          style: TextStyle(color: AppTheme.brandBlack, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 3),
         ),
       ),
       body: SafeArea(
@@ -495,7 +495,7 @@ class _FinancesScreenState extends State<FinancesScreen> {
         centerTitle: false,
         title: const Text(
           'FINANZAS',
-          style: TextStyle(color: AppTheme.textPrimary, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 3),
+          style: TextStyle(color: AppTheme.brandBlack, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 3),
         ),
       ),
       body: SafeArea(

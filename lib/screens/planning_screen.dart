@@ -220,7 +220,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
         centerTitle: false,
         title: const Text(
           'PLANIFICACIÓN',
-          style: TextStyle(color: AppTheme.textPrimary, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2),
+          style: TextStyle(color: AppTheme.brandBlack, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2),
         ),
       ),
       body: _isLoading
