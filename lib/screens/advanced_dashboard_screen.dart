@@ -92,7 +92,7 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
                 Expanded(flex: 7, child: _GanttChartPanel(worksites: _worksites)),
                 const SizedBox(width: 16),
                 // SIDE MODULES
-                Expanded(flex: 2, child: _ModulesPanel(worksites: _worksites)),
+                Expanded(flex: 2, child: const _TeamStatusPanel()),
               ],
             ),
           ),
@@ -147,7 +147,7 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
             // SIDE MODULES (Vertical)
             SizedBox(
               height: 250,
-              child: _ModulesPanel(worksites: _worksites),
+              child: const _TeamStatusPanel(),
             ),
             const SizedBox(height: 16),
             
@@ -448,14 +448,11 @@ class _GanttChartPanel extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────
 // SIDE MODULES
 // ─────────────────────────────────────────────────────────────────
-class _ModulesPanel extends StatelessWidget {
-  final List<Worksite> worksites;
-  const _ModulesPanel({required this.worksites});
+class _TeamStatusPanel extends StatelessWidget {
+  const _TeamStatusPanel();
 
   @override
   Widget build(BuildContext context) {
-    final activeSites = worksites.where((w) => w.status == 'active').toList();
-    
     return Container(
       decoration: BoxDecoration(
         color: _cardBg,
@@ -466,33 +463,80 @@ class _ModulesPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Estado de Obras Key', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
+          Row(
+            children: [
+              const Icon(Icons.campaign_outlined, color: AppTheme.brandYellow, size: 18),
+              const SizedBox(width: 8),
+              const Text('Alertas de Equipo', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppTheme.errorRed.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppTheme.errorRed.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.warning_amber_rounded, color: AppTheme.errorRed, size: 16),
+                const SizedBox(width: 10),
+                Expanded(child: Text('Alta saturación en Fontanería y Pintura. Posibles retrasos de 2 días.', style: TextStyle(color: AppTheme.errorRed, fontSize: 11, fontWeight: FontWeight.w600, height: 1.3))),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Text('SATURACIÓN POR OFICIO', style: TextStyle(color: _textMuted, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+          const SizedBox(height: 14),
           Expanded(
-            child: activeSites.isEmpty 
-              ? const Center(child: Text('Sin obras activas', style: TextStyle(color: _textMuted)))
-              : ListView.builder(
-              itemCount: activeSites.length,
-              itemBuilder: (context, index) {
-                final site = activeSites[index];
-                // Simular un estado
-                final colors = [AppTheme.successGreen, AppTheme.warningAmber];
-                final statuses = ['En Tiempo', 'Retraso Ligero'];
-                final color = colors[index % colors.length];
-                final status = statuses[index % statuses.length];
-                
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(child: Text(site.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white70, fontSize: 12))),
-                      const SizedBox(width: 8),
-                      Text(status, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                );
-              },
+            child: ListView(
+              children: [
+                _buildProfessionBar('Fontanería', 0.95, AppTheme.errorRed),
+                _buildProfessionBar('Pintura', 0.85, AppTheme.warningAmber),
+                _buildProfessionBar('Electricidad', 0.60, AppTheme.brandYellow),
+                _buildProfessionBar('Albañilería', 0.40, AppTheme.successGreen),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfessionBar(String name, double percentage, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(name, style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500)),
+              Text('${(percentage * 100).toInt()}%', style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Container(
+            height: 6,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white10,
+              borderRadius: BorderRadius.circular(3),
+            ),
+            child: FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: percentage,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(3),
+                  boxShadow: [
+                    BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 4, offset: const Offset(0, 1)),
+                  ]
+                ),
+              ),
             ),
           ),
         ],
