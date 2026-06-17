@@ -86,7 +86,26 @@ class _MainShellState extends State<MainShell> {
   Widget build(BuildContext context) {
     // Si la pantalla es ancha (desktop/tablet landscape), mostramos el Advanced Dashboard
     if (MediaQuery.of(context).size.width > 900) {
-      return const AdvancedDashboardScreen();
+      return Scaffold(
+        backgroundColor: const Color(0xFF141416), // Dark background for sidebar
+        body: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AdvancedSidebar(
+              currentIndex: _currentIndex,
+              onTabSelected: _onTabSelected,
+            ),
+            Expanded(
+              child: _currentIndex == 0 
+                ? const AdvancedDashboardScreen() 
+                : Container(
+                    color: AppTheme.backgroundLight,
+                    child: _buildActiveTab(),
+                  ),
+            ),
+          ],
+        ),
+      );
     }
 
     return Scaffold(
