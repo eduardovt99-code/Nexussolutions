@@ -548,7 +548,8 @@ class _PlanningScreenState extends State<PlanningScreen> {
                             final startHour = log.checkIn.hour + log.checkIn.minute / 60.0;
                             final endHour = end.hour + end.minute / 60.0;
                             final leftFrac = ((startHour - timelineStartHour) / timelineHours).clamp(0.0, 1.0);
-                            final widthFrac = ((endHour - startHour) / timelineHours).clamp(0.05, 1.0 - leftFrac);
+                            final maxFrac = (1.0 - leftFrac) < 0.05 ? 0.05 : (1.0 - leftFrac);
+                            final widthFrac = ((endHour - startHour) / timelineHours).clamp(0.05, maxFrac);
                             
                             final List<Color> palette = site.status == 'active'
                                 ? [
