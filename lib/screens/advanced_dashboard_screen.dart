@@ -92,7 +92,16 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
                 Expanded(flex: 7, child: _GanttChartPanel(worksites: _worksites)),
                 const SizedBox(width: 16),
                 // SIDE MODULES
-                Expanded(flex: 2, child: const _TeamStatusPanel()),
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    children: [
+                      Expanded(child: _ModulesPanel(worksites: _worksites)),
+                      const SizedBox(height: 16),
+                      const Expanded(child: _TeamStatusPanel()),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -147,7 +156,12 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
             // SIDE MODULES (Vertical)
             SizedBox(
               height: 250,
-              child: const _TeamStatusPanel(),
+              child: _ModulesPanel(worksites: _worksites),
+            ),
+            const SizedBox(height: 16),
+            const SizedBox(
+              height: 350,
+              child: _TeamStatusPanel(),
             ),
             const SizedBox(height: 16),
             
@@ -537,6 +551,59 @@ class _TeamStatusPanel extends StatelessWidget {
                   ]
                 ),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ModulesPanel extends StatelessWidget {
+  final List<Worksite> worksites;
+  const _ModulesPanel({required this.worksites});
+
+  @override
+  Widget build(BuildContext context) {
+    final activeSites = worksites.where((w) => w.status == 'active').toList();
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: _cardBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _borderColor),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Estado de Obras Key', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          Expanded(
+            child: activeSites.isEmpty 
+              ? const Center(child: Text('Sin obras activas', style: TextStyle(color: _textMuted)))
+              : ListView.builder(
+              itemCount: activeSites.length,
+              itemBuilder: (context, index) {
+                final site = activeSites[index];
+                // Simular un estado
+                final colors = [AppTheme.successGreen, AppTheme.warningAmber];
+                final statuses = ['En Tiempo', 'Retraso Ligero'];
+                final color = colors[index % colors.length];
+                final status = statuses[index % statuses.length];
+                
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(child: Text(site.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white70, fontSize: 12))),
+                      const SizedBox(width: 8),
+                      Text(status, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
         ],
