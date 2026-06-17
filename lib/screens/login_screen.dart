@@ -33,19 +33,19 @@ class _LoginScreenState extends State<LoginScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceLight,
+        color: const Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE6EAF2)),
+        border: Border.all(color: const Color(0xFF333333)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: AppTheme.brandBlack),
+          Icon(icon, size: 16, color: AppTheme.brandYellow),
           const SizedBox(width: 6),
           Text(
             label,
             style: const TextStyle(
-              color: AppTheme.textPrimary,
+              color: AppTheme.pureWhite,
               fontSize: 12,
               fontWeight: FontWeight.w700,
             ),
@@ -58,6 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.brandBlack,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -69,12 +70,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Logo
-                  const Center(
-                    child: TajoLogo.onYellow(
-                      iconSize: 40,
-                      fontSize: 36,
-                      borderRadius: 16,
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                  Center(
+                    child: Image.asset(
+                      'assets/images/TAJO.png',
+                      width: 250,
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(height: 28),
@@ -85,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 2,
-                      color: AppTheme.textSecondary,
+                      color: Colors.white70,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -104,20 +104,34 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    style: const TextStyle(color: AppTheme.textPrimary),
-                    decoration: const InputDecoration(
+                    style: const TextStyle(color: AppTheme.pureWhite),
+                    decoration: InputDecoration(
                       labelText: 'CORREO ELECTRÓNICO',
-                      prefixIcon: Icon(Icons.email_outlined, color: AppTheme.textSecondary),
+                      labelStyle: const TextStyle(color: Colors.white70),
+                      prefixIcon: const Icon(Icons.email_outlined, color: Colors.white70),
+                      filled: true,
+                      fillColor: const Color(0xFF1A1A1A),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
-                    style: const TextStyle(color: AppTheme.textPrimary),
-                    decoration: const InputDecoration(
+                    style: const TextStyle(color: AppTheme.pureWhite),
+                    decoration: InputDecoration(
                       labelText: 'CONTRASEÑA',
-                      prefixIcon: Icon(Icons.lock_outline, color: AppTheme.textSecondary),
+                      labelStyle: const TextStyle(color: Colors.white70),
+                      prefixIcon: const Icon(Icons.lock_outline, color: Colors.white70),
+                      filled: true,
+                      fillColor: const Color(0xFF1A1A1A),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                     onSubmitted: (_) => _login(),
                   ),
@@ -125,11 +139,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Botón con el gradiente de marca
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      color: AppTheme.brandBlack,
+                      color: AppTheme.brandYellow,
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.brandBlack.withValues(alpha: 0.25),
+                          color: AppTheme.brandYellow.withValues(alpha: 0.25),
                           blurRadius: 16,
                           offset: const Offset(0, 6),
                         ),
@@ -142,7 +156,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         shadowColor: Colors.transparent,
                         padding: const EdgeInsets.symmetric(vertical: 18),
                       ),
-                      child: const Text('ENTRAR', style: TextStyle(letterSpacing: 2)),
+                      child: const Text(
+                        'ENTRAR', 
+                        style: TextStyle(
+                          letterSpacing: 2,
+                          color: AppTheme.brandBlack,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -152,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       fontStyle: FontStyle.italic,
-                      color: AppTheme.textSecondary,
+                      color: Colors.white54,
                     ),
                   ),
                 ],
