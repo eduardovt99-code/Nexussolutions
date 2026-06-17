@@ -556,6 +556,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                                 decoration: BoxDecoration(
                                   color: _worksiteBarColor(site.status, plannedOnly: false),
                                   borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: const Color(0xFFF7F8FA), width: 1.5),
                                 ),
                                 padding: const EdgeInsets.symmetric(horizontal: 4),
                                 alignment: Alignment.centerLeft,
