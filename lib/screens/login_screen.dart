@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
             createdAt: DateTime.now(),
           );
           await DatabaseService().saveUserProfile(profile);
-          await DatabaseService().seedForNewUser();
+          // Omitimos la inyección de datos de demo para que empiecen en limpio.
         }
       }
     } on FirebaseAuthException catch (e) {
