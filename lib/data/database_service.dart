@@ -30,10 +30,10 @@ class DatabaseService {
     if (storedVersion != _seedVersion) {
       try {
         // Poblar Firestore con los datos iniciales
-        await _seedFirestore();
+        await _seedFirestore().timeout(const Duration(seconds: 5));
         await prefs.setInt('seed_version_firestore', _seedVersion);
       } catch (e) {
-        print("Error al inicializar Firestore (posible problema de permisos): $e");
+        print("Error al inicializar Firestore (posible problema de conexión/permisos): $e");
       }
     }
   }
@@ -48,7 +48,7 @@ class DatabaseService {
   // WORKSITES
   Future<List<Worksite>> getWorksites() async {
     try {
-      final snapshot = await _db.collection('worksites').get();
+      final snapshot = await _db.collection('worksites').get().timeout(const Duration(seconds: 5));
       return snapshot.docs.map((doc) => Worksite.fromJson(doc.data())).toList();
     } catch (e) {
       print("Error fetching worksites: $e");
@@ -76,7 +76,7 @@ class DatabaseService {
   // BUDGETS
   Future<List<Budget>> getAllBudgets() async {
     try {
-      final snapshot = await _db.collection('budgets').get();
+      final snapshot = await _db.collection('budgets').get().timeout(const Duration(seconds: 5));
       return snapshot.docs.map((doc) => Budget.fromJson(doc.data())).toList();
     } catch (e) {
       print("Error fetching budgets: $e");
