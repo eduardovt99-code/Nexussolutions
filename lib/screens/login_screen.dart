@@ -23,6 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLogin = true;
   bool _isLoading = false;
   String? _errorMessage;
+  bool _isSuccessMessage = false;
 
   @override
   void dispose() {
@@ -43,20 +44,32 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (_isLogin) {
       if (email.isEmpty || password.isEmpty) {
-        setState(() => _errorMessage = 'Por favor, llena todos los campos.');
+        setState(() {
+          _errorMessage = 'Por favor, llena todos los campos.';
+          _isSuccessMessage = false;
+        });
         return;
       }
     } else {
       if (email.isEmpty || password.isEmpty || name.isEmpty || company.isEmpty || confirmPassword.isEmpty) {
-        setState(() => _errorMessage = 'Por favor, llena todos los campos.');
+        setState(() {
+          _errorMessage = 'Por favor, llena todos los campos.';
+          _isSuccessMessage = false;
+        });
         return;
       }
       if (password.length < 8) {
-        setState(() => _errorMessage = 'La contraseña debe tener al menos 8 caracteres.');
+        setState(() {
+          _errorMessage = 'La contraseña debe tener al menos 8 caracteres.';
+          _isSuccessMessage = false;
+        });
         return;
       }
       if (password != confirmPassword) {
-        setState(() => _errorMessage = 'Las contraseñas no coinciden.');
+        setState(() {
+          _errorMessage = 'Las contraseñas no coinciden.';
+          _isSuccessMessage = false;
+        });
         return;
       }
     }
@@ -64,16 +77,27 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
+      _isSuccessMessage = false;
     });
 
     HapticFeedback.mediumImpact();
 
     try {
       if (_isLogin) {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
+        final userCred = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
+        
+        if (userCred.user != null && !userCred.user!.emailVerified) {
+          await FirebaseAuth.instance.signOut();
+          setState(() {
+            _errorMessage = 'Por favor, verifica tu correo electrónico usando el enlace que te enviamos antes de iniciar sesión.';
+            _isSuccessMessage = false;
+          });
+          return;
+        }
+
       } else {
         final userCred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
@@ -90,16 +114,46 @@ class _LoginScreenState extends State<LoginScreen> {
             createdAt: DateTime.now(),
           );
           await DatabaseService().saveUserProfile(profile);
-          // Omitimos la inyección de datos de demo para que empiecen en limpio.
+          
+          await userCred.user?.sendEmailVerification();
+          await FirebaseAuth.instance.signOut();
+          
+          setState(() {
+            _isLogin = true;
+            _errorMessage = '¡Cuenta creada! Hemos enviado un enlace de verificación a tu correo. Por favor, verifícalo para poder entrar.';
+            _isSuccessMessage = true;
+            _passwordController.clear();
+            _confirmPasswordController.clear();
+          });
+          return;
         }
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
-        _errorMessage = e.message;
+        _isSuccessMessage = false;
+        switch (e.code) {
+          case 'email-already-in-use':
+            _errorMessage = 'Ya existe un usuario registrado con este correo.';
+            break;
+          case 'invalid-email':
+            _errorMessage = 'El correo electrónico no es válido.';
+            break;
+          case 'weak-password':
+            _errorMessage = 'La contraseña es demasiado débil.';
+            break;
+          case 'user-not-found':
+          case 'wrong-password':
+          case 'invalid-credential':
+            _errorMessage = 'Correo o contraseña incorrectos.';
+            break;
+          default:
+            _errorMessage = e.message ?? 'Ocurrió un error en la autenticación.';
+        }
       });
     } catch (e) {
       setState(() {
         _errorMessage = 'Ocurrió un error inesperado.';
+        _isSuccessMessage = false;
       });
     } finally {
       if (mounted) {
@@ -186,13 +240,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.all(12),
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
-                        color: Colors.red.withValues(alpha: 0.1),
-                        border: Border.all(color: Colors.red),
+                        color: _isSuccessMessage 
+                            ? Colors.green.withValues(alpha: 0.1) 
+                            : Colors.red.withValues(alpha: 0.1),
+                        border: Border.all(
+                            color: _isSuccessMessage ? Colors.green : Colors.red),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         _errorMessage!,
-                        style: const TextStyle(color: Colors.red, fontSize: 13),
+                        style: TextStyle(
+                            color: _isSuccessMessage ? Colors.green : Colors.red, 
+                            fontSize: 13),
                         textAlign: TextAlign.center,
                       ),
                     ),
