@@ -48,6 +48,10 @@ class DatabaseService {
     await saveWorkers(seededWorkers);
   }
 
+  Future<void> saveUserProfile(UserProfile profile) async {
+    await _db.collection('users').doc(profile.id).set(profile.toJson());
+  }
+
   // WORKSITES
   Future<List<Worksite>> getWorksites() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;

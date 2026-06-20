@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/app_theme.dart';
 import '../main.dart' show MainShell;
 import '../data/database_service.dart';
+import '../models/models.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,6 +16,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _companyController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   
   bool _isLogin = true;
   bool _isLoading = false;
@@ -24,16 +28,37 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _nameController.dispose();
+    _companyController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
+    final name = _nameController.text.trim();
+    final company = _companyController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      setState(() => _errorMessage = 'Por favor, llena todos los campos.');
-      return;
+    if (_isLogin) {
+      if (email.isEmpty || password.isEmpty) {
+        setState(() => _errorMessage = 'Por favor, llena todos los campos.');
+        return;
+      }
+    } else {
+      if (email.isEmpty || password.isEmpty || name.isEmpty || company.isEmpty || confirmPassword.isEmpty) {
+        setState(() => _errorMessage = 'Por favor, llena todos los campos.');
+        return;
+      }
+      if (password.length < 8) {
+        setState(() => _errorMessage = 'La contraseña debe tener al menos 8 caracteres.');
+        return;
+      }
+      if (password != confirmPassword) {
+        setState(() => _errorMessage = 'Las contraseñas no coinciden.');
+        return;
+      }
     }
 
     setState(() {
@@ -49,14 +74,24 @@ class _LoginScreenState extends State<LoginScreen> {
           email: email,
           password: password,
         );
-        // Si es login exitoso, MainShell será mostrado automáticamente por el StreamBuilder en main.dart
       } else {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        final userCred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
-        // Si es registro, inicializamos los datos de demo para que el usuario nuevo tenga contenido
-        await DatabaseService().seedForNewUser();
+        
+        final uid = userCred.user?.uid;
+        if (uid != null) {
+          final profile = UserProfile(
+            id: uid,
+            name: name,
+            companyName: company,
+            email: email,
+            createdAt: DateTime.now(),
+          );
+          await DatabaseService().saveUserProfile(profile);
+          await DatabaseService().seedForNewUser();
+        }
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -162,6 +197,41 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
 
+                  if (!_isLogin) ...[
+                    TextField(
+                      controller: _nameController,
+                      style: const TextStyle(color: AppTheme.pureWhite),
+                      decoration: InputDecoration(
+                        labelText: 'NOMBRE COMPLETO',
+                        labelStyle: const TextStyle(color: Colors.white70),
+                        prefixIcon: const Icon(Icons.person_outline, color: Colors.white70),
+                        filled: true,
+                        fillColor: const Color(0xFF1A1A1A),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _companyController,
+                      style: const TextStyle(color: AppTheme.pureWhite),
+                      decoration: InputDecoration(
+                        labelText: 'NOMBRE DE LA EMPRESA / CONSTRUCTORA',
+                        labelStyle: const TextStyle(color: Colors.white70),
+                        prefixIcon: const Icon(Icons.business, color: Colors.white70),
+                        filled: true,
+                        fillColor: const Color(0xFF1A1A1A),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
                   TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -194,8 +264,28 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderSide: BorderSide.none,
                       ),
                     ),
-                    onSubmitted: (_) => _submit(),
+                    onSubmitted: (_) => _isLogin ? _submit() : null,
                   ),
+                  if (!_isLogin) ...[
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _confirmPasswordController,
+                      obscureText: true,
+                      style: const TextStyle(color: AppTheme.pureWhite),
+                      decoration: InputDecoration(
+                        labelText: 'CONFIRMAR CONTRASEÑA',
+                        labelStyle: const TextStyle(color: Colors.white70),
+                        prefixIcon: const Icon(Icons.lock_outline, color: Colors.white70),
+                        filled: true,
+                        fillColor: const Color(0xFF1A1A1A),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      onSubmitted: (_) => _submit(),
+                    ),
+                  ],
                   const SizedBox(height: 28),
                   // Botón con el gradiente de marca
                   DecoratedBox(

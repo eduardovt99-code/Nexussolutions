@@ -220,3 +220,35 @@ class Worker {
     weeklyCapacityHours: (json['weeklyCapacityHours'] as num?)?.toDouble() ?? 40,
   );
 }
+
+class UserProfile {
+  final String id;
+  final String name;
+  final String companyName;
+  final String email;
+  final DateTime createdAt;
+
+  UserProfile({
+    required this.id,
+    required this.name,
+    required this.companyName,
+    required this.email,
+    required this.createdAt,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'companyName': companyName,
+    'email': email,
+    'createdAt': createdAt.toIso8601String(),
+  };
+
+  factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
+    id: json['id'],
+    name: json['name'] ?? '',
+    companyName: json['companyName'] ?? '',
+    email: json['email'] ?? '',
+    createdAt: DateTime.parse(json['createdAt']),
+  );
+}
