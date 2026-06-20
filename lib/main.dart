@@ -9,9 +9,10 @@ import 'theme/app_theme.dart';
 import 'models/models.dart';
 import 'data/database_service.dart';
 import 'screens/login_screen.dart';
-import 'screens/dashboard_screen.dart';
 import 'screens/worksite_detail_screen.dart';
 import 'screens/pro_calculator_screen.dart';
+import 'screens/planning_screen.dart';
+import 'screens/team_screen.dart';
 import 'screens/planning_screen.dart';
 import 'screens/advanced_dashboard_screen.dart';
 import 'screens/verification_screen.dart';
@@ -180,7 +181,7 @@ class _MainShellState extends State<MainShell> {
       case 0:
         return const AdvancedDashboardScreen();
       case 1:
-        return DashboardScreen(onNavigateTab: _goToTab);
+        return const TeamScreen();
       case 2:
         return const ProjectsScreen();
       case 3:
@@ -260,13 +261,13 @@ class _MainShellState extends State<MainShell> {
               label: 'DASHBOARD',
             ),
             const NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
-              label: 'OBRAS',
+              icon: Icon(Icons.groups_outlined),
+              selectedIcon: Icon(Icons.groups),
+              label: 'EQUIPO',
             ),
             const NavigationDestination(
-              icon: Icon(Icons.construction_outlined),
-              selectedIcon: Icon(Icons.construction),
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home),
               label: 'OBRAS',
             ),
             const NavigationDestination(

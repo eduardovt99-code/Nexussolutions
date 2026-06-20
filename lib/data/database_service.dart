@@ -200,4 +200,20 @@ class DatabaseService {
     }
     await batch.commit();
   }
+
+  Future<void> saveWorker(Worker worker) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final w = Worker(
+      id: worker.id,
+      ownerId: uid,
+      name: worker.name,
+      profession: worker.profession,
+      weeklyCapacityHours: worker.weeklyCapacityHours,
+    );
+    await _db.collection('workers').doc(w.id).set(w.toJson());
+  }
+
+  Future<void> deleteWorker(String workerId) async {
+    await _db.collection('workers').doc(workerId).delete();
+  }
 }

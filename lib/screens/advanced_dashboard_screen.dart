@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/app_theme.dart';
 import '../models/models.dart';
 import '../data/database_service.dart';
+import '../data/crew_capacity.dart';
 
 const Color _darkBg = Color(0xFF141416);
 const Color _cardBg = Color(0xFF1E1E20);
@@ -21,6 +22,8 @@ class AdvancedDashboardScreen extends StatefulWidget {
 class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
   List<Worksite> _worksites = [];
   List<Budget> _budgets = [];
+  List<Worker> _workers = [];
+  List<TimeLog> _timeLogs = [];
   bool _isLoading = true;
 
   @override
@@ -32,10 +35,14 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
   Future<void> _loadData() async {
     final worksites = await DatabaseService().getWorksites();
     final budgets = await DatabaseService().getAllBudgets();
+    final workers = await DatabaseService().getAllWorkers();
+    final timeLogs = await DatabaseService().getAllTimeLogs();
     if (!mounted) return;
     setState(() {
       _worksites = worksites;
       _budgets = budgets;
+      _workers = workers;
+      _timeLogs = timeLogs;
       _isLoading = false;
     });
   }
@@ -69,7 +76,6 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // HEADER
           Row(
             children: [
               const Text(
@@ -84,23 +90,20 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
           ),
           const SizedBox(height: 24),
           
-          // GANTT & SIDE MODULES
           Expanded(
             flex: 3,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // GANTT CHART
                 Expanded(flex: 7, child: _GanttChartPanel(worksites: _worksites)),
                 const SizedBox(width: 16),
-                // SIDE MODULES
                 Expanded(
                   flex: 2,
                   child: Column(
                     children: [
                       Expanded(flex: 3, child: _ModulesPanel(worksites: _worksites)),
                       const SizedBox(height: 16),
-                      const Expanded(flex: 5, child: _TeamStatusPanel()),
+                      Expanded(flex: 5, child: _TeamStatusPanel(workers: _workers, timeLogs: _timeLogs)),
                     ],
                   ),
                 ),
@@ -109,7 +112,6 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
           ),
           const SizedBox(height: 16),
 
-          // BOTTOM CARDS
           Expanded(
             flex: 2,
             child: Row(
@@ -135,14 +137,12 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // HEADER (Mobile)
             const Text(
               'Suite Avanzada de Gestión\nde Construcciones TAJO',
               style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800, height: 1.2),
             ),
             const SizedBox(height: 24),
             
-            // GANTT CHART (Scrollable horizontally)
             SizedBox(
               height: 350,
               child: SingleChildScrollView(
@@ -155,19 +155,17 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
             ),
             const SizedBox(height: 16),
             
-            // SIDE MODULES (Vertical)
             SizedBox(
               height: 180,
               child: _ModulesPanel(worksites: _worksites),
             ),
             const SizedBox(height: 16),
-            const SizedBox(
+            SizedBox(
               height: 420,
-              child: _TeamStatusPanel(),
+              child: _TeamStatusPanel(workers: _workers, timeLogs: _timeLogs),
             ),
             const SizedBox(height: 16),
             
-            // BOTTOM CARDS (Stacked)
             SizedBox(
               height: 280,
               child: _AvanceProyectoCard(worksites: _worksites),
@@ -190,9 +188,6 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────
-// SIDEBAR (Exportado para MainShell)
-// ─────────────────────────────────────────────────────────────────
 class AdvancedSidebar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTabSelected;
@@ -229,32 +224,32 @@ class AdvancedSidebar extends StatelessWidget {
             onTap: () => onTabSelected(0),
           ),
           _NavItem(
-            icon: Icons.home, 
-            label: 'Obras', 
+            icon: Icons.groups, 
+            label: 'Equipo', 
             isSelected: currentIndex == 1,
             onTap: () => onTabSelected(1),
           ),
           _NavItem(
-            icon: Icons.local_shipping, 
-            label: 'Logística de\nObras',
+            icon: Icons.home, 
+            label: 'Obras', 
             isSelected: currentIndex == 2,
             onTap: () => onTabSelected(2),
           ),
           _NavItem(
             icon: Icons.calendar_today, 
-            label: 'Cronogramas\nde Tareas',
+            label: 'Planificación',
             isSelected: currentIndex == 3,
             onTap: () => onTabSelected(3),
           ),
           _NavItem(
             icon: Icons.calculate, 
-            label: 'Calculadora\nPro-Calc',
+            label: 'Pro-Calc',
             isSelected: currentIndex == 4,
             onTap: () => onTabSelected(4),
           ),
           _NavItem(
             icon: Icons.account_balance_wallet, 
-            label: 'Presupuestos\ny Costos',
+            label: 'Finanzas',
             isSelected: currentIndex == 5,
             onTap: () => onTabSelected(5),
           ),
@@ -326,16 +321,12 @@ class _NavItem extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────
-// GANTT CHART PANEL
-// ─────────────────────────────────────────────────────────────────
 class _GanttChartPanel extends StatelessWidget {
   final List<Worksite> worksites;
   const _GanttChartPanel({required this.worksites});
 
   @override
   Widget build(BuildContext context) {
-    // Tomar las últimas 12 obras sin importar estado para mostrar en el gráfico
     final displaySites = worksites.take(12).toList();
     if (displaySites.isEmpty) {
       displaySites.add(Worksite(
@@ -362,7 +353,6 @@ class _GanttChartPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header
           Container(
             padding: const EdgeInsets.all(12),
             decoration: const BoxDecoration(
@@ -395,7 +385,6 @@ class _GanttChartPanel extends StatelessWidget {
               ],
             ),
           ),
-          // Rows
           Expanded(
             child: ListView.builder(
               itemCount: displaySites.length,
@@ -422,12 +411,10 @@ class _GanttChartPanel extends StatelessWidget {
                       Expanded(
                         child: Stack(
                           children: [
-                            // Vertical grid lines
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: List.generate(12, (i) => Container(width: 1, color: _borderColor)),
                             ),
-                            // Gantt Bar
                             Positioned(
                               top: 10,
                               bottom: 10,
@@ -479,11 +466,11 @@ class _GanttChartPanel extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────
-// SIDE MODULES
-// ─────────────────────────────────────────────────────────────────
 class _TeamStatusPanel extends StatelessWidget {
-  const _TeamStatusPanel();
+  final List<Worker> workers;
+  final List<TimeLog> timeLogs;
+
+  const _TeamStatusPanel({required this.workers, required this.timeLogs});
 
   @override
   Widget build(BuildContext context) {
@@ -497,49 +484,68 @@ class _TeamStatusPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(Icons.campaign_outlined, color: AppTheme.brandYellow, size: 18),
-              const SizedBox(width: 8),
-              const Text('Alertas de Equipo', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+              Icon(Icons.campaign_outlined, color: AppTheme.brandYellow, size: 18),
+              SizedBox(width: 8),
+              Text('Alertas de Equipo', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
             ],
           ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppTheme.errorRed.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppTheme.errorRed.withValues(alpha: 0.3)),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.warning_amber_rounded, color: AppTheme.errorRed, size: 16),
-                const SizedBox(width: 10),
-                Expanded(child: Text('Alta saturación en Fontanería y Pintura. Posibles retrasos de 2 días.', style: TextStyle(color: AppTheme.errorRed, fontSize: 11, fontWeight: FontWeight.w600, height: 1.3))),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          const Text('SATURACIÓN POR OFICIO', style: TextStyle(color: _textMuted, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-          const SizedBox(height: 14),
-          Expanded(
-            child: ListView(
-              children: [
-                _buildProfessionBar('Fontanería', 0.95, AppTheme.errorRed),
-                _buildProfessionBar('Pintura', 0.85, AppTheme.warningAmber),
-                _buildProfessionBar('Pladur', 0.75, AppTheme.warningAmber),
-                _buildProfessionBar('Electricidad', 0.60, AppTheme.brandYellow),
-                _buildProfessionBar('Carpintería', 0.55, AppTheme.brandYellow),
-                _buildProfessionBar('Albañilería', 0.40, AppTheme.successGreen),
-                _buildProfessionBar('Climatización', 0.35, AppTheme.successGreen),
-                _buildProfessionBar('Limpieza Fin de Obra', 0.20, AppTheme.successGreen),
-              ],
-            ),
-          ),
+          const SizedBox(height: 16),
+          ..._buildDynamicAlerts(),
         ],
       ),
     );
+  }
+
+  List<Widget> _buildDynamicAlerts() {
+    if (workers.isEmpty) {
+      return [const Center(child: Text('Sin datos de equipo', style: TextStyle(color: _textMuted)))];
+    }
+
+    final now = DateTime.now();
+    final weekBounds = CrewCapacity.currentWeekBounds(now);
+    final capacities = CrewCapacity.byProfession(
+      workers: workers,
+      logs: timeLogs,
+      periodStart: weekBounds.$1,
+      periodEnd: weekBounds.$2,
+      workerCapacityInPeriod: (w) => w.weeklyCapacityHours,
+    );
+
+    final saturated = capacities.where((c) => c.utilizationRatio > 0.8).toList();
+    List<Widget> widgets = [];
+
+    if (saturated.isNotEmpty) {
+      final names = saturated.map((c) => c.label).join(', ');
+      widgets.add(
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: AppTheme.errorRed.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppTheme.errorRed.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.warning_amber_rounded, color: AppTheme.errorRed, size: 16),
+              const SizedBox(width: 8),
+              Expanded(child: Text('Alta saturación: $names', style: const TextStyle(color: AppTheme.errorRed, fontSize: 11, fontWeight: FontWeight.w600))),
+            ],
+          ),
+        ),
+      );
+    }
+
+    widgets.add(const SizedBox(height: 16));
+    widgets.add(const Text('SATURACIÓN POR OFICIO', style: TextStyle(color: _textMuted, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)));
+    widgets.add(const SizedBox(height: 12));
+
+    for (var c in capacities) {
+      final color = c.utilizationRatio > 0.8 ? AppTheme.errorRed : AppTheme.brandYellow;
+      widgets.add(_buildProfessionBar(c.label, c.utilizationRatio, color));
+    }
+    return widgets;
   }
 
   Widget _buildProfessionBar(String name, double percentage, Color color) {
