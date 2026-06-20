@@ -28,9 +28,13 @@ class DatabaseService {
     final storedVersion = prefs.getInt('seed_version_firestore');
     
     if (storedVersion != _seedVersion) {
-      // Poblar Firestore con los datos iniciales
-      await _seedFirestore();
-      await prefs.setInt('seed_version_firestore', _seedVersion);
+      try {
+        // Poblar Firestore con los datos iniciales
+        await _seedFirestore();
+        await prefs.setInt('seed_version_firestore', _seedVersion);
+      } catch (e) {
+        print("Error al inicializar Firestore (posible problema de permisos): $e");
+      }
     }
   }
 
@@ -43,8 +47,13 @@ class DatabaseService {
 
   // WORKSITES
   Future<List<Worksite>> getWorksites() async {
-    final snapshot = await _db.collection('worksites').get();
-    return snapshot.docs.map((doc) => Worksite.fromJson(doc.data())).toList();
+    try {
+      final snapshot = await _db.collection('worksites').get();
+      return snapshot.docs.map((doc) => Worksite.fromJson(doc.data())).toList();
+    } catch (e) {
+      print("Error fetching worksites: $e");
+      return [];
+    }
   }
 
   Future<void> saveWorksites(List<Worksite> worksites) async {
@@ -66,8 +75,13 @@ class DatabaseService {
 
   // BUDGETS
   Future<List<Budget>> getAllBudgets() async {
-    final snapshot = await _db.collection('budgets').get();
-    return snapshot.docs.map((doc) => Budget.fromJson(doc.data())).toList();
+    try {
+      final snapshot = await _db.collection('budgets').get();
+      return snapshot.docs.map((doc) => Budget.fromJson(doc.data())).toList();
+    } catch (e) {
+      print("Error fetching budgets: $e");
+      return [];
+    }
   }
 
   Future<List<Budget>> getBudgets(String worksiteId) async {

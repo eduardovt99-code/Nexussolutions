@@ -19,17 +19,21 @@ const Color _cardBorder = AppTheme.borderDark;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: "AIzaSyAer59kHeAfSTIqEA-pvU6dPXAnYKxCTeU",
-      appId: "1:783193222774:web:a200eaa1d4a4b0709b3957",
-      messagingSenderId: "783193222774",
-      projectId: "tajo-513a9",
-      authDomain: "tajo-513a9.firebaseapp.com",
-      storageBucket: "tajo-513a9.firebasestorage.app",
-      measurementId: "G-BGJMBDRS3S",
-    ),
-  );
+  try {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "AIzaSyAer59kHeAfSTIqEA-pvU6dPXAnYKxCTeU",
+        appId: "1:783193222774:web:a200eaa1d4a4b0709b3957",
+        messagingSenderId: "783193222774",
+        projectId: "tajo-513a9",
+        authDomain: "tajo-513a9.firebaseapp.com",
+        storageBucket: "tajo-513a9.firebasestorage.app",
+        measurementId: "G-BGJMBDRS3S",
+      ),
+    );
+  } catch (e) {
+    print("Error initializing Firebase: $e");
+  }
   await initializeDateFormatting('es_ES');
   await DatabaseService().init();
   runApp(const TajoApp());
