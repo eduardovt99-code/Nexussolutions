@@ -87,19 +87,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       if (_isLogin) {
-        final userCred = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
-        
-        if (userCred.user != null && !userCred.user!.emailVerified) {
-          await FirebaseAuth.instance.signOut();
-          setState(() {
-            _errorMessage = 'Por favor, verifica tu correo electrónico usando el enlace que te enviamos antes de iniciar sesión.';
-            _isSuccessMessage = false;
-          });
-          return;
-        }
 
       } else {
         final userCred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -120,15 +111,10 @@ class _LoginScreenState extends State<LoginScreen> {
           await DatabaseService().saveUserProfile(profile);
           
           await userCred.user?.sendEmailVerification();
-          await FirebaseAuth.instance.signOut();
           
-          setState(() {
-            _isLogin = true;
-            _errorMessage = '¡Cuenta creada! Hemos enviado un enlace de verificación a tu correo. Por favor, verifícalo para poder entrar.';
-            _isSuccessMessage = true;
-            _passwordController.clear();
-            _confirmPasswordController.clear();
-          });
+          // No cerramos sesión manualmente ni mostramos el mensaje de éxito aquí.
+          // Dejamos que el usuario "inicie sesión", y el StreamBuilder de main.dart
+          // lo atrapará enviándolo a la VerificationScreen porque emailVerified es false.
           return;
         }
       }

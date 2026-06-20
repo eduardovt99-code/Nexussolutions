@@ -14,6 +14,7 @@ import 'screens/worksite_detail_screen.dart';
 import 'screens/pro_calculator_screen.dart';
 import 'screens/planning_screen.dart';
 import 'screens/advanced_dashboard_screen.dart';
+import 'screens/verification_screen.dart';
 import 'demo_version.dart';
 
 const Color _cardBorder = AppTheme.borderDark;
@@ -126,7 +127,7 @@ class TajoApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
+        stream: FirebaseAuth.instance.userChanges(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
@@ -137,6 +138,9 @@ class TajoApp extends StatelessWidget {
             );
           }
           if (snapshot.hasData && snapshot.data != null) {
+            if (!snapshot.data!.emailVerified) {
+              return const VerificationScreen();
+            }
             return const MainShell();
           }
           return const LoginScreen();
