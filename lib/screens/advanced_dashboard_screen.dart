@@ -339,7 +339,8 @@ class _GanttChartPanel extends StatelessWidget {
     final displaySites = worksites.take(12).toList();
     if (displaySites.isEmpty) {
       displaySites.add(Worksite(
-        id: 'mock', 
+        id: 'mock',
+        ownerId: '', 
         name: 'Sin obras activas', 
         clientName: '', 
         address: '', 

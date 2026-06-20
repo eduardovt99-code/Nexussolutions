@@ -366,7 +366,7 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
   Future<void> _loadData() async {
     final db = DatabaseService();
     final worksites = await db.getWorksites();
-    final workers = await db.getWorkers();
+    final workers = await db.getAllWorkers();
     final logs = await db.getAllTimeLogs();
     if (!mounted) return;
     setState(() {
@@ -641,6 +641,7 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
 
     final budget = Budget(
       id: 'bdg_${DateTime.now().millisecondsSinceEpoch}',
+      ownerId: '',
       worksiteId: site.id,
       totalAmount: total,
       status: 'draft',

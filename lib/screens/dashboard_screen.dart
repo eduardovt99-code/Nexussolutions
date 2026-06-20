@@ -795,6 +795,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                   final newWorksite = Worksite(
                     id: 'ws_${DateTime.now().millisecondsSinceEpoch}',
+                    ownerId: '',
                     name: nameController.text,
                     clientName: clientController.text,
                     address: addressController.text,
@@ -1021,6 +1022,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                         final updatedWorksite = Worksite(
                           id: worksite.id,
+                          ownerId: worksite.ownerId,
                           name: nameController.text,
                           clientName: clientController.text,
                           address: worksite.address,

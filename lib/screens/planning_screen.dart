@@ -153,7 +153,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
     final db = DatabaseService();
     final worksites = await db.getWorksites();
     final logs = await db.getAllTimeLogs();
-    final workers = await db.getWorkers();
+    final workers = await db.getAllWorkers();
     if (!mounted) return;
     setState(() {
       _worksites = worksites.where((w) => w.status != 'completed').toList();
@@ -732,7 +732,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
               final worker = _workers.firstWhere(
                 (w) => w.name == wName,
                 orElse: () =>
-                    Worker(id: '', name: wName, profession: 'general'),
+                    Worker(id: '', ownerId: '', name: wName, profession: 'general'),
               );
               final dayLogs = siteLogs
                   .where(
@@ -1014,7 +1014,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
               final worker = _workers.firstWhere(
                 (w) => w.name == wName,
                 orElse: () =>
-                    Worker(id: '', name: wName, profession: 'general'),
+                    Worker(id: '', ownerId: '', name: wName, profession: 'general'),
               );
 
               final List<List<int>> segments = [];
@@ -1287,7 +1287,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
               final worker = _workers.firstWhere(
                 (w) => w.name == wName,
                 orElse: () =>
-                    Worker(id: '', name: wName, profession: 'general'),
+                    Worker(id: '', ownerId: '', name: wName, profession: 'general'),
               );
 
               final List<List<int>> segments = [];

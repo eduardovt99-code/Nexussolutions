@@ -86,7 +86,8 @@ class _WorksiteDetailScreenState extends State<WorksiteDetailScreen> with Single
       final cost = hoursWorked * kHourlyRate;
 
       final newLog = TimeLog(
-        id: 'tl_${DateTime.now().millisecondsSinceEpoch}',
+        id: 'log_${DateTime.now().millisecondsSinceEpoch}',
+        ownerId: '',
         userId: 'Eduardo Ruiz',
         worksiteId: widget.worksite.id,
         checkIn: _currentSessionStart!,
@@ -1122,6 +1123,7 @@ class _AIQuoteAssistantModalState extends State<AIQuoteAssistantModal> with Tick
 
     final newBudget = Budget(
       id: 'bdg_${DateTime.now().millisecondsSinceEpoch}',
+      ownerId: '',
       worksiteId: widget.worksiteId,
       totalAmount: _grandTotal,
       status: 'sent',
