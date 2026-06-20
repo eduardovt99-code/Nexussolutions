@@ -17,26 +17,88 @@ import 'demo_version.dart';
 
 const Color _cardBorder = AppTheme.borderDark;
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey: "AIzaSyAer59kHeAfSTIqEA-pvU6dPXAnYKxCTeU",
-        appId: "1:783193222774:web:a200eaa1d4a4b0709b3957",
-        messagingSenderId: "783193222774",
-        projectId: "tajo-513a9",
-        authDomain: "tajo-513a9.firebaseapp.com",
-        storageBucket: "tajo-513a9.firebasestorage.app",
-        measurementId: "G-BGJMBDRS3S",
-      ),
-    );
-  } catch (e) {
-    print("Error initializing Firebase: $e");
+  runApp(const InitApp());
+}
+
+class InitApp extends StatefulWidget {
+  const InitApp({super.key});
+  @override
+  State<InitApp> createState() => _InitAppState();
+}
+
+class _InitAppState extends State<InitApp> {
+  bool _initialized = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _initAll();
   }
-  await initializeDateFormatting('es_ES');
-  await DatabaseService().init();
-  runApp(const TajoApp());
+
+  Future<void> _initAll() async {
+    try {
+      await Firebase.initializeApp(
+        options: const FirebaseOptions(
+          apiKey: "AIzaSyAer59kHeAfSTIqEA-pvU6dPXAnYKxCTeU",
+          appId: "1:783193222774:web:a200eaa1d4a4b0709b3957",
+          messagingSenderId: "783193222774",
+          projectId: "tajo-513a9",
+          authDomain: "tajo-513a9.firebaseapp.com",
+          storageBucket: "tajo-513a9.firebasestorage.app",
+          measurementId: "G-BGJMBDRS3S",
+        ),
+      );
+      await initializeDateFormatting('es_ES');
+      await DatabaseService().init();
+      setState(() {
+        _initialized = true;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+      });
+      print("Error initializing app: $e");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_error != null) {
+      return MaterialApp(
+        theme: ThemeData.dark(),
+        home: Scaffold(
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text(
+                "Error de inicialización:\n$_error",
+                style: const TextStyle(color: Colors.red, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (!_initialized) {
+      return MaterialApp(
+        theme: ThemeData.dark().copyWith(
+          scaffoldBackgroundColor: const Color(0xFF1E1E1E),
+        ),
+        home: const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(color: Colors.amber),
+          ),
+        ),
+      );
+    }
+
+    return const TajoApp();
+  }
 }
 
 class TajoApp extends StatelessWidget {
