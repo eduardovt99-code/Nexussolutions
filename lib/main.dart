@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'theme/app_theme.dart';
 import 'models/models.dart';
@@ -18,6 +19,17 @@ const Color _cardBorder = AppTheme.borderDark;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+      apiKey: "AIzaSyAer59kHeAfSTIqEA-pvU6dPXAnYKxCTeU",
+      appId: "1:783193222774:web:a200eaa1d4a4b0709b3957",
+      messagingSenderId: "783193222774",
+      projectId: "tajo-513a9",
+      authDomain: "tajo-513a9.firebaseapp.com",
+      storageBucket: "tajo-513a9.firebasestorage.app",
+      measurementId: "G-BGJMBDRS3S",
+    ),
+  );
   await initializeDateFormatting('es_ES');
   await DatabaseService().init();
   runApp(const TajoApp());
