@@ -12,7 +12,7 @@ class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   /// Versión de los datos de demo: al subirla se reemplazan los datos antiguos.
-  static const int _seedVersion = 10;
+  static const int _seedVersion = 11;
 
   Future<void> init() async {
     // Usamos SharedPreferences solo para saber si ya inicializamos Firestore en este navegador
@@ -21,7 +21,8 @@ class DatabaseService {
     
     final storedBuild = prefs.getString('app_build_id');
     if (storedBuild != DemoVersion.build) {
-      await prefs.clear();
+      // Nota: Si borramos todo prefs.clear(), perderíamos la bandera de seed_version_firestore.
+      // Mejor solo actualizar el build y mantener seed_version.
       await prefs.setString('app_build_id', DemoVersion.build);
     }
 
@@ -30,7 +31,7 @@ class DatabaseService {
     if (storedVersion != _seedVersion) {
       try {
         // Poblar Firestore con los datos iniciales
-        await _seedFirestore().timeout(const Duration(seconds: 5));
+        await _seedFirestore();
         await prefs.setInt('seed_version_firestore', _seedVersion);
       } catch (e) {
         print("Error al inicializar Firestore (posible problema de conexión/permisos): $e");
@@ -48,7 +49,7 @@ class DatabaseService {
   // WORKSITES
   Future<List<Worksite>> getWorksites() async {
     try {
-      final snapshot = await _db.collection('worksites').get().timeout(const Duration(seconds: 5));
+      final snapshot = await _db.collection('worksites').get();
       return snapshot.docs.map((doc) => Worksite.fromJson(doc.data())).toList();
     } catch (e) {
       print("Error fetching worksites: $e");
@@ -76,7 +77,7 @@ class DatabaseService {
   // BUDGETS
   Future<List<Budget>> getAllBudgets() async {
     try {
-      final snapshot = await _db.collection('budgets').get().timeout(const Duration(seconds: 5));
+      final snapshot = await _db.collection('budgets').get();
       return snapshot.docs.map((doc) => Budget.fromJson(doc.data())).toList();
     } catch (e) {
       print("Error fetching budgets: $e");
