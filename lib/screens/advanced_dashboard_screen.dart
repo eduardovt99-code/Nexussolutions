@@ -33,7 +33,14 @@ class _AdvancedDashboardScreenState extends State<AdvancedDashboardScreen> {
   }
 
   Future<void> _loadData() async {
-    final worksites = await DatabaseService().getWorksites();
+    var worksites = await DatabaseService().getWorksites();
+    
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null && user.email == 'eduardovt99@gmail.com' && worksites.isEmpty) {
+      await DatabaseService().seedForNewUser();
+      worksites = await DatabaseService().getWorksites();
+    }
+
     final budgets = await DatabaseService().getAllBudgets();
     final workers = await DatabaseService().getAllWorkers();
     final timeLogs = await DatabaseService().getAllTimeLogs();
