@@ -31,7 +31,7 @@ jobs:
         run: flutter pub get
 
       - name: Build web
-        run: flutter build web --release --base-href "/Nexussolutions/" --pwa-strategy=none
+        run: flutter build web --release --base-href "/" --pwa-strategy=none
 
       - name: Cache bust JS bundle
         run: |
