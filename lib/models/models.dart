@@ -223,14 +223,16 @@ class Worker {
 
 class UserProfile {
   final String id;
-  final String name;
+  final String firstName;
+  final String lastName;
   final String companyName;
   final String email;
   final DateTime createdAt;
 
   UserProfile({
     required this.id,
-    required this.name,
+    required this.firstName,
+    required this.lastName,
     required this.companyName,
     required this.email,
     required this.createdAt,
@@ -238,7 +240,8 @@ class UserProfile {
 
   Map<String, dynamic> toJson() => {
     'id': id,
-    'name': name,
+    'firstName': firstName,
+    'lastName': lastName,
     'companyName': companyName,
     'email': email,
     'createdAt': createdAt.toIso8601String(),
@@ -246,7 +249,8 @@ class UserProfile {
 
   factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
     id: json['id'],
-    name: json['name'] ?? '',
+    firstName: json['firstName'] ?? '',
+    lastName: json['lastName'] ?? '',
     companyName: json['companyName'] ?? '',
     email: json['email'] ?? '',
     createdAt: DateTime.parse(json['createdAt']),

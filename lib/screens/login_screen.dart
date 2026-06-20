@@ -16,7 +16,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _nameController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _companyController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   
@@ -29,7 +30,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _nameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _companyController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -38,7 +40,8 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _submit() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
-    final name = _nameController.text.trim();
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
     final company = _companyController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
 
@@ -51,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
     } else {
-      if (email.isEmpty || password.isEmpty || name.isEmpty || company.isEmpty || confirmPassword.isEmpty) {
+      if (email.isEmpty || password.isEmpty || firstName.isEmpty || lastName.isEmpty || company.isEmpty || confirmPassword.isEmpty) {
         setState(() {
           _errorMessage = 'Por favor, llena todos los campos.';
           _isSuccessMessage = false;
@@ -108,7 +111,8 @@ class _LoginScreenState extends State<LoginScreen> {
         if (uid != null) {
           final profile = UserProfile(
             id: uid,
-            name: name,
+            firstName: firstName,
+            lastName: lastName,
             companyName: company,
             email: email,
             createdAt: DateTime.now(),
@@ -257,20 +261,43 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
 
                   if (!_isLogin) ...[
-                    TextField(
-                      controller: _nameController,
-                      style: const TextStyle(color: AppTheme.pureWhite),
-                      decoration: InputDecoration(
-                        labelText: 'NOMBRE COMPLETO',
-                        labelStyle: const TextStyle(color: Colors.white70),
-                        prefixIcon: const Icon(Icons.person_outline, color: Colors.white70),
-                        filled: true,
-                        fillColor: const Color(0xFF1A1A1A),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide.none,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _firstNameController,
+                            style: const TextStyle(color: AppTheme.pureWhite),
+                            decoration: InputDecoration(
+                              labelText: 'NOMBRE(S)',
+                              labelStyle: const TextStyle(color: Colors.white70),
+                              prefixIcon: const Icon(Icons.person_outline, color: Colors.white70),
+                              filled: true,
+                              fillColor: const Color(0xFF1A1A1A),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: _lastNameController,
+                            style: const TextStyle(color: AppTheme.pureWhite),
+                            decoration: InputDecoration(
+                              labelText: 'APELLIDO(S)',
+                              labelStyle: const TextStyle(color: Colors.white70),
+                              filled: true,
+                              fillColor: const Color(0xFF1A1A1A),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     TextField(
