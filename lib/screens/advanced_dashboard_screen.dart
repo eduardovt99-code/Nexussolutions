@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/app_theme.dart';
 import '../models/models.dart';
 import '../data/database_service.dart';
@@ -256,6 +258,17 @@ class AdvancedSidebar extends StatelessWidget {
             isSelected: currentIndex == 5,
             onTap: () => onTabSelected(5),
           ),
+          const Spacer(),
+          _NavItem(
+            icon: Icons.logout,
+            label: 'Cerrar Sesión',
+            isSelected: false,
+            onTap: () async {
+              HapticFeedback.lightImpact();
+              await FirebaseAuth.instance.signOut();
+            },
+          ),
+          const SizedBox(height: 24),
         ],
       ),
     );

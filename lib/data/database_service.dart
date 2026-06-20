@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/models.dart';
-import '../data/mock_data.dart';
 import '../demo_version.dart';
+import '../data/mock_data.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -11,45 +12,48 @@ class DatabaseService {
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  /// Versión de los datos de demo: al subirla se reemplazan los datos antiguos.
-  static const int _seedVersion = 11;
-
   Future<void> init() async {
-    // Usamos SharedPreferences solo para saber si ya inicializamos Firestore en este navegador
-    // y no sobreescribir la base de datos de producción con MockData cada vez que abrimos la app.
     final prefs = await SharedPreferences.getInstance();
-    
     final storedBuild = prefs.getString('app_build_id');
     if (storedBuild != DemoVersion.build) {
-      // Nota: Si borramos todo prefs.clear(), perderíamos la bandera de seed_version_firestore.
-      // Mejor solo actualizar el build y mantener seed_version.
       await prefs.setString('app_build_id', DemoVersion.build);
-    }
-
-    final storedVersion = prefs.getInt('seed_version_firestore');
-    
-    if (storedVersion != _seedVersion) {
-      try {
-        // Poblar Firestore con los datos iniciales
-        await _seedFirestore();
-        await prefs.setInt('seed_version_firestore', _seedVersion);
-      } catch (e) {
-        print("Error al inicializar Firestore (posible problema de conexión/permisos): $e");
-      }
     }
   }
 
-  Future<void> _seedFirestore() async {
-    await saveWorksites(MockData.worksites);
-    await saveBudgets(MockData.budgets);
-    await saveTimeLogs(MockData.timeLogs);
-    await saveWorkers(MockData.workers);
+  Future<void> seedForNewUser() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null || uid.isEmpty) return;
+
+    final seededWorksites = MockData.worksites.map((w) => Worksite(
+      id: w.id, ownerId: uid, name: w.name, clientName: w.clientName, address: w.address,
+      locationLat: w.locationLat, locationLng: w.locationLng, status: w.status,
+      createdAt: w.createdAt, plannedStart: w.plannedStart, plannedEnd: w.plannedEnd
+    )).toList();
+    await saveWorksites(seededWorksites);
+
+    final seededBudgets = MockData.budgets.map((b) => Budget(
+      id: b.id, ownerId: uid, worksiteId: b.worksiteId, totalAmount: b.totalAmount, items: b.items, status: b.status
+    )).toList();
+    await saveBudgets(seededBudgets);
+
+    final seededTimeLogs = MockData.timeLogs.map((t) => TimeLog(
+      id: t.id, ownerId: uid, userId: t.userId, worksiteId: t.worksiteId,
+      checkIn: t.checkIn, checkOut: t.checkOut, checkInLat: t.checkInLat, checkInLng: t.checkInLng, laborCostCalculated: t.laborCostCalculated
+    )).toList();
+    await saveTimeLogs(seededTimeLogs);
+
+    final seededWorkers = MockData.workers.map((w) => Worker(
+      id: w.id, ownerId: uid, name: w.name, profession: w.profession, weeklyCapacityHours: w.weeklyCapacityHours
+    )).toList();
+    await saveWorkers(seededWorkers);
   }
 
   // WORKSITES
   Future<List<Worksite>> getWorksites() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return [];
     try {
-      final snapshot = await _db.collection('worksites').get();
+      final snapshot = await _db.collection('worksites').where('ownerId', isEqualTo: uid).get();
       return snapshot.docs.map((doc) => Worksite.fromJson(doc.data())).toList();
     } catch (e) {
       print("Error fetching worksites: $e");
@@ -67,7 +71,13 @@ class DatabaseService {
   }
 
   Future<void> addWorksite(Worksite worksite) async {
-    await _db.collection('worksites').doc(worksite.id).set(worksite.toJson());
+    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final w = Worksite(
+      id: worksite.id, ownerId: uid, name: worksite.name, clientName: worksite.clientName,
+      address: worksite.address, locationLat: worksite.locationLat, locationLng: worksite.locationLng,
+      status: worksite.status, createdAt: worksite.createdAt, plannedStart: worksite.plannedStart, plannedEnd: worksite.plannedEnd
+    );
+    await _db.collection('worksites').doc(w.id).set(w.toJson());
   }
 
   Future<void> updateWorksite(Worksite worksite) async {
@@ -76,8 +86,10 @@ class DatabaseService {
 
   // BUDGETS
   Future<List<Budget>> getAllBudgets() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return [];
     try {
-      final snapshot = await _db.collection('budgets').get();
+      final snapshot = await _db.collection('budgets').where('ownerId', isEqualTo: uid).get();
       return snapshot.docs.map((doc) => Budget.fromJson(doc.data())).toList();
     } catch (e) {
       print("Error fetching budgets: $e");
@@ -85,22 +97,36 @@ class DatabaseService {
     }
   }
 
-  Future<List<Budget>> getBudgets(String worksiteId) async {
-    final snapshot = await _db.collection('budgets').where('worksiteId', isEqualTo: worksiteId).get();
-    return snapshot.docs.map((doc) => Budget.fromJson(doc.data())).toList();
-  }
-
   Future<void> saveBudgets(List<Budget> budgets) async {
     final batch = _db.batch();
-    for (var budget in budgets) {
-      final docRef = _db.collection('budgets').doc(budget.id);
-      batch.set(docRef, budget.toJson());
+    for (var b in budgets) {
+      final docRef = _db.collection('budgets').doc(b.id);
+      batch.set(docRef, b.toJson());
     }
     await batch.commit();
   }
 
+  Future<List<Budget>> getBudgets(String worksiteId) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return [];
+    try {
+      final snapshot = await _db.collection('budgets')
+        .where('ownerId', isEqualTo: uid)
+        .where('worksiteId', isEqualTo: worksiteId)
+        .get();
+      return snapshot.docs.map((doc) => Budget.fromJson(doc.data())).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
   Future<void> addBudget(Budget budget) async {
-    await _db.collection('budgets').doc(budget.id).set(budget.toJson());
+    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final b = Budget(
+      id: budget.id, ownerId: uid, worksiteId: budget.worksiteId,
+      totalAmount: budget.totalAmount, items: budget.items, status: budget.status
+    );
+    await _db.collection('budgets').doc(b.id).set(b.toJson());
   }
 
   Future<void> updateBudgetStatus(String id, String newStatus) async {
@@ -109,13 +135,15 @@ class DatabaseService {
 
   // TIME LOGS
   Future<List<TimeLog>> getAllTimeLogs() async {
-    final snapshot = await _db.collection('time_logs').get();
-    return snapshot.docs.map((doc) => TimeLog.fromJson(doc.data())).toList();
-  }
-
-  Future<List<TimeLog>> getTimeLogs(String worksiteId) async {
-    final snapshot = await _db.collection('time_logs').where('worksiteId', isEqualTo: worksiteId).get();
-    return snapshot.docs.map((doc) => TimeLog.fromJson(doc.data())).toList();
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return [];
+    try {
+      final snapshot = await _db.collection('time_logs').where('ownerId', isEqualTo: uid).get();
+      return snapshot.docs.map((doc) => TimeLog.fromJson(doc.data())).toList();
+    } catch (e) {
+      print("Error fetching time_logs: $e");
+      return [];
+    }
   }
 
   Future<void> saveTimeLogs(List<TimeLog> timeLogs) async {
@@ -127,14 +155,37 @@ class DatabaseService {
     await batch.commit();
   }
 
+  Future<List<TimeLog>> getTimeLogs(String worksiteId) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return [];
+    final snapshot = await _db.collection('time_logs')
+      .where('ownerId', isEqualTo: uid)
+      .where('worksiteId', isEqualTo: worksiteId)
+      .get();
+    return snapshot.docs.map((doc) => TimeLog.fromJson(doc.data())).toList();
+  }
+
   Future<void> addTimeLog(TimeLog timeLog) async {
-    await _db.collection('time_logs').doc(timeLog.id).set(timeLog.toJson());
+    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final t = TimeLog(
+      id: timeLog.id, ownerId: uid, userId: timeLog.userId, worksiteId: timeLog.worksiteId,
+      checkIn: timeLog.checkIn, checkOut: timeLog.checkOut, checkInLat: timeLog.checkInLat,
+      checkInLng: timeLog.checkInLng, laborCostCalculated: timeLog.laborCostCalculated
+    );
+    await _db.collection('time_logs').doc(t.id).set(t.toJson());
   }
 
   // WORKERS
-  Future<List<Worker>> getWorkers() async {
-    final snapshot = await _db.collection('workers').get();
-    return snapshot.docs.map((doc) => Worker.fromJson(doc.data())).toList();
+  Future<List<Worker>> getAllWorkers() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return [];
+    try {
+      final snapshot = await _db.collection('workers').where('ownerId', isEqualTo: uid).get();
+      return snapshot.docs.map((doc) => Worker.fromJson(doc.data())).toList();
+    } catch (e) {
+      print("Error fetching workers: $e");
+      return [];
+    }
   }
 
   Future<void> saveWorkers(List<Worker> workers) async {

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/app_theme.dart';
 import '../main.dart' show MainShell;
+import '../data/database_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,22 +13,64 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController(text: 'eduardo@reformamadrid.es');
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
-  void _login() {
-    HapticFeedback.mediumImpact();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const MainShell()),
-    );
-  }
+  
+  bool _isLogin = true;
+  bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      setState(() => _errorMessage = 'Por favor, llena todos los campos.');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    HapticFeedback.mediumImpact();
+
+    try {
+      if (_isLogin) {
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        // Si es login exitoso, MainShell será mostrado automáticamente por el StreamBuilder en main.dart
+      } else {
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        // Si es registro, inicializamos los datos de demo para que el usuario nuevo tenga contenido
+        await DatabaseService().seedForNewUser();
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Ocurrió un error inesperado.';
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   Widget _moduleChip(IconData icon, String label) {
@@ -101,6 +145,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 48),
+                  
+                  if (_errorMessage != null)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.1),
+                        border: Border.all(color: Colors.red),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        _errorMessage!,
+                        style: const TextStyle(color: Colors.red, fontSize: 13),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+
                   TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -133,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderSide: BorderSide.none,
                       ),
                     ),
-                    onSubmitted: (_) => _login(),
+                    onSubmitted: (_) => _submit(),
                   ),
                   const SizedBox(height: 28),
                   // Botón con el gradiente de marca
@@ -150,20 +211,44 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                     child: ElevatedButton(
-                      onPressed: _login,
+                      onPressed: _isLoading ? null : _submit,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
                         padding: const EdgeInsets.symmetric(vertical: 18),
                       ),
-                      child: const Text(
-                        'ENTRAR', 
-                        style: TextStyle(
-                          letterSpacing: 2,
-                          color: AppTheme.brandBlack,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: AppTheme.brandBlack,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(
+                              _isLogin ? 'ENTRAR' : 'CREAR CUENTA',
+                              style: const TextStyle(
+                                letterSpacing: 2,
+                                color: AppTheme.brandBlack,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _isLogin = !_isLogin;
+                        _errorMessage = null;
+                      });
+                    },
+                    child: Text(
+                      _isLogin
+                          ? '¿No tienes cuenta? Regístrate gratis'
+                          : '¿Ya tienes cuenta? Inicia sesión',
+                      style: const TextStyle(color: AppTheme.brandYellow),
                     ),
                   ),
                   const SizedBox(height: 24),

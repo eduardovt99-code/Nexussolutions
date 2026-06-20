@@ -18,6 +18,7 @@ class MockData {
 
   static final List<Worksite> worksites = [
     Worksite(
+      ownerId: '',
       id: 'ws_001',
       name: 'Reforma integral de baño',
       clientName: 'Familia Hernández',
@@ -30,6 +31,7 @@ class MockData {
       plannedEnd: _daysAhead(8),
     ),
     Worksite(
+      ownerId: '',
       id: 'ws_002',
       name: 'Cocina y suelos — piso Chamberí',
       clientName: 'Marta Vidal',
@@ -42,6 +44,7 @@ class MockData {
       plannedEnd: _daysAhead(18),
     ),
     Worksite(
+      ownerId: '',
       id: 'ws_003',
       name: 'Sustitución de bajante comunitaria',
       clientName: 'Com. de Propietarios Bravo Murillo 98',
@@ -54,6 +57,7 @@ class MockData {
       plannedEnd: _daysAhead(22),
     ),
     Worksite(
+      ownerId: '',
       id: 'ws_004',
       name: 'Local comercial — Malasaña',
       clientName: 'Grupo Lumen S.L.',
@@ -66,6 +70,7 @@ class MockData {
       plannedEnd: _daysAhead(14),
     ),
     Worksite(
+      ownerId: '',
       id: 'ws_005',
       name: 'Impermeabilización terraza',
       clientName: 'Com. Prop. Goya 45',
@@ -79,6 +84,7 @@ class MockData {
     ),
     // ── Presupuestando ──
     Worksite(
+      ownerId: '',
       id: 'ws_006',
       name: 'Reforma loft Salamanca',
       clientName: 'Beatriz Olmedo',
@@ -91,6 +97,7 @@ class MockData {
       plannedEnd: _daysAhead(35),
     ),
     Worksite(
+      ownerId: '',
       id: 'ws_007',
       name: 'Baño y vestidor — Retiro',
       clientName: 'Javier y Ana Prieto',
@@ -103,6 +110,7 @@ class MockData {
       plannedEnd: _daysAhead(28),
     ),
     Worksite(
+      ownerId: '',
       id: 'ws_008',
       name: 'Adecuación oficina coworking',
       clientName: 'Nexo Spaces S.L.',
@@ -115,6 +123,7 @@ class MockData {
       plannedEnd: _daysAhead(42),
     ),
     Worksite(
+      ownerId: '',
       id: 'ws_009',
       name: 'Ático dúplex — Arganzuela',
       clientName: 'Familia Ríos',
@@ -128,6 +137,7 @@ class MockData {
     ),
     // ── En obra ──
     Worksite(
+      ownerId: '',
       id: 'ws_010',
       name: 'Instalación aerotermia — chalet',
       clientName: 'Carlos Menéndez',
@@ -140,6 +150,7 @@ class MockData {
       plannedEnd: _daysAhead(6),
     ),
     Worksite(
+      ownerId: '',
       id: 'ws_011',
       name: 'Reforma portal comunitario',
       clientName: 'Com. Prop. Av. de la Albufera 220',
@@ -153,6 +164,7 @@ class MockData {
     ),
     // ── Finalizadas ──
     Worksite(
+      ownerId: '',
       id: 'ws_012',
       name: 'Cocina abierta — Getafe',
       clientName: 'Elena Soto',
@@ -165,6 +177,7 @@ class MockData {
       plannedEnd: _daysAgo(30),
     ),
     Worksite(
+      ownerId: '',
       id: 'ws_013',
       name: 'Baño accesible PMR',
       clientName: 'Residencia San Rafael',
@@ -177,6 +190,7 @@ class MockData {
       plannedEnd: _daysAgo(45),
     ),
     Worksite(
+      ownerId: '',
       id: 'ws_014',
       name: 'Local peluquería — Moncloa',
       clientName: 'Estudio Capilar Luna',
@@ -189,6 +203,7 @@ class MockData {
       plannedEnd: _daysAgo(60),
     ),
     Worksite(
+      ownerId: '',
       id: 'ws_015',
       name: 'Piso alquiler turístico',
       clientName: 'Invertir Madrid S.L.',
@@ -201,6 +216,7 @@ class MockData {
       plannedEnd: _daysAgo(20),
     ),
     Worksite(
+      ownerId: '',
       id: 'ws_016',
       name: 'Terraza y pérgola bioclimática',
       clientName: 'Com. Prop. Velázquez 85',
@@ -216,6 +232,7 @@ class MockData {
 
   static final List<Budget> budgets = [
     Budget(
+      ownerId: '',
       id: 'bdg_001',
       worksiteId: 'ws_001',
       totalAmount: 8970.00,
@@ -229,6 +246,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_002',
       worksiteId: 'ws_002',
       totalAmount: 12450.00,
@@ -241,6 +259,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_003',
       worksiteId: 'ws_003',
       totalAmount: 5840.00,
@@ -252,6 +271,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_004',
       worksiteId: 'ws_004',
       totalAmount: 18600.00,
@@ -264,6 +284,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_005',
       worksiteId: 'ws_005',
       totalAmount: 7320.00,
@@ -275,6 +296,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_006',
       worksiteId: 'ws_006',
       totalAmount: 22400.00,
@@ -286,6 +308,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_007',
       worksiteId: 'ws_007',
       totalAmount: 11850.00,
@@ -297,6 +320,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_008',
       worksiteId: 'ws_008',
       totalAmount: 34200.00,
@@ -308,6 +332,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_009',
       worksiteId: 'ws_009',
       totalAmount: 45600.00,
@@ -319,6 +344,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_010',
       worksiteId: 'ws_010',
       totalAmount: 16800.00,
@@ -330,6 +356,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_011',
       worksiteId: 'ws_011',
       totalAmount: 9450.00,
@@ -341,6 +368,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_012',
       worksiteId: 'ws_012',
       totalAmount: 11200.00,
@@ -352,6 +380,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_013',
       worksiteId: 'ws_013',
       totalAmount: 8900.00,
@@ -363,6 +392,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_014',
       worksiteId: 'ws_014',
       totalAmount: 15600.00,
@@ -374,6 +404,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_015',
       worksiteId: 'ws_015',
       totalAmount: 9800.00,
@@ -385,6 +416,7 @@ class MockData {
       ],
     ),
     Budget(
+      ownerId: '',
       id: 'bdg_016',
       worksiteId: 'ws_016',
       totalAmount: 21400.00,
@@ -399,28 +431,28 @@ class MockData {
 
   /// 22 trabajadores con capacidades distintas para reflejar cuadrilla real.
   static final List<Worker> workers = [
-    Worker(id: 'wrk_001', name: 'Andrés Gómez', profession: WorkerProfession.albanileria, weeklyCapacityHours: 40),
-    Worker(id: 'wrk_002', name: 'Luis Martín', profession: WorkerProfession.albanileria, weeklyCapacityHours: 40),
-    Worker(id: 'wrk_003', name: 'Pedro Sánchez', profession: WorkerProfession.albanileria, weeklyCapacityHours: 40),
-    Worker(id: 'wrk_004', name: 'Marco Vargas', profession: WorkerProfession.albanileria, weeklyCapacityHours: 38),
-    Worker(id: 'wrk_005', name: 'Iván Herrera', profession: WorkerProfession.albanileria, weeklyCapacityHours: 40),
-    Worker(id: 'wrk_006', name: 'Raúl Domínguez', profession: WorkerProfession.albanileria, weeklyCapacityHours: 36),
-    Worker(id: 'wrk_007', name: 'Karim Bensaïd', profession: WorkerProfession.fontaneria, weeklyCapacityHours: 40),
-    Worker(id: 'wrk_008', name: 'David Fernández', profession: WorkerProfession.fontaneria, weeklyCapacityHours: 40),
-    Worker(id: 'wrk_009', name: 'Óscar Núñez', profession: WorkerProfession.fontaneria, weeklyCapacityHours: 38),
-    Worker(id: 'wrk_010', name: 'Héctor Prieto', profession: WorkerProfession.fontaneria, weeklyCapacityHours: 32),
-    Worker(id: 'wrk_011', name: 'Miguel Torres', profession: WorkerProfession.electricidad, weeklyCapacityHours: 36),
-    Worker(id: 'wrk_012', name: 'Roberto Gil', profession: WorkerProfession.electricidad, weeklyCapacityHours: 40),
-    Worker(id: 'wrk_013', name: 'Fran Delgado', profession: WorkerProfession.electricidad, weeklyCapacityHours: 34),
-    Worker(id: 'wrk_014', name: 'Sandra León', profession: WorkerProfession.pintura, weeklyCapacityHours: 32),
-    Worker(id: 'wrk_015', name: 'Carmen Ibáez', profession: WorkerProfession.pintura, weeklyCapacityHours: 36),
-    Worker(id: 'wrk_016', name: 'Lucía Ramos', profession: WorkerProfession.pintura, weeklyCapacityHours: 30),
-    Worker(id: 'wrk_017', name: 'Jorge Ruiz', profession: WorkerProfession.general, weeklyCapacityHours: 40),
-    Worker(id: 'wrk_018', name: 'Paco Morales', profession: WorkerProfession.general, weeklyCapacityHours: 40),
-    Worker(id: 'wrk_019', name: 'Tomás Vega', profession: WorkerProfession.general, weeklyCapacityHours: 38),
-    Worker(id: 'wrk_020', name: 'Nacho Castillo', profession: WorkerProfession.general, weeklyCapacityHours: 40),
-    Worker(id: 'wrk_021', name: 'Sergio Almada', profession: WorkerProfession.general, weeklyCapacityHours: 36),
-    Worker(id: 'wrk_022', name: 'Dani Paredes', profession: WorkerProfession.general, weeklyCapacityHours: 32),
+    Worker(ownerId: '', id: 'wrk_001', name: 'Andrés Gómez', profession: WorkerProfession.albanileria, weeklyCapacityHours: 40),
+    Worker(ownerId: '', id: 'wrk_002', name: 'Luis Martín', profession: WorkerProfession.albanileria, weeklyCapacityHours: 40),
+    Worker(ownerId: '', id: 'wrk_003', name: 'Pedro Sánchez', profession: WorkerProfession.albanileria, weeklyCapacityHours: 40),
+    Worker(ownerId: '', id: 'wrk_004', name: 'Marco Vargas', profession: WorkerProfession.albanileria, weeklyCapacityHours: 38),
+    Worker(ownerId: '', id: 'wrk_005', name: 'Iván Herrera', profession: WorkerProfession.albanileria, weeklyCapacityHours: 40),
+    Worker(ownerId: '', id: 'wrk_006', name: 'Raúl Domínguez', profession: WorkerProfession.albanileria, weeklyCapacityHours: 36),
+    Worker(ownerId: '', id: 'wrk_007', name: 'Karim Bensaïd', profession: WorkerProfession.fontaneria, weeklyCapacityHours: 40),
+    Worker(ownerId: '', id: 'wrk_008', name: 'David Fernández', profession: WorkerProfession.fontaneria, weeklyCapacityHours: 40),
+    Worker(ownerId: '', id: 'wrk_009', name: 'Óscar Núñez', profession: WorkerProfession.fontaneria, weeklyCapacityHours: 38),
+    Worker(ownerId: '', id: 'wrk_010', name: 'Héctor Prieto', profession: WorkerProfession.fontaneria, weeklyCapacityHours: 32),
+    Worker(ownerId: '', id: 'wrk_011', name: 'Miguel Torres', profession: WorkerProfession.electricidad, weeklyCapacityHours: 36),
+    Worker(ownerId: '', id: 'wrk_012', name: 'Roberto Gil', profession: WorkerProfession.electricidad, weeklyCapacityHours: 40),
+    Worker(ownerId: '', id: 'wrk_013', name: 'Fran Delgado', profession: WorkerProfession.electricidad, weeklyCapacityHours: 34),
+    Worker(ownerId: '', id: 'wrk_014', name: 'Sandra León', profession: WorkerProfession.pintura, weeklyCapacityHours: 32),
+    Worker(ownerId: '', id: 'wrk_015', name: 'Carmen Ibáez', profession: WorkerProfession.pintura, weeklyCapacityHours: 36),
+    Worker(ownerId: '', id: 'wrk_016', name: 'Lucía Ramos', profession: WorkerProfession.pintura, weeklyCapacityHours: 30),
+    Worker(ownerId: '', id: 'wrk_017', name: 'Jorge Ruiz', profession: WorkerProfession.general, weeklyCapacityHours: 40),
+    Worker(ownerId: '', id: 'wrk_018', name: 'Paco Morales', profession: WorkerProfession.general, weeklyCapacityHours: 40),
+    Worker(ownerId: '', id: 'wrk_019', name: 'Tomás Vega', profession: WorkerProfession.general, weeklyCapacityHours: 38),
+    Worker(ownerId: '', id: 'wrk_020', name: 'Nacho Castillo', profession: WorkerProfession.general, weeklyCapacityHours: 40),
+    Worker(ownerId: '', id: 'wrk_021', name: 'Sergio Almada', profession: WorkerProfession.general, weeklyCapacityHours: 36),
+    Worker(ownerId: '', id: 'wrk_022', name: 'Dani Paredes', profession: WorkerProfession.general, weeklyCapacityHours: 32),
   ];
 
   static DateTime _startOfWeek(DateTime d) =>
@@ -512,6 +544,7 @@ class MockData {
         final checkIn = _today.subtract(const Duration(hours: 4));
         logs.add(
           TimeLog(
+            ownerId: '',
             id: 'tl_${seq.toString().padLeft(3, '0')}',
             userId: profile.name,
             worksiteId: site,
@@ -544,6 +577,7 @@ class MockData {
 
       logs.add(
         TimeLog(
+          ownerId: '',
           id: 'tl_${seq.toString().padLeft(3, '0')}',
           userId: profile.name,
           worksiteId: site,

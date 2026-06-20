@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/app_theme.dart';
 import '../models/models.dart';
 import '../data/database_service.dart';
@@ -700,21 +701,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Reformas Pablo S.L.', style: TextStyle(color: AppTheme.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text('Mi Cuenta', style: TextStyle(color: AppTheme.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
                       SizedBox(height: 2),
-                      Text('pablo@reformaspablo.es', style: TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
+                      Text('Sesión activa', style: TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
                     ],
                   ),
                 ],
               ),
               const SizedBox(height: 24),
               OutlinedButton.icon(
-                onPressed: () {
+                onPressed: () async {
                   HapticFeedback.lightImpact();
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
-                    (Route<dynamic> route) => false,
-                  );
+                  await FirebaseAuth.instance.signOut();
+                  // StreamBuilder in main.dart will automatically route back to LoginScreen
                 },
                 icon: const Icon(Icons.logout, size: 18, color: AppTheme.errorRed),
                 label: const Text('CERRAR SESIÓN', style: TextStyle(color: AppTheme.errorRed)),

@@ -1,5 +1,6 @@
 class Worksite {
   final String id;
+  final String ownerId;
   final String name;
   final String clientName;
   final String address;
@@ -12,6 +13,7 @@ class Worksite {
 
   Worksite({
     required this.id,
+    required this.ownerId,
     required this.name,
     required this.clientName,
     this.address = '',
@@ -25,6 +27,7 @@ class Worksite {
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'ownerId': ownerId,
     'name': name,
     'clientName': clientName,
     'address': address,
@@ -38,6 +41,7 @@ class Worksite {
 
   factory Worksite.fromJson(Map<String, dynamic> json) => Worksite(
     id: json['id'],
+    ownerId: json['ownerId'] ?? '',
     name: json['name'],
     clientName: json['clientName'],
     address: json['address'] ?? '',
@@ -84,6 +88,7 @@ class BudgetItem {
 
 class Budget {
   final String id;
+  final String ownerId;
   final String worksiteId;
   final double totalAmount;
   final List<BudgetItem> items;
@@ -91,6 +96,7 @@ class Budget {
 
   Budget({
     required this.id,
+    required this.ownerId,
     required this.worksiteId,
     required this.totalAmount,
     required this.items,
@@ -99,6 +105,7 @@ class Budget {
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'ownerId': ownerId,
     'worksiteId': worksiteId,
     'totalAmount': totalAmount,
     'items': items.map((e) => e.toJson()).toList(),
@@ -107,6 +114,7 @@ class Budget {
 
   factory Budget.fromJson(Map<String, dynamic> json) => Budget(
     id: json['id'],
+    ownerId: json['ownerId'] ?? '',
     worksiteId: json['worksiteId'],
     totalAmount: json['totalAmount'].toDouble(),
     items: (json['items'] as List).map((e) => BudgetItem.fromJson(e)).toList(),
@@ -116,6 +124,7 @@ class Budget {
 
 class TimeLog {
   final String id;
+  final String ownerId;
   final String userId;
   final String worksiteId;
   final DateTime checkIn;
@@ -126,6 +135,7 @@ class TimeLog {
 
   TimeLog({
     required this.id,
+    required this.ownerId,
     required this.userId,
     required this.worksiteId,
     required this.checkIn,
@@ -137,6 +147,7 @@ class TimeLog {
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'ownerId': ownerId,
     'userId': userId,
     'worksiteId': worksiteId,
     'checkIn': checkIn.toIso8601String(),
@@ -148,6 +159,7 @@ class TimeLog {
 
   factory TimeLog.fromJson(Map<String, dynamic> json) => TimeLog(
     id: json['id'],
+    ownerId: json['ownerId'] ?? '',
     userId: json['userId'],
     worksiteId: json['worksiteId'],
     checkIn: DateTime.parse(json['checkIn']),
@@ -179,12 +191,14 @@ class WorkerProfession {
 
 class Worker {
   final String id;
+  final String ownerId;
   final String name;
   final String profession;
   final double weeklyCapacityHours;
 
   Worker({
     required this.id,
+    required this.ownerId,
     required this.name,
     required this.profession,
     this.weeklyCapacityHours = 40,
@@ -192,6 +206,7 @@ class Worker {
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'ownerId': ownerId,
     'name': name,
     'profession': profession,
     'weeklyCapacityHours': weeklyCapacityHours,
@@ -199,6 +214,7 @@ class Worker {
 
   factory Worker.fromJson(Map<String, dynamic> json) => Worker(
     id: json['id'],
+    ownerId: json['ownerId'] ?? '',
     name: json['name'],
     profession: json['profession'],
     weeklyCapacityHours: (json['weeklyCapacityHours'] as num?)?.toDouble() ?? 40,

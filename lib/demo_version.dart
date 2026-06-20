@@ -1,5 +1,5 @@
 /// Incrementar en cada release publicada para forzar recarga de demo en web.
 class DemoVersion {
-  static const String build = '53';
-  static const String label = 'Demo v53';
+  static const String build = '54';
+  static const String label = 'Demo v54';
 }

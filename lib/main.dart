@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'theme/app_theme.dart';
 import 'models/models.dart';
@@ -124,7 +125,23 @@ class TajoApp extends StatelessWidget {
       title: 'TAJO — El sistema operativo de tu reforma',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const LoginScreen(),
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              backgroundColor: AppTheme.brandBlack,
+              body: Center(
+                child: CircularProgressIndicator(color: AppTheme.brandYellow),
+              ),
+            );
+          }
+          if (snapshot.hasData && snapshot.data != null) {
+            return const MainShell();
+          }
+          return const LoginScreen();
+        },
+      ),
     );
   }
 }
