@@ -31,6 +31,7 @@ class InitApp extends StatefulWidget {
 class _InitAppState extends State<InitApp> {
   bool _initialized = false;
   String? _error;
+  String _currentStep = "Preparando aplicación...";
 
   @override
   void initState() {
@@ -40,6 +41,7 @@ class _InitAppState extends State<InitApp> {
 
   Future<void> _initAll() async {
     try {
+      setState(() => _currentStep = "Conectando a los servidores de Google...");
       await Firebase.initializeApp(
         options: const FirebaseOptions(
           apiKey: "AIzaSyAer59kHeAfSTIqEA-pvU6dPXAnYKxCTeU",
@@ -50,9 +52,14 @@ class _InitAppState extends State<InitApp> {
           storageBucket: "tajo-513a9.firebasestorage.app",
           measurementId: "G-BGJMBDRS3S",
         ),
-      );
+      ).timeout(const Duration(seconds: 15), onTimeout: () => throw "Firebase.initializeApp tardó demasiado");
+      
+      setState(() => _currentStep = "Configurando formatos de fecha...");
       await initializeDateFormatting('es_ES');
-      await DatabaseService().init();
+      
+      setState(() => _currentStep = "Sincronizando Base de Datos (Firestore)...");
+      await DatabaseService().init().timeout(const Duration(seconds: 15), onTimeout: () => throw "DatabaseService.init tardó demasiado");
+      
       setState(() {
         _initialized = true;
       });
@@ -89,9 +96,16 @@ class _InitAppState extends State<InitApp> {
         theme: ThemeData.dark().copyWith(
           scaffoldBackgroundColor: const Color(0xFF1E1E1E),
         ),
-        home: const Scaffold(
+        home: Scaffold(
           body: Center(
-            child: CircularProgressIndicator(color: Colors.amber),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(color: Colors.amber),
+                const SizedBox(height: 20),
+                Text(_currentStep, style: const TextStyle(color: Colors.white70)),
+              ],
+            ),
           ),
         ),
       );
