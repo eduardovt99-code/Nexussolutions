@@ -46,8 +46,9 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
   _AIFlowStep _step = _AIFlowStep.capture;
   final TextEditingController _descController = TextEditingController();
 
-  int _m2 = 12;
   int _aiCalculatedM2 = 0;
+  int _baseM2 = 0;
+  List<Partida> _baseResults = [];
   String _aiSalesPitch = '';
   final String _apiKey = 'AQ.Ab8RN6' 'Kv3Z2h8' 'ppzdOs1G' 'h1y_1B' 'lC3OCsCe' 'KneWi9dO' 'cJvWAcg';
   bool _usedLive = false;
@@ -131,7 +132,9 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
         final aiResult = await _callGemini();
         if (aiResult != null) {
           aiItems = aiResult['partidas'];
-          _aiCalculatedM2 = aiResult['m2_estimado'] ?? _m2;
+          _aiCalculatedM2 = aiResult['m2_estimado'] ?? 15;
+          _baseM2 = _aiCalculatedM2;
+          _baseResults = aiItems ?? [];
           _aiSalesPitch = aiResult['resumen_venta'] ?? 'Hemos elaborado este presupuesto a medida garantizando la máxima calidad en cada detalle.';
         }
         _usedLive = true;
@@ -150,25 +153,42 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
 
     setState(() {
       if (!_usedLive) {
-        _aiCalculatedM2 = _m2;
+        _aiCalculatedM2 = 15;
+        _baseM2 = 15;
         _aiSalesPitch = 'Presupuesto estimado para: ${_descController.text.isNotEmpty ? _descController.text : "Reforma"}. Transformaremos este espacio con acabados de primera calidad y tiempos de ejecución optimizados.';
         
         // Generar partidas dinámicas basadas en el texto si no hay API key
         final title = _descController.text.isNotEmpty ? _descController.text : 'Reforma general';
         aiItems = [
-          Partida('Preparación previa', title, 5.0 * _m2, 15.0 * _m2),
-          Partida('Materiales y suministros', 'Suministros para $title', 20.0 * _m2, 0),
-          Partida('Mano de obra especializada', 'Ejecución de $title', 0, 30.0 * _m2),
-          Partida('Acabados y limpieza', 'Remates finales y limpieza', 5.0 * _m2, 10.0 * _m2),
+          Partida('Preparación previa', title, 5.0 * _baseM2, 15.0 * _baseM2),
+          Partida('Materiales y suministros', 'Suministros para $title', 20.0 * _baseM2, 0),
+          Partida('Mano de obra especializada', 'Ejecución de $title', 0, 30.0 * _baseM2),
+          Partida('Acabados y limpieza', 'Remates finales y limpieza', 5.0 * _baseM2, 10.0 * _baseM2),
         ];
+        _baseResults = aiItems!;
       }
       _results = (aiItems != null && aiItems!.isNotEmpty) ? aiItems! : _scriptedData;
       _step = _AIFlowStep.results;
     });
   }
 
+  void _adjustSize(int delta) {
+    if (_baseM2 == 0 || _baseResults.isEmpty) return;
+    setState(() {
+      _aiCalculatedM2 = max(1, _aiCalculatedM2 + delta);
+      final double ratio = _aiCalculatedM2 / _baseM2;
+      _results = _baseResults.map((p) => Partida(
+        p.concepto,
+        p.detalle,
+        p.material * ratio,
+        p.mano_obra * ratio,
+      )).toList();
+    });
+  }
+
   Future<Map<String, dynamic>?> _callGemini() async {
-    final prompt = '''Eres un perito de reformas. Analiza el trabajo: "${_descController.text}" (Tamaño estimado: $_m2 m²).
+    final prompt = '''Eres un perito de reformas. Analiza el trabajo: "${_descController.text}".
+Estima el tamaño del espacio en la foto en metros cuadrados. Identifica el tipo de espacio (ej. cambiar cocina de departamento, transformar salón en bar, etc.) y basa tu presupuesto en esa transformación.
 Devuelve un JSON estrictamente así: 
 {
   "m2_estimado": number,
@@ -218,7 +238,7 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
     final List<dynamic> pList = jsonResult['partidas'];
     
     return {
-      'm2_estimado': (jsonResult['m2_estimado'] as num?)?.toInt() ?? _m2,
+      'm2_estimado': (jsonResult['m2_estimado'] as num?)?.toInt() ?? 15,
       'resumen_venta': jsonResult['resumen_venta'],
       'partidas': pList.map((e) => Partida(
         e['concepto'] ?? 'Partida',
@@ -355,16 +375,21 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
           ),
           
           const SizedBox(height: 16),
-          const Text('Tamaño aproximado (opcional, la IA lo validará)', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-            child: Row(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppTheme.brandYellow.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppTheme.brandYellow.withValues(alpha: 0.3)),
+            ),
+            child: const Row(
               children: [
-                _buildStepperBtn(Icons.remove, () => setState(() => _m2 = max(1, _m2 - 1))),
-                Expanded(child: Center(child: Text('$_m2 m²', style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold)))),
-                _buildStepperBtn(Icons.add, () => setState(() => _m2++)),
+                Icon(Icons.auto_awesome, color: AppTheme.brandYellow, size: 20),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text('✨ La IA analizará la foto para estimar los m² y el tipo de espacio automáticamente.', style: TextStyle(color: AppTheme.brandYellow, fontSize: 12, height: 1.3)),
+                ),
               ],
             ),
           ),
@@ -513,17 +538,29 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
           Text(_descController.text.split(':')[0], style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: _usedLive ? AppTheme.successGreen.withValues(alpha:0.2) : const Color(0xFFFEF6D6),
-                  borderRadius: BorderRadius.circular(6)
-                ),
-                child: Text(_usedLive ? '✦ IA en vivo' : '✦ IA', style: TextStyle(color: _usedLive ? AppTheme.successGreen : const Color(0xFF8A6B00), fontSize: 10, fontWeight: FontWeight.bold)),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: _usedLive ? AppTheme.successGreen.withValues(alpha:0.2) : const Color(0xFFFEF6D6),
+                      borderRadius: BorderRadius.circular(6)
+                    ),
+                    child: Text(_usedLive ? '✦ IA en vivo' : '✦ IA', style: TextStyle(color: _usedLive ? AppTheme.successGreen : const Color(0xFF8A6B00), fontSize: 10, fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(width: 8),
+                  Text('${_results.length} partidas generadas', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+                ],
               ),
-              const SizedBox(width: 8),
-              Text('$_aiCalculatedM2 m² (Área calculada) · ${_results.length} partidas', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+              Row(
+                children: [
+                  _buildStepperBtn(Icons.remove, () => _adjustSize(-1)),
+                  SizedBox(width: 60, child: Text('$_aiCalculatedM2 m²', textAlign: TextAlign.center, style: const TextStyle(color: AppTheme.brandYellow, fontSize: 16, fontWeight: FontWeight.bold))),
+                  _buildStepperBtn(Icons.add, () => _adjustSize(1)),
+                ],
+              ),
             ],
           ),
 
