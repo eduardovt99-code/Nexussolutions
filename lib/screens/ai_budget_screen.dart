@@ -44,9 +44,7 @@ class AIBudgetScreen extends StatefulWidget {
 class _AIBudgetScreenState extends State<AIBudgetScreen>
     with TickerProviderStateMixin {
   _AIFlowStep _step = _AIFlowStep.capture;
-  final TextEditingController _descController = TextEditingController(
-      text:
-          'Reforma integral de cocina: quitar la cocina antigua, fontanería, electricidad, alicatar paredes, suelo nuevo, muebles altos y bajos, encimera, fregadero y pintura.');
+  final TextEditingController _descController = TextEditingController();
 
   int _m2 = 12;
   int _aiCalculatedM2 = 0;
@@ -465,6 +463,8 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
+              hintText: 'Ej: Reforma de baño, quitar bañera y poner ducha...',
+              hintStyle: TextStyle(color: Colors.grey.shade400),
               contentPadding: const EdgeInsets.all(12),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
             ),
@@ -642,6 +642,31 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
               Text('$_aiCalculatedM2 m² (Área calculada) · ${_results.length} partidas', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
             ],
           ),
+          
+          if (!_usedLive) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.withValues(alpha: 0.1),
+                border: Border.all(color: Colors.orange),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Estás viendo un presupuesto de prueba (Cocina). Para que la IA lea tus fotos y genere presupuestos reales, haz clic en "Demo" arriba y añade tu API Key de Anthropic.',
+                      style: TextStyle(color: Colors.orange, fontSize: 12, height: 1.4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           
           if (_aiSalesPitch.isNotEmpty) ...[
             const SizedBox(height: 16),
