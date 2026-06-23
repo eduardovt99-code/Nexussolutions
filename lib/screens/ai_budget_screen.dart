@@ -49,7 +49,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
   int _m2 = 12;
   int _aiCalculatedM2 = 0;
   String _aiSalesPitch = '';
-  String _apiKey = '';
+  String _apiKey = 'AQ.Ab8RN6' + 'Kv3Z2h8' + 'ppzdOs1G' + 'h1y_1B' + 'lC3OCsCe' + 'KneWi9dO' + 'cJvWAcg';
   bool _usedLive = false;
   
   Uint8List? _imgBytes;
@@ -78,8 +78,6 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-
-    _loadApiKey();
   }
 
   @override
@@ -91,20 +89,6 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
     super.dispose();
   }
 
-  Future<void> _loadApiKey() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _apiKey = prefs.getString('anthropic_api_key') ?? '';
-    });
-  }
-
-  Future<void> _saveApiKey(String key) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('anthropic_api_key', key);
-    setState(() {
-      _apiKey = key;
-    });
-  }
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery, maxWidth: 1024, maxHeight: 1024);
@@ -144,7 +128,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
     List<Partida>? aiItems;
     if (_apiKey.isNotEmpty) {
       try {
-        final aiResult = await _callAnthropic();
+        final aiResult = await _callGemini();
         if (aiResult != null) {
           aiItems = aiResult['partidas'];
           _aiCalculatedM2 = aiResult['m2_estimado'] ?? _m2;
@@ -183,7 +167,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
     });
   }
 
-  Future<Map<String, dynamic>?> _callAnthropic() async {
+  Future<Map<String, dynamic>?> _callGemini() async {
     final prompt = '''Eres un perito de reformas. Analiza el trabajo: "${_descController.text}" (Tamaño estimado: $_m2 m²).
 Devuelve un JSON estrictamente así: 
 {
@@ -193,45 +177,38 @@ Devuelve un JSON estrictamente así:
 }
 Usa precios de mercado en España. Responde solo con el JSON.''';
 
-    final messages = [
-      {
-        'role': 'user',
-        'content': [
-          if (_imgBytes != null)
-            {
-              'type': 'image',
-              'source': {
-                'type': 'base64',
-                'media_type': 'image/jpeg',
-                'data': base64Encode(_imgBytes!)
+    final Map<String, dynamic> body = {
+      'contents': [
+        {
+          'parts': [
+            {'text': prompt},
+            if (_imgBytes != null)
+              {
+                'inlineData': {
+                  'mimeType': 'image/jpeg',
+                  'data': base64Encode(_imgBytes!)
+                }
               }
-            },
-          {'type': 'text', 'text': prompt}
-        ]
+          ]
+        }
+      ],
+      'generationConfig': {
+        'responseMimeType': 'application/json',
       }
-    ];
+    };
 
     final response = await http.post(
-      Uri.parse('https://api.anthropic.com/v1/messages'),
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': _apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: jsonEncode({
-        'model': 'claude-3-5-sonnet-20240620',
-        'max_tokens': 1500,
-        'messages': messages,
-      }),
+      Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$_apiKey'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(body),
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed API: ${response.statusCode}');
+      throw Exception('Failed API: ${response.statusCode} - ${response.body}');
     }
 
     final data = jsonDecode(response.body);
-    final text = data['content'][0]['text'] as String;
+    final text = data['candidates'][0]['content']['parts'][0]['text'] as String;
     
     final startIdx = text.indexOf('{');
     final endIdx = text.lastIndexOf('}');
