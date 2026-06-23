@@ -49,6 +49,8 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
           'Reforma integral de cocina: quitar la cocina antigua, fontanería, electricidad, alicatar paredes, suelo nuevo, muebles altos y bajos, encimera, fregadero y pintura.');
 
   int _m2 = 12;
+  int _aiCalculatedM2 = 0;
+  String _aiSalesPitch = '';
   String _apiKey = '';
   bool _usedLive = false;
   
@@ -144,10 +146,15 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
     List<Partida>? aiItems;
     if (_apiKey.isNotEmpty) {
       try {
-        aiItems = await _callAnthropic();
+        final aiResult = await _callAnthropic();
+        if (aiResult != null) {
+          aiItems = aiResult['partidas'];
+          _aiCalculatedM2 = aiResult['m2_estimado'] ?? _m2;
+          _aiSalesPitch = aiResult['resumen_venta'] ?? 'Hemos elaborado este presupuesto a medida garantizando la máxima calidad en cada detalle.';
+        }
         _usedLive = true;
       } catch (e) {
-        print('Error API: \$e');
+        print('Error API: $e');
         _usedLive = false;
       }
     } else {
@@ -160,17 +167,24 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
     if (!mounted) return;
 
     setState(() {
+      if (!_usedLive) {
+        _aiCalculatedM2 = _m2;
+        _aiSalesPitch = 'Transformaremos este espacio con acabados de primera calidad y tiempos de ejecución optimizados para que lo disfrutes cuanto antes.';
+      }
       _results = (aiItems != null && aiItems.isNotEmpty) ? aiItems : _scriptedData;
       _step = _AIFlowStep.results;
     });
   }
 
-  Future<List<Partida>?> _callAnthropic() async {
-    final prompt = '''Eres un perito de reformas en España. Devuelve SOLO un array JSON válido (sin markdown) con entre 8 y 12 objetos. 
-Cada objeto: {"concepto": string, "detalle": string corto, "material": number, "mano_obra": number}. 
-Presupuesta este trabajo con precios de mercado en España: "${_descController.text}". 
-Tamaño aproximado: \$_m2 m². \${_imgBytes != null ? 'Usa la foto adjunta para estimar superficies.' : ''} 
-Responde únicamente con el JSON.''';
+  Future<Map<String, dynamic>?> _callAnthropic() async {
+    final prompt = '''Eres un perito de reformas. Analiza el trabajo: "${_descController.text}" (Tamaño estimado: $_m2 m²).
+Devuelve un JSON estrictamente así: 
+{
+  "m2_estimado": number,
+  "resumen_venta": "Un texto persuasivo y profesional de venta para el cliente",
+  "partidas": [{"concepto": string, "detalle": string, "material": number, "mano_obra": number}]
+}
+Usa precios de mercado en España. Responde solo con el JSON.''';
 
     final messages = [
       {
@@ -206,27 +220,29 @@ Responde únicamente con el JSON.''';
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed API: \${response.statusCode}');
+      throw Exception('Failed API: ${response.statusCode}');
     }
 
     final data = jsonDecode(response.body);
     final text = data['content'][0]['text'] as String;
     
-    final startIdx = text.indexOf('[');
-    final endIdx = text.lastIndexOf(']');
-    if (startIdx == -1 || endIdx == -1) throw Exception('No JSON array found');
+    final startIdx = text.indexOf('{');
+    final endIdx = text.lastIndexOf('}');
+    if (startIdx == -1 || endIdx == -1) throw Exception('No JSON found');
     
-    final jsonStr = text.substring(startIdx, endIdx + 1);
-    final List<dynamic> jsonList = jsonDecode(jsonStr);
-
-    return jsonList.map((e) {
-      return Partida(
-        e['concepto']?.toString() ?? 'Partida',
-        e['detalle']?.toString() ?? '',
+    final jsonResult = jsonDecode(text.substring(startIdx, endIdx + 1));
+    final List<dynamic> pList = jsonResult['partidas'];
+    
+    return {
+      'm2_estimado': (jsonResult['m2_estimado'] as num?)?.toInt() ?? _m2,
+      'resumen_venta': jsonResult['resumen_venta'],
+      'partidas': pList.map((e) => Partida(
+        e['concepto'] ?? 'Partida',
+        e['detalle'] ?? '',
         (e['material'] ?? 0).toDouble(),
         (e['mano_obra'] ?? 0).toDouble(),
-      );
-    }).toList();
+      )).toList()
+    };
   }
 
   void _showSettings() {
@@ -364,7 +380,7 @@ Responde únicamente con el JSON.''';
                       const SizedBox(height: 24),
                       const Text('Presupuesto enviado', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
-                      const Text('El cliente lo recibe al instante y puede\\nfirmarlo desde su móvil.', textAlign: TextAlign.center, style: TextStyle(color: AppTheme.textSecondary, height: 1.5)),
+                      const Text('El cliente lo recibe al instante y puede\nfirmarlo desde su móvil.', textAlign: TextAlign.center, style: TextStyle(color: AppTheme.textSecondary, height: 1.5)),
                       const SizedBox(height: 24),
                       TextButton(
                         onPressed: () {
@@ -455,7 +471,7 @@ Responde únicamente con el JSON.''';
           ),
           
           const SizedBox(height: 16),
-          const Text('Tamaño aproximado', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.bold)),
+          const Text('Tamaño aproximado (opcional, la IA lo validará)', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -463,7 +479,7 @@ Responde únicamente con el JSON.''';
             child: Row(
               children: [
                 _buildStepperBtn(Icons.remove, () => setState(() => _m2 = max(1, _m2 - 1))),
-                Expanded(child: Center(child: Text('\$_m2 m²', style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold)))),
+                Expanded(child: Center(child: Text('$_m2 m²', style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold)))),
                 _buildStepperBtn(Icons.add, () => setState(() => _m2++)),
               ],
             ),
@@ -623,10 +639,36 @@ Responde únicamente con el JSON.''';
                 child: Text(_usedLive ? '✦ IA en vivo' : '✦ IA', style: TextStyle(color: _usedLive ? AppTheme.successGreen : const Color(0xFF8A6B00), fontSize: 10, fontWeight: FontWeight.bold)),
               ),
               const SizedBox(width: 8),
-              Text('\$_m2 m² · \${_results.length} partidas', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+              Text('$_aiCalculatedM2 m² (Área calculada) · ${_results.length} partidas', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
             ],
           ),
           
+          if (_aiSalesPitch.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.brandYellow.withValues(alpha: 0.1),
+                border: Border.all(color: AppTheme.brandYellow.withValues(alpha: 0.5)),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.stars, color: AppTheme.brandYellow, size: 16),
+                      SizedBox(width: 6),
+                      Text('PROPUESTA DE VALOR', style: TextStyle(color: AppTheme.brandYellow, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(_aiSalesPitch, style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.4, fontStyle: FontStyle.italic)),
+                ],
+              ),
+            ),
+          ],
+
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(16),
