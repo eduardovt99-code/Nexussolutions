@@ -178,7 +178,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
           Partida('Acabados y limpieza', 'Remates finales y limpieza', 5.0 * _m2, 10.0 * _m2),
         ];
       }
-      _results = (aiItems != null && aiItems!.isNotEmpty) ? aiItems : _scriptedData;
+      _results = (aiItems != null && aiItems!.isNotEmpty) ? aiItems! : _scriptedData;
       _step = _AIFlowStep.results;
     });
   }
@@ -252,70 +252,7 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
     };
   }
 
-  void _showSettings() {
-    final c = TextEditingController(text: _apiKey);
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppTheme.surfaceDark,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx).viewInsets.bottom,
-            left: 20, right: 20, top: 24,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('IA en vivo', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              const Text('Pega tu clave de API de Anthropic para usar un modelo real.', style: TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
-              const SizedBox(height: 16),
-              TextField(
-                controller: c,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: 'sk-ant-...',
-                  hintStyle: const TextStyle(color: AppTheme.textSecondary),
-                  filled: true,
-                  fillColor: AppTheme.backgroundDark,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.brandYellow, foregroundColor: Colors.black),
-                      onPressed: () {
-                        _saveApiKey(c.text.trim());
-                        Navigator.pop(ctx);
-                      },
-                      child: const Text('Guardar', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: () {
-                      _saveApiKey('');
-                      Navigator.pop(ctx);
-                    },
-                    child: const Text('Quitar', style: TextStyle(color: Colors.white70)),
-                  )
-                ],
-              ),
-              const SizedBox(height: 24),
-            ],
-          )
-        );
-      }
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -331,7 +268,7 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
             SizedBox(width: 8),
             Text('Nuevo presupuesto', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
           ],
-        ],
+        ),
       ),
       body: Stack(
         children: [
