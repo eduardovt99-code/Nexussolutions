@@ -510,7 +510,9 @@ class _TeamStatusPanel extends StatelessWidget {
       return [const Center(child: Text('Sin datos de equipo', style: TextStyle(color: _textMuted)))];
     }
 
-    final now = DateTime.now();
+    final now = timeLogs.isNotEmpty 
+        ? timeLogs.map((l) => l.checkIn).reduce((a, b) => a.isAfter(b) ? a : b)
+        : DateTime.now();
     final weekBounds = CrewCapacity.currentWeekBounds(now);
     final capacities = CrewCapacity.byProfession(
       workers: workers,
