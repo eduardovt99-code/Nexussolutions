@@ -588,8 +588,8 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    const SizedBox(width: 60, child: Text('A mano', style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold))),
-                    Expanded(child: Container(height: 8, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(4)), child: FractionallySizedBox(alignment: Alignment.centerLeft, widthFactor: 1.0, child: Container(decoration: BoxDecoration(color: Colors.grey.shade600, borderRadius: BorderRadius.circular(4)))))),
+                    const SizedBox(width: 60, child: Text('A mano', style: TextStyle(color: Colors.black87, fontSize: 12, fontWeight: FontWeight.bold))),
+                    Expanded(child: Container(height: 8, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(4)), child: FractionallySizedBox(alignment: Alignment.centerLeft, widthFactor: 1.0, child: Container(decoration: BoxDecoration(color: Colors.blue.shade400, borderRadius: BorderRadius.circular(4)))))),
                     const SizedBox(width: 12),
                     const SizedBox(width: 40, child: Text('1–2 h', textAlign: TextAlign.right, style: TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.bold))),
                   ],
