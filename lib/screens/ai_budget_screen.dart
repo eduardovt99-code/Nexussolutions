@@ -172,14 +172,13 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
         // Generar partidas dinámicas basadas en el texto si no hay API key
         final title = _descController.text.isNotEmpty ? _descController.text : 'Reforma general';
         aiItems = [
-          Partida('Preparación y demolición', title, 150, 450),
-          Partida('Materiales principales', 'Materiales para $title', 800, 0),
-          Partida('Mano de obra especializada', 'Ejecución de $title', 0, 1200),
-          Partida('Acabados y pintura', 'Pintura premium', 200, 350),
-          Partida('Limpieza final', 'Entrega impecable', 50, 150),
+          Partida('Preparación previa', title, 5.0 * _m2, 15.0 * _m2),
+          Partida('Materiales y suministros', 'Suministros para $title', 20.0 * _m2, 0),
+          Partida('Mano de obra especializada', 'Ejecución de $title', 0, 30.0 * _m2),
+          Partida('Acabados y limpieza', 'Remates finales y limpieza', 5.0 * _m2, 10.0 * _m2),
         ];
       }
-      _results = (aiItems != null && aiItems!.isNotEmpty) ? aiItems! : _scriptedData;
+      _results = (aiItems != null && aiItems!.isNotEmpty) ? aiItems : _scriptedData;
       _step = _AIFlowStep.results;
     });
   }
@@ -332,32 +331,6 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
             SizedBox(width: 8),
             Text('Nuevo presupuesto', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
           ],
-        ),
-        actions: [
-          GestureDetector(
-            onTap: _showSettings,
-            child: Container(
-              margin: const EdgeInsets.only(right: 16, top: 12, bottom: 12),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: _apiKey.isNotEmpty ? AppTheme.successGreen.withValues(alpha:0.2) : Colors.white10,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 6, height: 6,
-                    decoration: BoxDecoration(
-                      color: _apiKey.isNotEmpty ? AppTheme.successGreen : Colors.white54,
-                      shape: BoxShape.circle
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(_apiKey.isNotEmpty ? 'IA en vivo' : 'Demo', style: TextStyle(color: _apiKey.isNotEmpty ? AppTheme.successGreen : Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
-          )
         ],
       ),
       body: Stack(
@@ -639,31 +612,7 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
               Text('$_aiCalculatedM2 m² (Área calculada) · ${_results.length} partidas', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
             ],
           ),
-          
-          if (!_usedLive) ...[
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.orange.withValues(alpha: 0.1),
-                border: Border.all(color: Colors.orange),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Estás viendo un presupuesto de prueba (Cocina). Para que la IA lea tus fotos y genere presupuestos reales, haz clic en "Demo" arriba y añade tu API Key de Anthropic.',
-                      style: TextStyle(color: Colors.orange, fontSize: 12, height: 1.4),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+
           
           if (_aiSalesPitch.isNotEmpty) ...[
             const SizedBox(height: 16),
@@ -702,7 +651,7 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    const SizedBox(width: 60, child: Text('A mano', style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold))),
+                    const SizedBox(width: 60, child: Text('A mano', style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold))),
                     Expanded(child: Container(height: 8, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(4)), child: FractionallySizedBox(alignment: Alignment.centerLeft, widthFactor: 1.0, child: Container(decoration: BoxDecoration(color: Colors.grey.shade400, borderRadius: BorderRadius.circular(4)))))),
                     const SizedBox(width: 12),
                     const SizedBox(width: 40, child: Text('1–2 h', textAlign: TextAlign.right, style: TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.bold))),
