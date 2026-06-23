@@ -181,7 +181,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
         p.concepto,
         p.detalle,
         p.material * ratio,
-        p.mano_obra * ratio,
+        p.manoObra * ratio,
       )).toList();
     });
   }
