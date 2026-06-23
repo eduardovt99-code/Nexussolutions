@@ -197,16 +197,17 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
   }
 
   Future<Map<String, dynamic>?> _callGemini() async {
-    final prompt = '''Eres un perito de reformas. Analiza el trabajo: "${_descController.text}".
-IMPORTANTE PARA EL TAMAÑO: Fíjate muy bien en la escala y perspectiva de la foto. Busca objetos de referencia (puertas, ventanas, sillas, mesas, baldosas) para calcular el área real. Ten en cuenta tamaños estándar (ej. baños=4-6m2, habitaciones=12-15m2, salones de clase=40-80m2, locales comerciales=100+m2).
-Identifica el tipo de espacio y basa tu presupuesto y el "m2_estimado" estrictamente en la escala real detectada.
+    final prompt = '''Eres un perito experto en reformas integrales y arquitectura comercial. Analiza el trabajo a realizar: "${_descController.text}".
+IMPORTANTE PARA EL TAMAÑO: Fíjate muy bien en la escala y perspectiva de la foto. Busca objetos de referencia (puertas, ventanas, sillas, mesas, baldosas) para calcular el área real. Ten en cuenta tamaños estándar (ej. baños=4-6m2, habitaciones=12-15m2, aulas/salones de clase=40-80m2, locales comerciales/restaurantes=100+m2).
+NIVEL DE DESGLOSE: Exijo un desglose EXTREMADAMENTE detallado y exhaustivo. No hagas un presupuesto genérico. Divide el proyecto en TODAS las fases necesarias: 1. Trabajos previos y demoliciones, 2. Albañilería (aplanados, muros, tabiques), 3. Instalaciones (eléctrica, fontanería, clima), 4. Revestimientos y pavimentos, 5. Carpintería (puertas, ventanas), 6. Mobiliario y Equipamiento (mesas, sillas, maquinaria, equipos especializados según el tipo de proyecto), 7. Pintura, decoración y acabados finales. Genera entre 8 y 15 partidas dependiendo de la magnitud de la obra.
+Identifica el tipo de espacio y basa tu presupuesto y el "m2_estimado" estrictamente en la escala real detectada y la transformación solicitada.
 Devuelve un JSON estrictamente así: 
 {
   "m2_estimado": number,
   "resumen_venta": "Un texto persuasivo y profesional de venta para el cliente",
   "partidas": [{"concepto": string, "detalle": string, "material": number, "mano_obra": number}]
 }
-Usa precios de mercado en España. Responde solo con el JSON.''';
+Usa precios reales de mercado en España. Responde solo con el JSON.''';
 
     final Map<String, dynamic> body = {
       'contents': [
