@@ -428,20 +428,7 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
                 else
                   const Center(child: Icon(Icons.kitchen, size: 64, color: Colors.white10)),
                 
-                Positioned(
-                  top: 12, left: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(8)),
-                    child: Row(
-                      children: [
-                        Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppTheme.brandYellow, shape: BoxShape.circle)),
-                        const SizedBox(width: 6),
-                        const Text('Cocina · 12 m²', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  ),
-                ),
+
               ],
             ),
           ),
