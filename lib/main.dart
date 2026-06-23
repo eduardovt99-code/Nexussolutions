@@ -11,7 +11,6 @@ import 'data/database_service.dart';
 import 'screens/login_screen.dart';
 import 'screens/worksite_detail_screen.dart';
 import 'screens/pro_calculator_screen.dart';
-import 'screens/planning_screen.dart';
 import 'screens/team_screen.dart';
 import 'screens/planning_screen.dart';
 import 'screens/advanced_dashboard_screen.dart';
@@ -70,7 +69,7 @@ class _InitAppState extends State<InitApp> {
       setState(() {
         _error = e.toString();
       });
-      print("Error initializing app: $e");
+      debugPrint("Error initializing app: $e");
     }
   }
 
@@ -171,8 +170,6 @@ class _MainShellState extends State<MainShell> {
     HapticFeedback.lightImpact();
     setState(() => _currentIndex = index);
   }
-
-  void _goToTab(int index) => _onTabSelected(index);
 
   // Cada pestaña se reconstruye al seleccionarla para que sus datos
   // estén siempre frescos tras editar en otras pestañas.

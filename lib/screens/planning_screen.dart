@@ -198,29 +198,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
     }
   }
 
-  double _worksiteHoursInRange(
-    String worksiteId,
-    DateTime start,
-    DateTime end,
-  ) {
-    return _logs
-        .where((l) => l.worksiteId == worksiteId)
-        .fold(0.0, (sum, l) => sum + _logHoursInRange(l, start, end));
-  }
-
   bool _worksitePlannedOnDay(Worksite site, DateTime day) {
     if (site.plannedStart == null || site.plannedEnd == null) return false;
     return _inRange(day, site.plannedStart!, site.plannedEnd!);
-  }
-
-  List<TimeLog> _logsForWorksiteOnDay(String worksiteId, DateTime day) {
-    final dayStart = _dateOnly(day);
-    final dayEnd = dayStart.add(const Duration(hours: 23, minutes: 59));
-    return _logs.where((l) {
-      if (l.worksiteId != worksiteId) return false;
-      final end = l.checkOut ?? DateTime.now();
-      return !end.isBefore(dayStart) && !l.checkIn.isAfter(dayEnd);
-    }).toList();
   }
 
   double _workerHoursInPeriod(Worker worker, DateTime start, DateTime end) {
@@ -544,40 +524,6 @@ class _PlanningScreenState extends State<PlanningScreen> {
               PlanningView.week => _buildWeekGantt(_startOfWeek(_anchor)),
               PlanningView.month => _buildMonthGantt(_startOfMonth(_anchor)),
             },
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWorksiteLabel(Worksite site, {double width = 108}) {
-    return SizedBox(
-      width: width,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            site.name,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: AppTheme.textPrimary,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              height: 1.2,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            AppTheme.worksiteStatusLabel(site.status),
-            style: TextStyle(
-              color: site.status == 'active'
-                  ? AppTheme.brandYellowDark
-                  : AppTheme.textSecondary,
-              fontSize: 8,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.6,
-            ),
-          ),
         ],
       ),
     );
@@ -916,9 +862,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
               int? startIdx;
               for (int i = 0; i < 7; i++) {
                 final planned = _worksitePlannedOnDay(site, days[i]);
-                if (planned && startIdx == null)
+                if (planned && startIdx == null) {
                   startIdx = i;
-                else if (!planned && startIdx != null) {
+                } else if (!planned && startIdx != null) {
                   segments.add([startIdx, i - 1]);
                   startIdx = null;
                 }
@@ -1030,9 +976,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
                           l.checkIn.day == day.day,
                     )
                     .toList();
-                if (dayLogs.isNotEmpty && startIdx == null)
+                if (dayLogs.isNotEmpty && startIdx == null) {
                   startIdx = i;
-                else if (dayLogs.isEmpty && startIdx != null) {
+                } else if (dayLogs.isEmpty && startIdx != null) {
                   segments.add([startIdx, i - 1]);
                   startIdx = null;
                 }
@@ -1188,9 +1134,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
                   }
                 }
 
-                if (activeWeek && startIdx == null)
+                if (activeWeek && startIdx == null) {
                   startIdx = i;
-                else if (!activeWeek && startIdx != null) {
+                } else if (!activeWeek && startIdx != null) {
                   segments.add([startIdx, i - 1]);
                   startIdx = null;
                 }
@@ -1312,9 +1258,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
                   }
                 }
 
-                if (activeWeek && startIdx == null)
+                if (activeWeek && startIdx == null) {
                   startIdx = i;
-                else if (!activeWeek && startIdx != null) {
+                } else if (!activeWeek && startIdx != null) {
                   segments.add([startIdx, i - 1]);
                   startIdx = null;
                 }

@@ -277,7 +277,7 @@ class _WorkerDialogState extends State<_WorkerDialog> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _profession,
+                initialValue: _profession,
                 dropdownColor: AppTheme.brandBlack,
                 style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(

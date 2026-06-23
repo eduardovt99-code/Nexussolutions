@@ -116,11 +116,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
     }
   }
 
-  void _useSamplePhoto() {
-    setState(() {
-      _imgBytes = null;
-    });
-  }
+
 
   Future<void> _generate() async {
     setState(() {
@@ -436,26 +432,11 @@ Responde únicamente con el JSON.''';
             ),
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildPbtn(
-                  icon: Icons.image, 
-                  label: 'Foto de ejemplo', 
-                  active: _imgBytes == null, 
-                  onTap: _useSamplePhoto
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildPbtn(
-                  icon: Icons.camera_alt, 
-                  label: 'Subir foto', 
-                  active: _imgBytes != null, 
-                  onTap: _pickImage
-                ),
-              ),
-            ],
+          _buildPbtn(
+            icon: Icons.camera_alt, 
+            label: 'Subir foto', 
+            active: true, 
+            onTap: _pickImage
           ),
           
           const SizedBox(height: 20),

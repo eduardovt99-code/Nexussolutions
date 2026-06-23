@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import '../models/models.dart';
 import '../demo_version.dart';
 import '../data/mock_data.dart';
@@ -60,7 +61,7 @@ class DatabaseService {
       final snapshot = await _db.collection('worksites').where('ownerId', isEqualTo: uid).get();
       return snapshot.docs.map((doc) => Worksite.fromJson(doc.data())).toList();
     } catch (e) {
-      print("Error fetching worksites: $e");
+      debugPrint("Error fetching worksites: $e");
       return [];
     }
   }
@@ -96,7 +97,7 @@ class DatabaseService {
       final snapshot = await _db.collection('budgets').where('ownerId', isEqualTo: uid).get();
       return snapshot.docs.map((doc) => Budget.fromJson(doc.data())).toList();
     } catch (e) {
-      print("Error fetching budgets: $e");
+      debugPrint("Error fetching budgets: $e");
       return [];
     }
   }
@@ -145,7 +146,7 @@ class DatabaseService {
       final snapshot = await _db.collection('time_logs').where('ownerId', isEqualTo: uid).get();
       return snapshot.docs.map((doc) => TimeLog.fromJson(doc.data())).toList();
     } catch (e) {
-      print("Error fetching time_logs: $e");
+      debugPrint("Error fetching time_logs: $e");
       return [];
     }
   }
@@ -187,7 +188,7 @@ class DatabaseService {
       final snapshot = await _db.collection('workers').where('ownerId', isEqualTo: uid).get();
       return snapshot.docs.map((doc) => Worker.fromJson(doc.data())).toList();
     } catch (e) {
-      print("Error fetching workers: $e");
+      debugPrint("Error fetching workers: $e");
       return [];
     }
   }
