@@ -714,7 +714,7 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
                     const SizedBox(width: 60, child: Text('Con TAJO', style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold))),
                     Expanded(child: Container(height: 8, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(4)), child: FractionallySizedBox(alignment: Alignment.centerLeft, widthFactor: max(0.04, _elapsed/100), child: Container(decoration: BoxDecoration(color: AppTheme.brandYellow, borderRadius: BorderRadius.circular(4)))))),
                     const SizedBox(width: 12),
-                    SizedBox(width: 40, child: Text('\${_elapsed.toStringAsFixed(1)} s', textAlign: TextAlign.right, style: TextStyle(color: Colors.orange.shade800, fontSize: 13, fontWeight: FontWeight.bold))),
+                    SizedBox(width: 40, child: Text('${_elapsed.toStringAsFixed(1)} s', textAlign: TextAlign.right, style: TextStyle(color: Colors.orange.shade800, fontSize: 13, fontWeight: FontWeight.bold))),
                   ],
                 )
               ],
@@ -738,7 +738,7 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
                           children: [
                             Text(p.concepto, style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 2),
-                            Text('\${p.detalle} · mat \${eur(p.material)} · m.obra \${eur(p.manoObra)}', style: const TextStyle(color: Colors.black54, fontSize: 11)),
+                            Text('${p.detalle} · mat ${eur(p.material)} · m.obra ${eur(p.manoObra)}', style: const TextStyle(color: Colors.black54, fontSize: 11)),
                           ],
                         ),
                       ),
@@ -777,10 +777,10 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Tu margen', style: TextStyle(color: AppTheme.textSecondary, fontSize: 13, fontWeight: FontWeight.bold)),
-                    Text('\$_margin%', style: const TextStyle(color: AppTheme.brandYellow, fontSize: 22, fontWeight: FontWeight.bold)),
+                    Text('$_margin%', style: const TextStyle(color: AppTheme.brandYellow, fontSize: 22, fontWeight: FontWeight.bold)),
                   ],
                 ),
-                Text('Beneficio: \${eur(benefit)}', style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                Text('Beneficio: ${eur(benefit)}', style: const TextStyle(color: Colors.white70, fontSize: 13)),
                 const SizedBox(height: 12),
                 SliderTheme(
                   data: SliderTheme.of(context).copyWith(
@@ -819,7 +819,7 @@ Usa precios de mercado en España. Responde solo con el JSON.''';
                 const Text('PRECIO PARA EL CLIENTE', style: TextStyle(color: Color(0xFF7A5E12), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1)),
                 const SizedBox(height: 4),
                 Text(eur(pvp), style: const TextStyle(color: Colors.black, fontSize: 34, fontWeight: FontWeight.bold)),
-                Text('Base \${eur(bi)} + IVA 10% \${eur(iva)}', style: const TextStyle(color: Color(0xFF7A5E12), fontSize: 11)),
+                Text('Base ${eur(bi)} + IVA 10% ${eur(iva)}', style: const TextStyle(color: Color(0xFF7A5E12), fontSize: 11)),
               ],
             ),
           ),
