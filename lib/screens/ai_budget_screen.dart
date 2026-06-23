@@ -167,9 +167,19 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
     setState(() {
       if (!_usedLive) {
         _aiCalculatedM2 = _m2;
-        _aiSalesPitch = 'Transformaremos este espacio con acabados de primera calidad y tiempos de ejecución optimizados para que lo disfrutes cuanto antes.';
+        _aiSalesPitch = 'Presupuesto estimado para: ${_descController.text.isNotEmpty ? _descController.text : "Reforma"}. Transformaremos este espacio con acabados de primera calidad y tiempos de ejecución optimizados.';
+        
+        // Generar partidas dinámicas basadas en el texto si no hay API key
+        final title = _descController.text.isNotEmpty ? _descController.text : 'Reforma general';
+        aiItems = [
+          Partida('Preparación y demolición', title, 150, 450),
+          Partida('Materiales principales', 'Materiales para $title', 800, 0),
+          Partida('Mano de obra especializada', 'Ejecución de $title', 0, 1200),
+          Partida('Acabados y pintura', 'Pintura premium', 200, 350),
+          Partida('Limpieza final', 'Entrega impecable', 50, 150),
+        ];
       }
-      _results = (aiItems != null && aiItems.isNotEmpty) ? aiItems : _scriptedData;
+      _results = (aiItems != null && aiItems!.isNotEmpty) ? aiItems : _scriptedData;
       _step = _AIFlowStep.results;
     });
   }
