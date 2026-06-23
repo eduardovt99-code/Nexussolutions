@@ -6,6 +6,7 @@ import '../theme/app_theme.dart';
 import '../models/models.dart';
 import '../data/crew_capacity.dart';
 import '../data/database_service.dart';
+import 'ai_budget_screen.dart';
 
 /// Coste hora estándar de la cuadrilla (EUR/hora). Editable en pantalla.
 const double kLaborRate = 22.0;
@@ -711,6 +712,40 @@ class _ProCalculatorScreenState extends State<ProCalculatorScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const AIBudgetScreen()));
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  gradient: AppTheme.cyberGradient,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(color: AppTheme.brandYellow.withValues(alpha: 0.2), blurRadius: 12, offset: const Offset(0, 4)),
+                  ],
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.auto_awesome, color: AppTheme.brandBlack, size: 28),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Generar con Inteligencia Artificial', style: TextStyle(color: AppTheme.brandBlack, fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
+                          SizedBox(height: 2),
+                          Text('Toma una foto y extrae medidas y partidas al instante.', style: TextStyle(color: Color(0xFF6B5100), fontSize: 12, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.arrow_forward_ios, color: AppTheme.brandBlack, size: 16),
+                  ],
+                ),
+              ),
+            ),
             _buildDestinationCard(),
             const SizedBox(height: 16),
             _buildPresetSelector(),

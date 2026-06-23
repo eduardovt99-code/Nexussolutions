@@ -6,7 +6,6 @@ import '../data/database_service.dart';
 import '../data/crew_capacity.dart';
 import '../models/models.dart';
 import '../theme/app_theme.dart';
-import 'ai_budget_screen.dart';
 
 const Color _cardBorder = AppTheme.borderDark;
 
@@ -270,15 +269,6 @@ class _PlanningScreenState extends State<PlanningScreen> {
                 ],
               ),
             ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppTheme.brandYellow,
-        foregroundColor: AppTheme.brandBlack,
-        icon: const Icon(Icons.auto_awesome),
-        label: const Text('Presupuesto IA', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5)),
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const AIBudgetScreen()));
-        },
-      ),
     );
   }
 
