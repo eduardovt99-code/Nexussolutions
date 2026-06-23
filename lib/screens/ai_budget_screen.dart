@@ -198,7 +198,8 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
 
   Future<Map<String, dynamic>?> _callGemini() async {
     final prompt = '''Eres un perito de reformas. Analiza el trabajo: "${_descController.text}".
-Estima el tamaño del espacio en la foto en metros cuadrados. Identifica el tipo de espacio (ej. cambiar cocina de departamento, transformar salón en bar, etc.) y basa tu presupuesto en esa transformación.
+IMPORTANTE PARA EL TAMAÑO: Fíjate muy bien en la escala y perspectiva de la foto. Busca objetos de referencia (puertas, ventanas, sillas, mesas, baldosas) para calcular el área real. Ten en cuenta tamaños estándar (ej. baños=4-6m2, habitaciones=12-15m2, salones de clase=40-80m2, locales comerciales=100+m2).
+Identifica el tipo de espacio y basa tu presupuesto y el "m2_estimado" estrictamente en la escala real detectada.
 Devuelve un JSON estrictamente así: 
 {
   "m2_estimado": number,
