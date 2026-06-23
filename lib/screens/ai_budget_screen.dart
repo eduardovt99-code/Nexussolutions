@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 import '../theme/app_theme.dart';
 
@@ -49,7 +49,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
   int _m2 = 12;
   int _aiCalculatedM2 = 0;
   String _aiSalesPitch = '';
-  String _apiKey = 'AQ.Ab8RN6' + 'Kv3Z2h8' + 'ppzdOs1G' + 'h1y_1B' + 'lC3OCsCe' + 'KneWi9dO' + 'cJvWAcg';
+  final String _apiKey = 'AQ.Ab8RN6' 'Kv3Z2h8' 'ppzdOs1G' 'h1y_1B' 'lC3OCsCe' 'KneWi9dO' 'cJvWAcg';
   bool _usedLive = false;
   
   Uint8List? _imgBytes;
@@ -136,7 +136,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
         }
         _usedLive = true;
       } catch (e) {
-        print('Error API: $e');
+        debugPrint('Error API: $e');
         _usedLive = false;
       }
     } else {
