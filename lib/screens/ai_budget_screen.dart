@@ -179,7 +179,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
           Partida('Limpieza final', 'Entrega impecable', 50, 150),
         ];
       }
-      _results = (aiItems != null && aiItems!.isNotEmpty) ? aiItems : _scriptedData;
+      _results = (aiItems != null && aiItems!.isNotEmpty) ? aiItems! : _scriptedData;
       _step = _AIFlowStep.results;
     });
   }
