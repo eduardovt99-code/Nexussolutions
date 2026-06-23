@@ -261,7 +261,7 @@ Responde únicamente con el JSON.''';
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: 'sk-ant-...',
-                  hintStyle: const TextStyle(color: AppTheme.textMuted),
+                  hintStyle: const TextStyle(color: AppTheme.textSecondary),
                   filled: true,
                   fillColor: AppTheme.backgroundDark,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
@@ -396,7 +396,7 @@ Responde únicamente con el JSON.''';
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('REFORMA', style: TextStyle(color: AppTheme.textMuted, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+          const Text('REFORMA', style: TextStyle(color: AppTheme.textSecondary, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
           const SizedBox(height: 4),
           const Text('Haz una foto, describe el trabajo y la IA presupuesta', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, height: 1.2)),
           const SizedBox(height: 16),
@@ -554,7 +554,7 @@ Responde únicamente con el JSON.''';
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text('TIEMPO', style: TextStyle(color: AppTheme.textMuted, fontSize: 11, letterSpacing: 1.5, fontWeight: FontWeight.bold)),
+          const Text('TIEMPO', style: TextStyle(color: AppTheme.textSecondary, fontSize: 11, letterSpacing: 1.5, fontWeight: FontWeight.bold)),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -616,7 +616,11 @@ Responde únicamente con el JSON.''';
     double iva = bi * 0.10;
     double pvp = bi + iva;
 
-    String eur(double val) => '\${val.round().toString().replaceAll(RegExp(r'\\B(?=(\\d{3})+(?!\\d))'), '.')} €';
+    String eur(double val) {
+      final str = val.round().toString();
+      final regex = RegExp(r'\B(?=(\d{3})+(?!\d))');
+      return '${str.replaceAll(regex, '.')} €';
+    }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
