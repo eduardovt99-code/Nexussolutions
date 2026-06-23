@@ -104,6 +104,16 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
 
 
   Future<void> _generate() async {
+    if (_imgBytes == null || _descController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor sube una foto y describe el trabajo antes de continuar.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _step = _AIFlowStep.analyzing;
       _elapsed = 0.0;
