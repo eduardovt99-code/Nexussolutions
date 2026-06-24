@@ -138,9 +138,10 @@ class TajoApp extends StatelessWidget {
             );
           }
           if (snapshot.hasData && snapshot.data != null) {
-            if (!snapshot.data!.emailVerified) {
-              return const VerificationScreen();
-            }
+            // TEMPORAL: Se ha deshabilitado la validación de correo para agilizar el registro
+            // if (!snapshot.data!.emailVerified) {
+            //   return const VerificationScreen();
+            // }
             return const MainShell();
           }
           return const LoginScreen();

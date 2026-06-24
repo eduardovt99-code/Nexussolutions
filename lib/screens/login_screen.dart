@@ -109,11 +109,11 @@ class _LoginScreenState extends State<LoginScreen> {
           );
           await DatabaseService().saveUserProfile(profile);
           
-          await userCred.user?.sendEmailVerification();
+          // TEMPORAL: Deshabilitado temporalmente el envío de correos de verificación.
+          // await userCred.user?.sendEmailVerification();
           
-          // No cerramos sesión manualmente ni mostramos el mensaje de éxito aquí.
-          // Dejamos que el usuario "inicie sesión", y el StreamBuilder de main.dart
-          // lo atrapará enviándolo a la VerificationScreen porque emailVerified es false.
+          // Dejamos que el usuario "inicie sesión" normalmente.
+          // El StreamBuilder de main.dart ahora lo dejará pasar directamente.
           return;
         }
       }
