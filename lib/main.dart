@@ -576,8 +576,16 @@ class _FinancesScreenState extends State<FinancesScreen> {
     final conceptController = TextEditingController(text: 'Factura final de obra');
     final amountController = TextEditingController();
 
+    // Only include worksites that have an approved budget > 0
+    final validWorksites = _allWorksites.where((w) {
+      final approvedSum = _budgets
+          .where((b) => b.worksiteId == w.id && b.status == 'approved')
+          .fold(0.0, (sum, b) => sum + b.totalAmount);
+      return approvedSum > 0;
+    }).toList();
+
     // Sort worksites so completed are first
-    final sortedWorksites = List<Worksite>.from(_allWorksites)
+    final sortedWorksites = validWorksites
       ..sort((a, b) {
         if (a.status == 'completed' && b.status != 'completed') return -1;
         if (a.status != 'completed' && b.status == 'completed') return 1;
