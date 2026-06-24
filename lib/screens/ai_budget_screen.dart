@@ -62,6 +62,9 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
   List<Partida> _results = [];
   int _margin = 30;
   bool _showSent = false;
+  
+  bool _isGeneratingRender = false;
+  String? _renderImageUrl;
 
   late AnimationController _scanController;
   late AnimationController _sentController;
@@ -333,6 +336,7 @@ Responde solo con el JSON.''';
                             _step = _AIFlowStep.capture;
                             _results.clear();
                             _imgBytesList.clear();
+                            _renderImageUrl = null;
                           });
                         },
                         child: const Text('Crear otro presupuesto', style: TextStyle(color: AppTheme.brandYellow)),
@@ -795,6 +799,52 @@ Responde solo con el JSON.''';
             ),
           ),
           
+          if (_renderImageUrl != null)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Render IA de tu proyecto', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.network(_renderImageUrl!, width: double.infinity, height: 220, fit: BoxFit.cover),
+                ),
+              ],
+            )
+          else
+            _isGeneratingRender
+                ? Container(
+                    height: 120,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceDark,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppTheme.brandYellow.withValues(alpha: 0.5)),
+                    ),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(color: AppTheme.brandYellow),
+                        SizedBox(height: 16),
+                        Text('Diseñando render en 3D...', style: TextStyle(color: AppTheme.brandYellow, fontSize: 14)),
+                      ],
+                    ),
+                  )
+                : SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.auto_awesome, size: 20),
+                      label: const Text('Generar Render IA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Colors.white30),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                      ),
+                      onPressed: _generateRender,
+                    ),
+                  ),
+          
           const SizedBox(height: 24),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -828,6 +878,7 @@ Responde solo con el JSON.''';
                 _results.clear();
                 _margin = 30;
                 _imgBytesList.clear();
+                _renderImageUrl = null;
               });
             },
             child: const Text('Empezar de nuevo', style: TextStyle(color: Colors.white, fontSize: 16)),
