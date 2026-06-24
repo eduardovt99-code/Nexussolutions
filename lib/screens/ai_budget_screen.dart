@@ -65,6 +65,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
   
   bool _isGeneratingRender = false;
   String? _renderImageUrl;
+  Uint8List? _generatedRenderBytes;
 
   late AnimationController _scanController;
   late AnimationController _sentController;
@@ -283,13 +284,60 @@ Responde solo con el JSON.''';
   Future<void> _generateRender() async {
     setState(() {
       _isGeneratingRender = true;
+      _generatedRenderBytes = null;
     });
     
-    // Simulate generation time
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      final prompt = 'Genera un render hiperrealista de diseño de interiores basado en esta descripción y respetando la estructura de la imagen original: ${_descController.text}';
+      
+      final Map<String, dynamic> body = {
+        'contents': [
+          {
+            'parts': [
+              {'text': prompt},
+              if (_imgBytesList.isNotEmpty)
+                {
+                  'inlineData': {
+                    'mimeType': 'image/jpeg',
+                    'data': base64Encode(_imgBytesList.first)
+                  }
+                }
+            ]
+          }
+        ]
+      };
+
+      final response = await http.post(
+        Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/nano-banana-pro-preview:generateContent?key=$_apiKey'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final parts = data['candidates'][0]['content']['parts'] as List<dynamic>;
+        
+        String? base64Img;
+        for (var part in parts) {
+          if (part['inlineData'] != null && part['inlineData']['data'] != null) {
+            base64Img = part['inlineData']['data'];
+            break;
+          }
+        }
+        
+        if (base64Img != null) {
+          setState(() {
+            _generatedRenderBytes = base64Decode(base64Img!);
+            _isGeneratingRender = false;
+          });
+          return;
+        }
+      }
+    } catch (e) {
+      debugPrint('Error API Render: $e');
+    }
     
     if (!mounted) return;
-    
     setState(() {
       _isGeneratingRender = false;
       _renderImageUrl = 'local'; 
@@ -351,6 +399,7 @@ Responde solo con el JSON.''';
                             _results.clear();
                             _imgBytesList.clear();
                             _renderImageUrl = null;
+                            _generatedRenderBytes = null;
                           });
                         },
                         child: const Text('Crear otro presupuesto', style: TextStyle(color: AppTheme.brandYellow)),
@@ -684,7 +733,19 @@ Responde solo con el JSON.''';
           ],
 
           const SizedBox(height: 24),
-          if (_renderImageUrl == 'local' && _imgBytesList.isNotEmpty)
+          if (_generatedRenderBytes != null)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Render IA de tu proyecto', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.memory(_generatedRenderBytes!, width: double.infinity, height: 220, fit: BoxFit.cover),
+                ),
+              ],
+            )
+          else if (_renderImageUrl == 'local' && _imgBytesList.isNotEmpty)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -907,6 +968,7 @@ Responde solo con el JSON.''';
                 _margin = 30;
                 _imgBytesList.clear();
                 _renderImageUrl = null;
+                _generatedRenderBytes = null;
               });
             },
             child: const Text('Empezar de nuevo', style: TextStyle(color: Colors.white, fontSize: 16)),
