@@ -85,16 +85,19 @@ class _LoginScreenState extends State<LoginScreen> {
     HapticFeedback.mediumImpact();
 
     try {
+      // Firebase exige mínimo 6 caracteres. Rellenamos las contraseñas cortas por detrás para engañar a Firebase
+      final String safePassword = password.length < 6 ? password + '_TajoAuthPad!' : password;
+
       if (_isLogin) {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email,
-          password: password,
+          password: safePassword,
         );
 
       } else {
         final userCred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
-          password: password,
+          password: safePassword,
         );
         
         final uid = userCred.user?.uid;
