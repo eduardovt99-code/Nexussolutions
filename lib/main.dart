@@ -707,20 +707,30 @@ class _FinancesScreenState extends State<FinancesScreen> {
                       await _loadData();
                       
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Row(
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: AppTheme.surfaceLight,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.check_circle, color: AppTheme.brandBlack),
-                                SizedBox(width: 12),
-                                Expanded(child: Text('¡Factura enviada al cliente!', style: TextStyle(color: AppTheme.brandBlack, fontWeight: FontWeight.bold))),
+                                const Icon(Icons.check_circle, color: AppTheme.successGreen, size: 64),
+                                const SizedBox(height: 16),
+                                const Text('¡Factura enviada al cliente!', textAlign: TextAlign.center, style: TextStyle(color: AppTheme.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 24),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppTheme.brandYellow,
+                                    foregroundColor: AppTheme.brandBlack,
+                                    minimumSize: const Size(double.infinity, 50),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                  ),
+                                  child: const Text('OK', style: TextStyle(fontWeight: FontWeight.w900)),
+                                ),
                               ],
                             ),
-                            backgroundColor: AppTheme.brandYellow,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            margin: const EdgeInsets.all(16),
-                            duration: const Duration(seconds: 4),
                           ),
                         );
                       }
