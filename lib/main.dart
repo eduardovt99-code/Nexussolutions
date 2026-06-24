@@ -866,13 +866,18 @@ class _FinancesScreenState extends State<FinancesScreen> {
                             children: [
                               if (budget.status == 'invoiced')
                                 Container(
-                                  margin: const EdgeInsets.only(right: 12),
-                                  padding: const EdgeInsets.all(8),
+                                  margin: const EdgeInsets.only(right: 16),
                                   decoration: BoxDecoration(
-                                    color: AppTheme.brandYellow.withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(12),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppTheme.successGreen.withValues(alpha: 0.25),
+                                        blurRadius: 12,
+                                        spreadRadius: 1,
+                                      )
+                                    ],
                                   ),
-                                  child: const Icon(Icons.receipt_long, color: AppTheme.brandYellow, size: 24),
+                                  child: const Icon(Icons.check_circle, color: AppTheme.successGreen, size: 34),
                                 ),
                               Expanded(
                                 child: Column(
