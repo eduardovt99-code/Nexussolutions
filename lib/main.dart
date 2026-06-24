@@ -547,6 +547,7 @@ class _FinancesScreenState extends State<FinancesScreen> {
 
   List<Budget> _budgets = [];
   Map<String, String> _worksiteNames = {};
+  List<Worksite> _allWorksites = [];
   bool _isLoading = true;
 
   @override
@@ -562,12 +563,146 @@ class _FinancesScreenState extends State<FinancesScreen> {
     setState(() {
       _budgets = budgets;
       _worksiteNames = {for (final w in worksites) w.id: w.name};
+      _allWorksites = worksites;
       _isLoading = false;
     });
   }
 
   double _sumWhere(bool Function(Budget) test) =>
       _budgets.where(test).fold(0.0, (sum, b) => sum + b.totalAmount);
+
+  void _showCreateInvoiceModal() {
+    String? selectedWorksiteId;
+    final conceptController = TextEditingController(text: 'Factura final de obra');
+    final amountController = TextEditingController();
+
+    // Sort worksites so completed are first
+    final sortedWorksites = List<Worksite>.from(_allWorksites)
+      ..sort((a, b) {
+        if (a.status == 'completed' && b.status != 'completed') return -1;
+        if (a.status != 'completed' && b.status == 'completed') return 1;
+        return a.name.compareTo(b.name);
+      });
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.surfaceLight,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(ctx).viewInsets.bottom,
+                left: 24, right: 24, top: 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('EMITIR FACTURA', style: TextStyle(color: AppTheme.textPrimary, fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                  const SizedBox(height: 16),
+                  const Text('Obra', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: selectedWorksiteId,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: AppTheme.backgroundLight,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: _cardBorder)),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: _cardBorder)),
+                    ),
+                    dropdownColor: AppTheme.surfaceLight,
+                    style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
+                    items: sortedWorksites.map((w) {
+                      return DropdownMenuItem(
+                        value: w.id,
+                        child: Text('${w.status == 'completed' ? '✅ ' : ''}${w.name}', overflow: TextOverflow.ellipsis),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      setModalState(() => selectedWorksiteId = val);
+                    },
+                    hint: const Text('Selecciona una obra', style: TextStyle(color: AppTheme.textSecondary)),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('Concepto', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: conceptController,
+                    style: const TextStyle(color: AppTheme.textPrimary),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: AppTheme.backgroundLight,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: _cardBorder)),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: _cardBorder)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('Importe Total (€)', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: amountController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    style: const TextStyle(color: AppTheme.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: AppTheme.backgroundLight,
+                      prefixText: '€ ',
+                      prefixStyle: const TextStyle(color: AppTheme.brandYellow, fontSize: 20, fontWeight: FontWeight.bold),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: _cardBorder)),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: _cardBorder)),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (selectedWorksiteId == null) return;
+                      final amt = double.tryParse(amountController.text.replaceAll(',', '.')) ?? 0.0;
+                      if (amt <= 0) return;
+                      
+                      final invoice = Budget(
+                        id: 'inv_${DateTime.now().millisecondsSinceEpoch}',
+                        ownerId: '', // Filled by DatabaseService
+                        worksiteId: selectedWorksiteId!,
+                        totalAmount: amt,
+                        items: [
+                          BudgetItem(
+                            description: conceptController.text,
+                            quantity: 1,
+                            unit: 'ud',
+                            unitPrice: amt,
+                            subtotal: amt,
+                          )
+                        ],
+                        status: 'invoiced',
+                      );
+                      
+                      Navigator.pop(ctx);
+                      setState(() => _isLoading = true);
+                      await DatabaseService().addBudget(invoice);
+                      await _loadData();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.brandYellow,
+                      foregroundColor: AppTheme.brandBlack,
+                      minimumSize: const Size(double.infinity, 54),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: const Text('EMITIR FACTURA', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1)),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            );
+          }
+        );
+      }
+    );
+  }
 
   Widget _kpiTile(String label, double amount, Color color) {
     return Expanded(
@@ -618,6 +753,13 @@ class _FinancesScreenState extends State<FinancesScreen> {
           'FINANZAS',
           style: TextStyle(color: AppTheme.brandBlack, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 3),
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: AppTheme.brandYellow,
+        foregroundColor: AppTheme.brandBlack,
+        icon: const Icon(Icons.receipt),
+        label: const Text('Generar Factura', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+        onPressed: _showCreateInvoiceModal,
       ),
       body: SafeArea(
         child: _isLoading
