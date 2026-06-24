@@ -624,7 +624,17 @@ class _FinancesScreenState extends State<FinancesScreen> {
                       );
                     }).toList(),
                     onChanged: (val) {
-                      setModalState(() => selectedWorksiteId = val);
+                      setModalState(() {
+                        selectedWorksiteId = val;
+                        final double approvedSum = _budgets
+                            .where((b) => b.worksiteId == val && b.status == 'approved')
+                            .fold(0.0, (sum, b) => sum + b.totalAmount);
+                        if (approvedSum > 0) {
+                          amountController.text = approvedSum.toStringAsFixed(2);
+                        } else {
+                          amountController.text = '';
+                        }
+                      });
                     },
                     hint: const Text('Selecciona una obra', style: TextStyle(color: AppTheme.textSecondary)),
                   ),
