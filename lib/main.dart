@@ -630,7 +630,8 @@ class _FinancesScreenState extends State<FinancesScreen> {
                             .where((b) => b.worksiteId == val && b.status == 'approved')
                             .fold(0.0, (sum, b) => sum + b.totalAmount);
                         if (approvedSum > 0) {
-                          amountController.text = approvedSum.toStringAsFixed(2);
+                          final formatter = NumberFormat('#,##0.00', 'en_US');
+                          amountController.text = formatter.format(approvedSum);
                         } else {
                           amountController.text = '';
                         }
@@ -671,7 +672,8 @@ class _FinancesScreenState extends State<FinancesScreen> {
                   ElevatedButton(
                     onPressed: () async {
                       if (selectedWorksiteId == null) return;
-                      final amt = double.tryParse(amountController.text.replaceAll(',', '.')) ?? 0.0;
+                      final rawText = amountController.text.replaceAll(',', '');
+                      final amt = double.tryParse(rawText) ?? 0.0;
                       if (amt <= 0) return;
                       
                       final invoice = Budget(
