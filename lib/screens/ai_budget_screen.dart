@@ -288,7 +288,7 @@ Responde solo con el JSON.''';
     });
     
     try {
-      final prompt = 'Genera un render hiperrealista de diseño de interiores basado en esta descripción y respetando la estructura de la imagen original: ${_descController.text}';
+      final prompt = 'Eres un modelo de IA especializado en edición de imágenes de interiores. Toma la foto adjunta y EDÍTALA aplicando ESTRICTAMENTE los siguientes cambios solicitados por el usuario: "${_descController.text}". Mantén el resto de la estructura de la habitación idéntica a la original.';
       
       final Map<String, dynamic> body = {
         'contents': [
@@ -741,7 +741,7 @@ Responde solo con el JSON.''';
                 const SizedBox(height: 12),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: Image.memory(_generatedRenderBytes!, width: double.infinity, height: 220, fit: BoxFit.cover),
+                  child: Image.memory(_generatedRenderBytes!, width: double.infinity, fit: BoxFit.contain),
                 ),
               ],
             )
@@ -753,7 +753,7 @@ Responde solo con el JSON.''';
                 const SizedBox(height: 12),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: Image.memory(_imgBytesList.first, width: double.infinity, height: 220, fit: BoxFit.cover),
+                  child: Image.memory(_imgBytesList.first, width: double.infinity, fit: BoxFit.contain),
                 ),
               ],
             )
@@ -765,7 +765,7 @@ Responde solo con el JSON.''';
                 const SizedBox(height: 12),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: Image.network(_renderImageUrl!, width: double.infinity, height: 220, fit: BoxFit.cover),
+                  child: Image.network(_renderImageUrl!, width: double.infinity, fit: BoxFit.contain),
                 ),
               ],
             )
