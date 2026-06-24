@@ -12,24 +12,23 @@ import '../theme/app_theme.dart';
 class Partida {
   final String concepto;
   final String detalle;
-  final double material;
-  final double manoObra;
+  final double costo;
 
-  Partida(this.concepto, this.detalle, this.material, this.manoObra);
-  double get total => material + manoObra;
+  Partida(this.concepto, this.detalle, this.costo);
+  double get total => costo;
 }
 
 final List<Partida> _scriptedData = [
-  Partida('Demolición y retirada de escombro', 'cocina antigua', 120, 680),
-  Partida('Fontanería · 3 puntos', 'agua y desagüe', 260, 540),
-  Partida('Instalación eléctrica', '8 puntos + cuadro', 380, 620),
-  Partida('Alicatado de paredes', 'gres porcelánico', 540, 860),
-  Partida('Pavimento porcelánico', 'suelo', 420, 600),
-  Partida('Falso techo de pladur', 'con foseado de luz', 300, 560),
-  Partida('Mobiliario de cocina', 'muebles altos y bajos · 5 ml', 2600, 700),
-  Partida('Encimera de cuarzo', '5 ml', 780, 320),
-  Partida('Fregadero y grifería', 'acero inox', 240, 160),
-  Partida('Pintura de paredes y techo', 'plástica lavable', 130, 290),
+  Partida('Demolición y retirada de escombro', 'Levantado de elementos antiguos, carga manual y transporte a vertedero', 350),
+  Partida('Fontanería y desagües', 'Renovación integral de tuberías multicapa y desagües en PVC', 480),
+  Partida('Instalación eléctrica', 'Cuadro de mando, cableado libre de halógenos y 8 mecanismos', 550),
+  Partida('Alicatado de paredes', 'Suministro y colocación de gres porcelánico formato 60x60', 780),
+  Partida('Pavimento porcelánico', 'Suministro y colocación de pavimento porcelánico rectificado imitación madera', 650),
+  Partida('Falso techo de pladur', 'Techo continuo de placa laminada con foseado perimetral para luz LED', 420),
+  Partida('Mobiliario', 'Muebles de diseño a medida (5 ml) con herrajes con freno', 1950),
+  Partida('Encimera', 'Suministro y colocación de encimera tipo Silestone / Compac', 750),
+  Partida('Equipamiento', 'Fregadero bajo encimera de acero inox y grifería monomando extraíble', 220),
+  Partida('Pintura y acabados', 'Preparación de soporte y pintura plástica lavable ecológica', 320),
 ];
 
 enum _AIFlowStep { capture, analyzing, results }
@@ -170,10 +169,11 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
         // Generar partidas dinámicas basadas en el texto si no hay API key
         final title = _descController.text.isNotEmpty ? _descController.text : 'Reforma general';
         aiItems = [
-          Partida('Preparación previa', title, 5.0 * _baseM2, 15.0 * _baseM2),
-          Partida('Materiales y suministros', 'Suministros para $title', 20.0 * _baseM2, 0),
-          Partida('Mano de obra especializada', 'Ejecución de $title', 0, 30.0 * _baseM2),
-          Partida('Acabados y limpieza', 'Remates finales y limpieza', 5.0 * _baseM2, 10.0 * _baseM2),
+          Partida('Preparación previa', 'Protección de zonas, demoliciones y desescombro para $title', 35.0 * _baseM2),
+          Partida('Instalaciones', 'Adecuación de puntos de luz y fontanería básica', 45.0 * _baseM2),
+          Partida('Revestimientos', 'Suministro y colocación de pavimentos y alicatados', 60.0 * _baseM2),
+          Partida('Mobiliario y equipos', 'Instalación de mobiliario y equipos según requerimientos', 80.0 * _baseM2),
+          Partida('Acabados y pintura', 'Pintura plástica lisa, repasos y limpieza final de obra', 25.0 * _baseM2),
         ];
         _baseResults = aiItems!;
       }
@@ -190,8 +190,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
       _results = _baseResults.map((p) => Partida(
         p.concepto,
         p.detalle,
-        p.material * ratio,
-        p.manoObra * ratio,
+        p.costo * ratio,
       )).toList();
     });
   }
@@ -199,15 +198,18 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
   Future<Map<String, dynamic>?> _callGemini() async {
     final prompt = '''Eres un perito experto en reformas integrales y arquitectura comercial. Analiza el trabajo a realizar: "${_descController.text}".
 IMPORTANTE PARA EL TAMAÑO: Fíjate muy bien en la escala y perspectiva de la foto. Busca objetos de referencia (puertas, ventanas, sillas, mesas, baldosas) para calcular el área real. Ten en cuenta tamaños estándar (ej. baños=4-6m2, habitaciones=12-15m2, aulas/salones de clase=40-80m2, locales comerciales/restaurantes=100+m2).
-NIVEL DE DESGLOSE: Exijo un desglose EXTREMADAMENTE detallado y exhaustivo. No hagas un presupuesto genérico. Divide el proyecto en TODAS las fases necesarias: 1. Trabajos previos y demoliciones, 2. Albañilería (aplanados, muros, tabiques), 3. Instalaciones (eléctrica, fontanería, clima), 4. Revestimientos y pavimentos, 5. Carpintería (puertas, ventanas), 6. Mobiliario y Equipamiento (mesas, sillas, maquinaria, equipos especializados según el tipo de proyecto), 7. Pintura, decoración y acabados finales. Genera entre 8 y 15 partidas dependiendo de la magnitud de la obra.
-Identifica el tipo de espacio y basa tu presupuesto y el "m2_estimado" estrictamente en la escala real detectada y la transformación solicitada.
+NIVEL DE DESGLOSE Y PRECIOS: Exijo un desglose EXTREMADAMENTE detallado y exhaustivo. Divide el proyecto en TODAS las fases necesarias: 1. Trabajos previos y demoliciones, 2. Albañilería (aplanados, muros, tabiques), 3. Instalaciones (eléctrica, fontanería, clima), 4. Revestimientos y pavimentos, 5. Carpintería (puertas, ventanas), 6. Mobiliario y Equipamiento, 7. Pintura y acabados finales. Genera entre 8 y 15 partidas dependiendo de la magnitud de la obra.
+MUY IMPORTANTE (PRECIOS Y DETALLE): 
+- Los precios deben ser ALTAMENTE REALISTAS, MUCHO MÁS AJUSTADOS y competitivos para el mercado de España. No infles los costos.
+- NO dividas en material y mano de obra. Simplemente proporciona el "costo" TOTAL de esa partida.
+- El "detalle" debe ser EXTENSO, profesional, indicando calidades específicas, tipo de materiales, marcas de referencia o alcance exacto (ej. "Suministro e instalación de pavimento porcelánico rectificado formato 60x60, recibido con cemento cola C2TE").
 Devuelve un JSON estrictamente así: 
 {
   "m2_estimado": number,
   "resumen_venta": "Un texto persuasivo y profesional de venta para el cliente",
-  "partidas": [{"concepto": string, "detalle": string, "material": number, "mano_obra": number}]
+  "partidas": [{"concepto": string, "detalle": string, "costo": number}]
 }
-Usa precios reales de mercado en España. Responde solo con el JSON.''';
+Responde solo con el JSON.''';
 
     final Map<String, dynamic> body = {
       'contents': [
@@ -255,8 +257,7 @@ Usa precios reales de mercado en España. Responde solo con el JSON.''';
       'partidas': pList.map((e) => Partida(
         e['concepto'] ?? 'Partida',
         e['detalle'] ?? '',
-        (e['material'] ?? 0).toDouble(),
-        (e['mano_obra'] ?? 0).toDouble(),
+        (e['costo'] ?? 0).toDouble(),
       )).toList()
     };
   }
@@ -522,10 +523,8 @@ Usa precios reales de mercado en España. Responde solo con el JSON.''';
   }
 
   Widget _buildResults() {
-    double matT = 0, labT = 0, baseCost = 0;
+    double baseCost = 0;
     for (var p in _results) {
-      matT += p.material;
-      labT += p.manoObra;
       baseCost += p.total;
     }
     
@@ -649,8 +648,7 @@ Usa precios reales de mercado en España. Responde solo con el JSON.''';
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(p.concepto, style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 2),
-                            Text('${p.detalle} · mat ${eur(p.material)} · m.obra ${eur(p.manoObra)}', style: const TextStyle(color: Colors.black54, fontSize: 11)),
+                            Text(p.detalle, style: const TextStyle(color: Colors.black54, fontSize: 11)),
                           ],
                         ),
                       ),
@@ -667,13 +665,11 @@ Usa precios reales de mercado en España. Responde solo con el JSON.''';
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-            child: Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('Materiales', style: TextStyle(color: Colors.grey, fontSize: 13)), Text(eur(matT), style: const TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.bold))]),
-                const SizedBox(height: 6),
-                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('Mano de obra', style: TextStyle(color: Colors.grey, fontSize: 13)), Text(eur(labT), style: const TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.bold))]),
-                const Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Divider(height: 1, color: Colors.black12)),
-                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('Coste base', style: TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.bold)), Text(eur(baseCost), style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold))]),
+                const Text('Coste base (ejecución)', style: TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.bold)),
+                Text(eur(baseCost), style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)),
               ],
             ),
           ),
