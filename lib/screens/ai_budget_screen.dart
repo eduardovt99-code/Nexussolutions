@@ -341,33 +341,45 @@ Responde solo con el JSON.''';
           const Text('Haz una foto, describe el trabajo y la IA presupuesta', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, height: 1.2)),
           const SizedBox(height: 16),
           
-          Container(
-            height: 200,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceDark,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white10),
+          GestureDetector(
+            onTap: _pickImage,
+            child: Container(
+              height: 160,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceDark,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: _imgBytes != null ? AppTheme.successGreen.withValues(alpha: 0.5) : Colors.white10),
+              ),
+              child: Center(
+                child: _imgBytes != null 
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: AppTheme.successGreen.withValues(alpha: 0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.check_circle, color: AppTheme.successGreen, size: 48),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text('Foto cargada correctamente', style: TextStyle(color: AppTheme.successGreen, fontSize: 14, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        const Text('Toca para cambiarla', style: TextStyle(color: Colors.white30, fontSize: 11)),
+                      ],
+                    )
+                  : const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add_a_photo, size: 48, color: Colors.white24),
+                        SizedBox(height: 16),
+                        Text('Toca aquí para subir una foto', style: TextStyle(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+              ),
             ),
-            clipBehavior: Clip.hardEdge,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                if (_imgBytes != null)
-                  Image.memory(_imgBytes!, fit: BoxFit.cover)
-                else
-                  const Center(child: Icon(Icons.kitchen, size: 64, color: Colors.white10)),
-                
-
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          _buildPbtn(
-            icon: Icons.camera_alt, 
-            label: 'Subir foto', 
-            active: true, 
-            onTap: _pickImage
           ),
           
           const SizedBox(height: 20),
