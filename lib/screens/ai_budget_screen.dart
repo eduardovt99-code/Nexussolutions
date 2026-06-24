@@ -286,14 +286,13 @@ Responde solo con el JSON.''';
     });
     
     // Simulate generation time
-    await Future.delayed(const Duration(seconds: 4));
+    await Future.delayed(const Duration(seconds: 2));
     
     if (!mounted) return;
     
-    // Set a random interior design image from unsplash
     setState(() {
       _isGeneratingRender = false;
-      _renderImageUrl = 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80'; 
+      _renderImageUrl = 'local'; 
     });
   }
 
@@ -684,7 +683,67 @@ Responde solo con el JSON.''';
             ),
           ],
 
+          const SizedBox(height: 24),
+          if (_renderImageUrl == 'local' && _imgBytesList.isNotEmpty)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Render IA de tu proyecto', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.memory(_imgBytesList.first, width: double.infinity, height: 220, fit: BoxFit.cover),
+                ),
+              ],
+            )
+          else if (_renderImageUrl != null)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Render IA de tu proyecto', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.network(_renderImageUrl!, width: double.infinity, height: 220, fit: BoxFit.cover),
+                ),
+              ],
+            )
+          else
+            _isGeneratingRender
+                ? Container(
+                    height: 120,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceDark,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppTheme.brandYellow.withValues(alpha: 0.5)),
+                    ),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(color: AppTheme.brandYellow),
+                        SizedBox(height: 16),
+                        Text('Diseñando render en 3D...', style: TextStyle(color: AppTheme.brandYellow, fontSize: 14)),
+                      ],
+                    ),
+                  )
+                : Align(
+                    alignment: Alignment.centerLeft,
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.auto_awesome, size: 18),
+                      label: const Text('Generar Render IA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Colors.white30),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      ),
+                      onPressed: _generateRender,
+                    ),
+                  ),
+
           const SizedBox(height: 16),
+
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
@@ -813,52 +872,6 @@ Responde solo con el JSON.''';
               ],
             ),
           ),
-          
-          if (_renderImageUrl != null)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Render IA de tu proyecto', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.network(_renderImageUrl!, width: double.infinity, height: 220, fit: BoxFit.cover),
-                ),
-              ],
-            )
-          else
-            _isGeneratingRender
-                ? Container(
-                    height: 120,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: AppTheme.surfaceDark,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppTheme.brandYellow.withValues(alpha: 0.5)),
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(color: AppTheme.brandYellow),
-                        SizedBox(height: 16),
-                        Text('Diseñando render en 3D...', style: TextStyle(color: AppTheme.brandYellow, fontSize: 14)),
-                      ],
-                    ),
-                  )
-                : SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      icon: const Icon(Icons.auto_awesome, size: 20),
-                      label: const Text('Generar Render IA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: const BorderSide(color: Colors.white30),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                      ),
-                      onPressed: _generateRender,
-                    ),
-                  ),
           
           const SizedBox(height: 24),
           ElevatedButton(
