@@ -171,10 +171,23 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
         
         // Generar partidas dinámicas basadas en el texto si no hay API key
         final title = _descController.text.isNotEmpty ? _descController.text : 'Trabajos de reforma';
+        final lowerTitle = title.toLowerCase();
+        
+        double laborRate = 45.0;
+        double materialRate = 35.0;
+        
+        if (lowerTitle.contains('pinta') || lowerTitle.contains('pintura') || lowerTitle.contains('pared')) {
+          laborRate = 12.0;
+          materialRate = 6.0;
+        } else if (lowerTitle.contains('enchufe') || lowerTitle.contains('luz') || lowerTitle.contains('grifo') || lowerTitle.contains('arreglar')) {
+          laborRate = 5.0; 
+          materialRate = 2.0; 
+        }
+
         aiItems = [
           Partida('Preparación y protección', 'Protección de zonas y preparación previa para: $title', 45.0),
-          Partida('Mano de obra especializada', 'Ejecución completa de: $title', 45.0 * _baseM2),
-          Partida('Materiales y suministros', 'Suministro de materiales de primera calidad', 35.0 * _baseM2),
+          Partida('Mano de obra especializada', 'Ejecución completa de: $title', laborRate * _baseM2),
+          Partida('Materiales y suministros', 'Suministro de materiales de primera calidad', materialRate * _baseM2),
           Partida('Limpieza y remates', 'Limpieza final de obra y retirada de residuos', 60.0),
         ];
         _baseResults = aiItems!;
