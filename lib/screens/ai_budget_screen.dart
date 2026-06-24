@@ -93,7 +93,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
   Future<void> _pickImage() async {
     final pickedFiles = await _picker.pickMultiImage(maxWidth: 1024, maxHeight: 1024);
     if (pickedFiles.isNotEmpty) {
-      List<Uint8List> bytesList = [];
+      List<Uint8List> bytesList = List.from(_imgBytesList);
       for (var f in pickedFiles) {
         bytesList.add(await f.readAsBytes());
       }
@@ -371,7 +371,7 @@ Responde solo con el JSON.''';
                         const SizedBox(height: 16),
                         Text('${_imgBytesList.length} foto${_imgBytesList.length > 1 ? "s" : ""} cargada${_imgBytesList.length > 1 ? "s" : ""} correctamente', style: const TextStyle(color: AppTheme.successGreen, fontSize: 14, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 4),
-                        const Text('Toca para cambiar las fotos', style: TextStyle(color: Colors.white30, fontSize: 11)),
+                        const Text('Toca para añadir más fotos', style: TextStyle(color: Colors.white30, fontSize: 11)),
                       ],
                     )
                   : const Column(
@@ -379,12 +379,46 @@ Responde solo con el JSON.''';
                       children: [
                         Icon(Icons.add_a_photo, size: 48, color: Colors.white24),
                         SizedBox(height: 16),
-                        Text('Toca aquí para subir una foto', style: TextStyle(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.bold)),
+                        Text('Toca aquí para subir fotos', style: TextStyle(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.bold)),
                       ],
                     ),
               ),
             ),
           ),
+          if (_imgBytesList.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.add_photo_alternate, size: 18),
+                    label: const Text('Añadir más', style: TextStyle(fontWeight: FontWeight.bold)),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppTheme.brandYellow,
+                      side: BorderSide(color: AppTheme.brandYellow.withValues(alpha: 0.5)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: _pickImage,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.delete_outline, size: 18),
+                    label: const Text('Borrar todas', style: TextStyle(fontWeight: FontWeight.bold)),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.redAccent,
+                      side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.5)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () => setState(() => _imgBytesList.clear()),
+                  ),
+                ),
+              ],
+            ),
+          ],
           
           const SizedBox(height: 20),
           const Text('Describe el trabajo (la IA lo lee)', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.bold)),
