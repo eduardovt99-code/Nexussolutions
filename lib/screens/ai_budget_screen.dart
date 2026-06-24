@@ -280,7 +280,22 @@ Responde solo con el JSON.''';
       )).toList()
     };
   }
-
+  Future<void> _generateRender() async {
+    setState(() {
+      _isGeneratingRender = true;
+    });
+    
+    // Simulate generation time
+    await Future.delayed(const Duration(seconds: 4));
+    
+    if (!mounted) return;
+    
+    // Set a random interior design image from unsplash
+    setState(() {
+      _isGeneratingRender = false;
+      _renderImageUrl = 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80'; 
+    });
+  }
 
 
   @override
