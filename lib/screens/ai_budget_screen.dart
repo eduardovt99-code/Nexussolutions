@@ -5,9 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../theme/app_theme.dart';
+import '../models/models.dart' as models;
+import '../data/database_service.dart';
+import '../utils/pdf_generator.dart';
 
 class Partida {
   final String concepto;
@@ -62,6 +65,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
   List<Partida> _results = [];
   int _margin = 30;
   bool _showSent = false;
+  bool _isSaving = false;
   
   bool _isGeneratingRender = false;
   String? _renderImageUrl;
@@ -652,6 +656,119 @@ Responde solo con el JSON.''';
     );
   }
 
+  Future<void> _downloadPdf(double bi, double iva, double pvp) async {
+    final aiSummary = _results.map((e) => '- ${e.concepto}').join(', ');
+    await PdfGenerator.generateAndDownloadBudgetPdf(
+      projectName: _descController.text.isNotEmpty ? _descController.text : 'Generado por IA',
+      items: _results,
+      subtotal: bi,
+      iva: iva,
+      total: pvp, // pvp includes margin
+      margin: _margin,
+      aiSummary: 'Proyecto analizado desde imagen: $aiSummary',
+    );
+  }
+
+  Future<void> _saveToWorksites(double bi, double iva, double pvp) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Debes iniciar sesión para guardar')));
+      }
+      return;
+    }
+
+    String projectName = _descController.text.isNotEmpty ? _descController.text : 'Nuevo Proyecto IA';
+
+    // Show dialog to confirm/edit project name
+    final nameController = TextEditingController(text: projectName);
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.surfaceLight,
+          title: const Text('Guardar Proyecto', style: TextStyle(color: AppTheme.brandBlack)),
+          content: TextField(
+            controller: nameController,
+            style: const TextStyle(color: AppTheme.brandBlack),
+            decoration: const InputDecoration(
+              labelText: 'Nombre de la Obra',
+              labelStyle: TextStyle(color: AppTheme.textSecondary),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar', style: TextStyle(color: AppTheme.textSecondary)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.brandYellow, foregroundColor: Colors.black),
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm != true) return;
+
+    setState(() => _isSaving = true);
+
+    try {
+      final now = DateTime.now();
+      final String worksiteId = now.millisecondsSinceEpoch.toString();
+      final String budgetId = 'B_${now.millisecondsSinceEpoch}';
+
+      final worksite = models.Worksite(
+        id: worksiteId,
+        ownerId: user.uid,
+        name: nameController.text,
+        clientName: 'Cliente IA',
+        locationLat: 40.4168,
+        locationLng: -3.7038,
+        status: 'quoting',
+        createdAt: now,
+      );
+
+      final budgetItems = _results.map((p) {
+        final itemClientPrice = p.costo / (1 - (_margin / 100));
+        return models.BudgetItem(
+          description: p.concepto,
+          quantity: 1,
+          unit: 'ud',
+          unitPrice: itemClientPrice,
+          subtotal: itemClientPrice,
+        );
+      }).toList();
+
+      final budget = models.Budget(
+        id: budgetId,
+        ownerId: user.uid,
+        worksiteId: worksiteId,
+        totalAmount: pvp,
+        items: budgetItems,
+        status: 'pending',
+      );
+
+      await DatabaseService().addWorksite(worksite);
+      await DatabaseService().addBudget(budget);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('✅ Proyecto guardado correctamente en Obras'),
+          backgroundColor: AppTheme.deepCyan,
+        ));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al guardar: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
   Widget _buildResults() {
     double baseCost = 0;
     for (var p in _results) {
@@ -935,26 +1052,52 @@ Responde solo con el JSON.''';
           ),
           
           const SizedBox(height: 24),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.brandYellow,
-              foregroundColor: Colors.black,
-              minimumSize: const Size(double.infinity, 54),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            ),
-            onPressed: () {
-              setState(() => _showSent = true);
-              _sentController.forward(from: 0.0);
-            },
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          if (_isSaving)
+            const Center(child: CircularProgressIndicator(color: AppTheme.brandYellow))
+          else
+            Row(
               children: [
-                Icon(Icons.send),
-                SizedBox(width: 8),
-                Text('Enviar presupuesto al cliente', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      minimumSize: const Size(double.infinity, 54),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    onPressed: () => _downloadPdf(bi, iva, pvp),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.picture_as_pdf),
+                        SizedBox(width: 8),
+                        Text('Descargar PDF', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.brandYellow,
+                      foregroundColor: Colors.black,
+                      minimumSize: const Size(double.infinity, 54),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    onPressed: () => _saveToWorksites(bi, iva, pvp),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.save),
+                        SizedBox(width: 8),
+                        Text('Guardar en Obras', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
           const SizedBox(height: 12),
           TextButton(
             style: TextButton.styleFrom(
