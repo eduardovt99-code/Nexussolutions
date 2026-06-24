@@ -705,6 +705,25 @@ class _FinancesScreenState extends State<FinancesScreen> {
                       setState(() => _isLoading = true);
                       await DatabaseService().addBudget(invoice);
                       await _loadData();
+                      
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Row(
+                              children: [
+                                Icon(Icons.check_circle, color: AppTheme.brandBlack),
+                                SizedBox(width: 12),
+                                Expanded(child: Text('¡Factura enviada al cliente!', style: TextStyle(color: AppTheme.brandBlack, fontWeight: FontWeight.bold))),
+                              ],
+                            ),
+                            backgroundColor: AppTheme.brandYellow,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            margin: const EdgeInsets.all(16),
+                            duration: const Duration(seconds: 4),
+                          ),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.brandYellow,
@@ -835,6 +854,16 @@ class _FinancesScreenState extends State<FinancesScreen> {
                           ),
                           child: Row(
                             children: [
+                              if (budget.status == 'invoiced')
+                                Container(
+                                  margin: const EdgeInsets.only(right: 12),
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.brandYellow.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(Icons.receipt_long, color: AppTheme.brandYellow, size: 24),
+                                ),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
