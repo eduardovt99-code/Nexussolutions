@@ -248,7 +248,7 @@ Responde solo con el JSON.''';
     };
 
     final response = await http.post(
-      Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$_apiKey'),
+      Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=$_apiKey'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(body),
     );
