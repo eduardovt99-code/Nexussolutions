@@ -52,7 +52,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
   final String _apiKey = 'AQ.Ab8RN6' 'Kv3Z2h8' 'ppzdOs1G' 'h1y_1B' 'lC3OCsCe' 'KneWi9dO' 'cJvWAcg';
   bool _usedLive = false;
   
-  Uint8List? _imgBytes;
+  List<Uint8List> _imgBytesList = [];
   final ImagePicker _picker = ImagePicker();
 
   double _elapsed = 0.0;
@@ -91,11 +91,14 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
 
 
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery, maxWidth: 1024, maxHeight: 1024);
-    if (pickedFile != null) {
-      final bytes = await pickedFile.readAsBytes();
+    final pickedFiles = await _picker.pickMultiImage(maxWidth: 1024, maxHeight: 1024);
+    if (pickedFiles.isNotEmpty) {
+      List<Uint8List> bytesList = [];
+      for (var f in pickedFiles) {
+        bytesList.add(await f.readAsBytes());
+      }
       setState(() {
-        _imgBytes = bytes;
+        _imgBytesList = bytesList;
       });
     }
   }
@@ -103,7 +106,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
 
 
   Future<void> _generate() async {
-    if (_imgBytes == null || _descController.text.trim().isEmpty) {
+    if (_imgBytesList.isEmpty || _descController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Por favor sube una foto y describe el trabajo antes de continuar.'),
@@ -216,13 +219,13 @@ Responde solo con el JSON.''';
         {
           'parts': [
             {'text': prompt},
-            if (_imgBytes != null)
-              {
+            if (_imgBytesList.isNotEmpty)
+              ..._imgBytesList.map((bytes) => {
                 'inlineData': {
                   'mimeType': 'image/jpeg',
-                  'data': base64Encode(_imgBytes!)
+                  'data': base64Encode(bytes)
                 }
-              }
+              })
           ]
         }
       ],
@@ -316,6 +319,7 @@ Responde solo con el JSON.''';
                             _showSent = false;
                             _step = _AIFlowStep.capture;
                             _results.clear();
+                            _imgBytesList.clear();
                           });
                         },
                         child: const Text('Crear otro presupuesto', style: TextStyle(color: AppTheme.brandYellow)),
@@ -349,10 +353,10 @@ Responde solo con el JSON.''';
               decoration: BoxDecoration(
                 color: AppTheme.surfaceDark,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: _imgBytes != null ? AppTheme.successGreen.withValues(alpha: 0.5) : Colors.white10),
+                border: Border.all(color: _imgBytesList.isNotEmpty ? AppTheme.successGreen.withValues(alpha: 0.5) : Colors.white10),
               ),
               child: Center(
-                child: _imgBytes != null 
+                child: _imgBytesList.isNotEmpty 
                   ? Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -365,9 +369,9 @@ Responde solo con el JSON.''';
                           child: const Icon(Icons.check_circle, color: AppTheme.successGreen, size: 48),
                         ),
                         const SizedBox(height: 16),
-                        const Text('Foto cargada correctamente', style: TextStyle(color: AppTheme.successGreen, fontSize: 14, fontWeight: FontWeight.bold)),
+                        Text('${_imgBytesList.length} foto${_imgBytesList.length > 1 ? "s" : ""} cargada${_imgBytesList.length > 1 ? "s" : ""} correctamente', style: const TextStyle(color: AppTheme.successGreen, fontSize: 14, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 4),
-                        const Text('Toca para cambiarla', style: TextStyle(color: Colors.white30, fontSize: 11)),
+                        const Text('Toca para cambiar las fotos', style: TextStyle(color: Colors.white30, fontSize: 11)),
                       ],
                     )
                   : const Column(
@@ -776,6 +780,7 @@ Responde solo con el JSON.''';
                 _step = _AIFlowStep.capture;
                 _results.clear();
                 _margin = 30;
+                _imgBytesList.clear();
               });
             },
             child: const Text('Empezar de nuevo', style: TextStyle(color: Colors.white, fontSize: 16)),
