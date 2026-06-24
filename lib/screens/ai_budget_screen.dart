@@ -170,13 +170,12 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
         _aiSalesPitch = 'Presupuesto estimado para: ${_descController.text.isNotEmpty ? _descController.text : "Reforma"}. Transformaremos este espacio con acabados de primera calidad y tiempos de ejecución optimizados.';
         
         // Generar partidas dinámicas basadas en el texto si no hay API key
-        final title = _descController.text.isNotEmpty ? _descController.text : 'Reforma general';
+        final title = _descController.text.isNotEmpty ? _descController.text : 'Trabajos de reforma';
         aiItems = [
-          Partida('Preparación previa', 'Protección de zonas, demoliciones y desescombro para $title', 35.0 * _baseM2),
-          Partida('Instalaciones', 'Adecuación de puntos de luz y fontanería básica', 45.0 * _baseM2),
-          Partida('Revestimientos', 'Suministro y colocación de pavimentos y alicatados', 60.0 * _baseM2),
-          Partida('Mobiliario y equipos', 'Instalación de mobiliario y equipos según requerimientos', 80.0 * _baseM2),
-          Partida('Acabados y pintura', 'Pintura plástica lisa, repasos y limpieza final de obra', 25.0 * _baseM2),
+          Partida('Preparación y protección', 'Protección de zonas y preparación previa para: $title', 45.0),
+          Partida('Mano de obra especializada', 'Ejecución completa de: $title', 45.0 * _baseM2),
+          Partida('Materiales y suministros', 'Suministro de materiales de primera calidad', 35.0 * _baseM2),
+          Partida('Limpieza y remates', 'Limpieza final de obra y retirada de residuos', 60.0),
         ];
         _baseResults = aiItems!;
       }
@@ -201,9 +200,10 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
   Future<Map<String, dynamic>?> _callGemini() async {
     final prompt = '''Eres un perito experto en reformas integrales y arquitectura comercial. Analiza el trabajo a realizar: "${_descController.text}".
 IMPORTANTE PARA EL TAMAÑO: Fíjate muy bien en la escala y perspectiva de la foto. Busca objetos de referencia (puertas, ventanas, sillas, mesas, baldosas) para calcular el área real. Ten en cuenta tamaños estándar (ej. baños=4-6m2, habitaciones=12-15m2, aulas/salones de clase=40-80m2, locales comerciales/restaurantes=100+m2).
-NIVEL DE DESGLOSE Y PRECIOS: Exijo un desglose EXTREMADAMENTE detallado y exhaustivo. Divide el proyecto en TODAS las fases necesarias: 1. Trabajos previos y demoliciones, 2. Albañilería (aplanados, muros, tabiques), 3. Instalaciones (eléctrica, fontanería, clima), 4. Revestimientos y pavimentos, 5. Carpintería (puertas, ventanas), 6. Mobiliario y Equipamiento, 7. Pintura y acabados finales. Genera entre 8 y 15 partidas dependiendo de la magnitud de la obra.
+NIVEL DE DESGLOSE: Identifica EXACTAMENTE el alcance del trabajo. Si el trabajo es MUY ESPECÍFICO (ej. solo pintar una pared, arreglar un enchufe o poner un cuadro), genera ÚNICAMENTE 2 o 3 partidas estrictamente necesarias (ej. Preparación, Ejecución, Limpieza). ¡NO INVENTES partidas de fontanería, albañilería o demolición si no se piden expresamente!
+Si el trabajo es una REFORMA INTEGRAL, entonces sí desglosa exhaustivamente en todas las fases necesarias (demoliciones, albañilería, instalaciones, revestimientos, carpintería, pintura).
 MUY IMPORTANTE (PRECIOS Y DETALLE): 
-- Los precios deben ser ALTAMENTE REALISTAS, MUCHO MÁS AJUSTADOS y competitivos para el mercado de España. No infles los costos.
+- Los precios deben ser ALTAMENTE REALISTAS, MUCHO MÁS AJUSTADOS y competitivos para el mercado de España. No infles los costos. Un trabajo sencillo de pintura no puede costar miles de euros.
 - NO dividas en material y mano de obra. Simplemente proporciona el "costo" TOTAL de esa partida.
 - El "detalle" debe ser EXTENSO, profesional, indicando calidades específicas, tipo de materiales, marcas de referencia o alcance exacto (ej. "Suministro e instalación de pavimento porcelánico rectificado formato 60x60, recibido con cemento cola C2TE").
 Devuelve un JSON estrictamente así: 
