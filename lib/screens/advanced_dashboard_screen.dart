@@ -6,6 +6,7 @@ import '../theme/app_theme.dart';
 import '../models/models.dart';
 import '../data/database_service.dart';
 import '../data/crew_capacity.dart';
+import 'ai_budget_screen.dart';
 
 const Color _darkBg = Color(0xFF141416);
 const Color _cardBg = Color(0xFF1E1E20);
@@ -224,6 +225,34 @@ class AdvancedSidebar extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 40),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: ElevatedButton(
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const AIBudgetScreen()));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.brandYellow,
+                foregroundColor: AppTheme.brandBlack,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.auto_awesome, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'Crear con IA',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
           _NavItem(
             icon: Icons.schema, 
             label: 'Dashboard', 
