@@ -15,7 +15,7 @@ import '../utils/pdf_generator.dart';
 class Partida {
   final String concepto;
   final String detalle;
-  final double costo;
+  double costo;
 
   Partida(this.concepto, this.detalle, this.costo);
   double get total => costo;
@@ -656,6 +656,48 @@ Responde solo con el JSON.''';
     );
   }
 
+  void _editPartida(int index) {
+    final partida = _results[index];
+    final controller = TextEditingController(text: partida.costo.toStringAsFixed(2));
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.surfaceLight,
+          title: const Text('Editar Costo', style: TextStyle(color: AppTheme.brandBlack)),
+          content: TextField(
+            controller: controller,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            style: const TextStyle(color: AppTheme.brandBlack),
+            decoration: const InputDecoration(
+              labelText: 'Costo Base (€)',
+              labelStyle: TextStyle(color: AppTheme.textSecondary),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar', style: TextStyle(color: AppTheme.textSecondary)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.brandYellow, foregroundColor: Colors.black),
+              onPressed: () {
+                final newCost = double.tryParse(controller.text.replaceAll(',', '.'));
+                if (newCost != null) {
+                  setState(() {
+                    partida.costo = newCost;
+                  });
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _downloadPdf(double bi, double iva, double pvp) async {
     final aiSummary = _results.map((e) => '- ${e.concepto}').join(', ');
     await PdfGenerator.generateAndDownloadBudgetPdf(
@@ -956,7 +998,9 @@ Responde solo con el JSON.''';
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
             child: Column(
-              children: _results.map((p) {
+              children: _results.asMap().entries.map((entry) {
+                final index = entry.key;
+                final p = entry.value;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: Row(
@@ -973,6 +1017,12 @@ Responde solo con el JSON.''';
                       ),
                       const SizedBox(width: 8),
                       Text(eur(p.total), style: const TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold)),
+                      IconButton(
+                        icon: const Icon(Icons.edit, size: 16, color: Colors.black54),
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.only(left: 8),
+                        onPressed: () => _editPartida(index),
+                      ),
                     ],
                   ),
                 );
