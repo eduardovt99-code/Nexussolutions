@@ -258,6 +258,32 @@ Responde solo con el JSON.''';
       ],
       'generationConfig': {
         'responseMimeType': 'application/json',
+        'responseSchema': {
+          'type': 'OBJECT',
+          'properties': {
+            'm2_estimado': {'type': 'NUMBER'},
+            'resumen_venta': {'type': 'STRING'},
+            'recomendacion_equipo': {
+              'type': 'STRING',
+              'description': 'Obligatorio. Ej: Se recomienda 1 oficial y 1 peón durante 3 días.'
+            },
+            'partidas': {
+              'type': 'ARRAY',
+              'description': 'Mínimo 7 elementos individuales. NUNCA agrupar.',
+              'items': {
+                'type': 'OBJECT',
+                'properties': {
+                  'concepto': {'type': 'STRING'},
+                  'detalle': {'type': 'STRING'},
+                  'costo_material': {'type': 'NUMBER'},
+                  'costo_mano_obra': {'type': 'NUMBER'}
+                },
+                'required': ['concepto', 'detalle', 'costo_material', 'costo_mano_obra']
+              }
+            }
+          },
+          'required': ['m2_estimado', 'resumen_venta', 'recomendacion_equipo', 'partidas']
+        }
       }
     };
 
