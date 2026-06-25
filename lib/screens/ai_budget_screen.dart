@@ -838,6 +838,40 @@ Responde solo con el JSON.''';
     }
   }
 
+  void _showFullScreenImageBytes(Uint8List bytes) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          iconTheme: const IconThemeData(color: Colors.white),
+        ),
+        body: Center(
+          child: InteractiveViewer(
+            child: Image.memory(bytes, fit: BoxFit.contain),
+          ),
+        ),
+      );
+    }));
+  }
+
+  void _showFullScreenImageUrl(String url) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          iconTheme: const IconThemeData(color: Colors.white),
+        ),
+        body: Center(
+          child: InteractiveViewer(
+            child: Image.network(url, fit: BoxFit.contain),
+          ),
+        ),
+      );
+    }));
+  }
+
   Widget _buildResults() {
     double baseCost = 0;
     for (var p in _results) {
@@ -925,9 +959,12 @@ Responde solo con el JSON.''';
               children: [
                 const Text('Render IA de tu proyecto', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.memory(_generatedRenderBytes!, width: double.infinity, fit: BoxFit.contain),
+                GestureDetector(
+                  onTap: () => _showFullScreenImageBytes(_generatedRenderBytes!),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.memory(_generatedRenderBytes!, width: double.infinity, fit: BoxFit.contain),
+                  ),
                 ),
               ],
             )
@@ -937,9 +974,12 @@ Responde solo con el JSON.''';
               children: [
                 const Text('Render IA de tu proyecto', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.memory(_imgBytesList.first, width: double.infinity, fit: BoxFit.contain),
+                GestureDetector(
+                  onTap: () => _showFullScreenImageBytes(_imgBytesList.first),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.memory(_imgBytesList.first, width: double.infinity, fit: BoxFit.contain),
+                  ),
                 ),
               ],
             )
@@ -949,9 +989,12 @@ Responde solo con el JSON.''';
               children: [
                 const Text('Render IA de tu proyecto', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.network(_renderImageUrl!, width: double.infinity, fit: BoxFit.contain),
+                GestureDetector(
+                  onTap: () => _showFullScreenImageUrl(_renderImageUrl!),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(_renderImageUrl!, width: double.infinity, fit: BoxFit.contain),
+                  ),
                 ),
               ],
             )
