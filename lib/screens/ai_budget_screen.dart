@@ -1112,6 +1112,7 @@ Responde solo con el JSON.''';
             ),
           ),
           
+          const SizedBox(height: 16),
 
           Container(
             padding: const EdgeInsets.all(12),
