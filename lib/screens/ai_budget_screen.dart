@@ -15,23 +15,25 @@ import '../utils/pdf_generator.dart';
 class Partida {
   final String concepto;
   final String detalle;
-  double costo;
+  double costoMaterial;
+  double costoManoObra;
 
-  Partida(this.concepto, this.detalle, this.costo);
-  double get total => costo;
+  Partida(this.concepto, this.detalle, this.costoMaterial, this.costoManoObra);
+  double get total => costoMaterial + costoManoObra;
+  double get costo => costoMaterial + costoManoObra;
 }
 
 final List<Partida> _scriptedData = [
-  Partida('Demolición y retirada de escombro', 'Levantado de elementos antiguos, carga manual y transporte a vertedero', 350),
-  Partida('Fontanería y desagües', 'Renovación integral de tuberías multicapa y desagües en PVC', 480),
-  Partida('Instalación eléctrica', 'Cuadro de mando, cableado libre de halógenos y 8 mecanismos', 550),
-  Partida('Alicatado de paredes', 'Suministro y colocación de gres porcelánico formato 60x60', 780),
-  Partida('Pavimento porcelánico', 'Suministro y colocación de pavimento porcelánico rectificado imitación madera', 650),
-  Partida('Falso techo de pladur', 'Techo continuo de placa laminada con foseado perimetral para luz LED', 420),
-  Partida('Mobiliario', 'Muebles de diseño a medida (5 ml) con herrajes con freno', 1950),
-  Partida('Encimera', 'Suministro y colocación de encimera tipo Silestone / Compac', 750),
-  Partida('Equipamiento', 'Fregadero bajo encimera de acero inox y grifería monomando extraíble', 220),
-  Partida('Pintura y acabados', 'Preparación de soporte y pintura plástica lavable ecológica', 320),
+  Partida('Demolición y retirada de escombro', 'Levantado de elementos antiguos, carga manual y transporte a vertedero', 50, 300),
+  Partida('Fontanería y desagües', 'Renovación integral de tuberías multicapa y desagües en PVC', 200, 280),
+  Partida('Instalación eléctrica', 'Cuadro de mando, cableado libre de halógenos y 8 mecanismos', 250, 300),
+  Partida('Alicatado de paredes', 'Suministro y colocación de gres porcelánico formato 60x60', 380, 400),
+  Partida('Pavimento porcelánico', 'Suministro y colocación de pavimento porcelánico rectificado imitación madera', 350, 300),
+  Partida('Falso techo de pladur', 'Techo continuo de placa laminada con foseado perimetral para luz LED', 120, 300),
+  Partida('Mobiliario', 'Muebles de diseño a medida (5 ml) con herrajes con freno', 1500, 450),
+  Partida('Encimera', 'Suministro y colocación de encimera tipo Silestone / Compac', 600, 150),
+  Partida('Equipamiento', 'Fregadero bajo encimera de acero inox y grifería monomando extraíble', 170, 50),
+  Partida('Pintura y acabados', 'Preparación de soporte y pintura plástica lavable ecológica', 120, 200),
 ];
 
 enum _AIFlowStep { capture, analyzing, results }
@@ -52,6 +54,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
   int _baseM2 = 0;
   List<Partida> _baseResults = [];
   String _aiSalesPitch = '';
+  String _recomendacionEquipo = '';
   final String _apiKey = 'AQ.Ab8RN6' 'Kv3Z2h8' 'ppzdOs1G' 'h1y_1B' 'lC3OCsCe' 'KneWi9dO' 'cJvWAcg';
   bool _usedLive = false;
   
@@ -156,6 +159,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
           _baseM2 = _aiCalculatedM2;
           _baseResults = aiItems ?? [];
           _aiSalesPitch = aiResult['resumen_venta'] ?? 'Hemos elaborado este presupuesto a medida garantizando la máxima calidad en cada detalle.';
+          _recomendacionEquipo = aiResult['recomendacion_equipo'] ?? '';
         }
         _usedLive = true;
       } catch (e) {
@@ -176,6 +180,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
         _aiCalculatedM2 = 15;
         _baseM2 = 15;
         _aiSalesPitch = 'Presupuesto estimado para: ${_descController.text.isNotEmpty ? _descController.text : "Reforma"}. Transformaremos este espacio con acabados de primera calidad y tiempos de ejecución optimizados.';
+        _recomendacionEquipo = 'Se recomiendan 2 operarios especializados.';
         
         // Generar partidas dinámicas basadas en el texto si no hay API key
         final title = _descController.text.isNotEmpty ? _descController.text : 'Trabajos de reforma';
@@ -193,10 +198,9 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
         }
 
         aiItems = [
-          Partida('Preparación y protección', 'Protección de zonas y preparación previa para: $title', 45.0),
-          Partida('Mano de obra especializada', 'Ejecución completa de: $title', laborRate * _baseM2),
-          Partida('Materiales y suministros', 'Suministro de materiales de primera calidad', materialRate * _baseM2),
-          Partida('Limpieza y remates', 'Limpieza final de obra y retirada de residuos', 60.0),
+          Partida('Preparación y protección', 'Protección de zonas y preparación previa para: $title', 15.0, 30.0),
+          Partida('Ejecución especializada', 'Ejecución completa de: $title', materialRate * _baseM2, laborRate * _baseM2),
+          Partida('Limpieza y remates', 'Limpieza final de obra y retirada de residuos', 10.0, 50.0),
         ];
         _baseResults = aiItems!;
       }
@@ -213,7 +217,8 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
       _results = _baseResults.map((p) => Partida(
         p.concepto,
         p.detalle,
-        p.costo * ratio,
+        p.costoMaterial * ratio,
+        p.costoManoObra * ratio,
       )).toList();
     });
   }
@@ -225,13 +230,15 @@ NIVEL DE DESGLOSE: Identifica EXACTAMENTE el alcance del trabajo. Si el trabajo 
 Si el trabajo es una REFORMA INTEGRAL, entonces sí desglosa exhaustivamente en todas las fases necesarias (demoliciones, albañilería, instalaciones, revestimientos, carpintería, pintura).
 MUY IMPORTANTE (PRECIOS Y DETALLE): 
 - Los precios deben ser ALTAMENTE REALISTAS, MUCHO MÁS AJUSTADOS y competitivos para el mercado de España. No infles los costos. Un trabajo sencillo de pintura no puede costar miles de euros.
-- NO dividas en material y mano de obra. Simplemente proporciona el "costo" TOTAL de esa partida.
+- DIVIDE explícitamente el costo en "costo_material" y "costo_mano_obra" para cada partida.
 - El "detalle" debe ser EXTENSO, profesional, indicando calidades específicas, tipo de materiales, marcas de referencia o alcance exacto (ej. "Suministro e instalación de pavimento porcelánico rectificado formato 60x60, recibido con cemento cola C2TE").
+- Añade una "recomendacion_equipo" indicando cuántas personas y de qué oficios se recomiendan para ejecutar esta obra de forma óptima.
 Devuelve un JSON estrictamente así: 
 {
   "m2_estimado": number,
   "resumen_venta": "Un texto persuasivo y profesional de venta para el cliente",
-  "partidas": [{"concepto": string, "detalle": string, "costo": number}]
+  "recomendacion_equipo": "Ej: Se recomienda 1 oficial de primera y 1 peón durante 3 días.",
+  "partidas": [{"concepto": string, "detalle": string, "costo_material": number, "costo_mano_obra": number}]
 }
 Responde solo con el JSON.''';
 
@@ -278,10 +285,12 @@ Responde solo con el JSON.''';
     return {
       'm2_estimado': (jsonResult['m2_estimado'] as num?)?.toInt() ?? 15,
       'resumen_venta': jsonResult['resumen_venta'],
+      'recomendacion_equipo': jsonResult['recomendacion_equipo'],
       'partidas': pList.map((e) => Partida(
         e['concepto'] ?? 'Partida',
         e['detalle'] ?? '',
-        (e['costo'] ?? 0).toDouble(),
+        (e['costo_material'] ?? 0).toDouble(),
+        (e['costo_mano_obra'] ?? 0).toDouble(),
       )).toList()
     };
   }
@@ -658,21 +667,37 @@ Responde solo con el JSON.''';
 
   void _editPartida(int index) {
     final partida = _results[index];
-    final controller = TextEditingController(text: partida.costo.toStringAsFixed(2));
+    final controllerMaterial = TextEditingController(text: partida.costoMaterial.toStringAsFixed(2));
+    final controllerManoObra = TextEditingController(text: partida.costoManoObra.toStringAsFixed(2));
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppTheme.surfaceLight,
           title: const Text('Editar Costo', style: TextStyle(color: Colors.white)),
-          content: TextField(
-            controller: controller,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-              labelText: 'Costo Base (€)',
-              labelStyle: TextStyle(color: AppTheme.textSecondary),
-            ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: controllerManoObra,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  labelText: 'Mano de Obra (€)',
+                  labelStyle: TextStyle(color: AppTheme.textSecondary),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controllerMaterial,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  labelText: 'Materiales (€)',
+                  labelStyle: TextStyle(color: AppTheme.textSecondary),
+                ),
+              ),
+            ],
           ),
           actions: [
             TextButton(
@@ -682,10 +707,12 @@ Responde solo con el JSON.''';
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: AppTheme.brandYellow, foregroundColor: Colors.black),
               onPressed: () {
-                final newCost = double.tryParse(controller.text.replaceAll(',', '.'));
-                if (newCost != null) {
+                final newManoObra = double.tryParse(controllerManoObra.text.replaceAll(',', '.'));
+                final newMaterial = double.tryParse(controllerMaterial.text.replaceAll(',', '.'));
+                if (newManoObra != null && newMaterial != null) {
                   setState(() {
-                    partida.costo = newCost;
+                    partida.costoManoObra = newManoObra;
+                    partida.costoMaterial = newMaterial;
                   });
                 }
                 Navigator.pop(context);
@@ -708,6 +735,7 @@ Responde solo con el JSON.''';
       total: pvp, // pvp includes margin
       margin: _margin,
       aiSummary: 'Proyecto analizado desde imagen: $aiSummary',
+      recomendacionEquipo: _recomendacionEquipo,
     );
   }
 
@@ -994,6 +1022,29 @@ Responde solo con el JSON.''';
           ),
           
           const SizedBox(height: 16),
+          if (_recomendacionEquipo.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(color: AppTheme.brandYellow.withOpacity(0.1), borderRadius: BorderRadius.circular(16), border: Border.all(color: AppTheme.brandYellow)),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.people, color: Colors.orange, size: 24),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Recomendación de Equipo', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 14)),
+                        const SizedBox(height: 4),
+                        Text(_recomendacionEquipo, style: const TextStyle(color: Colors.black87, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
@@ -1002,7 +1053,7 @@ Responde solo con el JSON.''';
                 final index = entry.key;
                 final p = entry.value;
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.only(bottom: 16),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1012,6 +1063,8 @@ Responde solo con el JSON.''';
                           children: [
                             Text(p.concepto, style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.bold)),
                             Text(p.detalle, style: const TextStyle(color: Colors.black54, fontSize: 11)),
+                            const SizedBox(height: 4),
+                            Text('Mano de obra: ${eur(p.costoManoObra)} | Materiales: ${eur(p.costoMaterial)}', style: const TextStyle(color: AppTheme.brandYellow, fontSize: 11, fontWeight: FontWeight.w600)),
                           ],
                         ),
                       ),

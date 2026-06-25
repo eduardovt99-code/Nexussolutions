@@ -15,6 +15,7 @@ class PdfGenerator {
     required double total,
     required int margin,
     required String aiSummary,
+    required String recomendacionEquipo,
   }) async {
     final pdf = pw.Document();
 
@@ -62,9 +63,21 @@ class PdfGenerator {
                 color: PdfColors.grey100,
                 borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
               ),
-              child: pw.Text(
-                'Resumen IA: $aiSummary',
-                style: pw.TextStyle(fontStyle: pw.FontStyle.italic, color: PdfColors.grey800),
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    'Resumen IA: $aiSummary',
+                    style: pw.TextStyle(fontStyle: pw.FontStyle.italic, color: PdfColors.grey800),
+                  ),
+                  if (recomendacionEquipo.isNotEmpty) ...[
+                    pw.SizedBox(height: 8),
+                    pw.Text(
+                      'Equipo sugerido: $recomendacionEquipo',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColors.grey900),
+                    ),
+                  ],
+                ],
               ),
             ),
             pw.SizedBox(height: 24),
@@ -73,11 +86,13 @@ class PdfGenerator {
             pw.SizedBox(height: 12),
             
             pw.Table.fromTextArray(
-              headers: ['Concepto', 'Detalle', 'Precio'],
+              headers: ['Concepto', 'Detalle', 'Mano Obra', 'Material', 'Precio'],
               data: items.map((p) {
                 // p.costo is the base cost. To get the price the client sees, we add the margin.
-                final itemClientPrice = p.costo / (1 - (margin / 100));
-                return [p.concepto, p.detalle, currencyFormat.format(itemClientPrice)];
+                final itemClientPrice = p.total / (1 - (margin / 100));
+                final moClientPrice = p.costoManoObra / (1 - (margin / 100));
+                final matClientPrice = p.costoMaterial / (1 - (margin / 100));
+                return [p.concepto, p.detalle, currencyFormat.format(moClientPrice), currencyFormat.format(matClientPrice), currencyFormat.format(itemClientPrice)];
               }).toList(),
               border: pw.TableBorder.all(color: PdfColors.grey300),
               headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColors.white),
@@ -87,6 +102,8 @@ class PdfGenerator {
                 0: pw.Alignment.centerLeft,
                 1: pw.Alignment.centerLeft,
                 2: pw.Alignment.centerRight,
+                3: pw.Alignment.centerRight,
+                4: pw.Alignment.centerRight,
               },
             ),
             
