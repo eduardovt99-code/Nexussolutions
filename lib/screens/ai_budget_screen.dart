@@ -226,7 +226,7 @@ class _AIBudgetScreenState extends State<AIBudgetScreen>
   Future<Map<String, dynamic>?> _callGemini() async {
     final prompt = '''Eres un perito experto en reformas integrales y arquitectura comercial. Analiza el trabajo a realizar: "${_descController.text}".
 IMPORTANTE PARA EL TAMAÑO: Fíjate muy bien en la escala y perspectiva de la foto. Busca objetos de referencia (puertas, ventanas, sillas, mesas, baldosas) para calcular el área real. Ten en cuenta tamaños estándar (ej. baños=4-6m2, habitaciones=12-15m2, aulas/salones de clase=40-80m2, locales comerciales/restaurantes=100+m2).
-NIVEL DE DESGLOSE (CRÍTICO): El usuario requiere un DESGLOSE EXTREMADAMENTE DETALLADO de las actividades. NO agrupes tareas. Por ejemplo, si vas a pintar, divídelo en: 1. Protección de muebles, 2. Preparación de muros, 3. Lijado, 4. Imprimación, 5. Pintura, 6. Limpieza. Haz esto para cualquier tipo de trabajo (carpintería, fontanería, etc). Entre más pasos lógicos y minuciosos, mejor. Genera siempre un mínimo de 5 partidas detalladas para trabajos pequeños, y más de 12 para trabajos medianos o grandes. No inventes oficios que no se necesiten, pero desglosa exhaustivamente los que sí se necesiten.
+NIVEL DE DESGLOSE (CRÍTICO - DESGLOSE EXTREMO): ESTRICTAMENTE PROHIBIDO agrupar tareas. Debes desglosar CADA ACCIÓN individualmente en partidas separadas. Por ejemplo, si es pintar, NO pongas una partida de pintura; divídelo en: 1. Movimiento y protección de mobiliario, 2. Colocación de cinta y plásticos, 3. Masillado de imperfecciones, 4. Lijado de paredes, 5. Aplicación de imprimación, 6. Primera mano de pintura, 7. Segunda mano, 8. Retirada y limpieza. ¡Siempre genera al menos 7 partidas, incluso para trabajos muy simples! Para trabajos medianos o grandes, genera más de 15 partidas. No inventes oficios que no se necesiten, pero desglosa minuciosamente los que sí.
 MUY IMPORTANTE (PRECIOS Y DETALLE): 
 - Los precios deben ser ALTAMENTE REALISTAS, MUCHO MÁS AJUSTADOS y competitivos para el mercado de España. No infles los costos. Un trabajo sencillo de pintura no puede costar miles de euros.
 - DIVIDE explícitamente el costo en "costo_material" y "costo_mano_obra" para cada partida.
@@ -925,7 +925,30 @@ Responde solo con el JSON.''';
             ],
           ),
 
-          
+          const SizedBox(height: 16),
+          if (_recomendacionEquipo.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(color: AppTheme.brandYellow.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(16), border: Border.all(color: AppTheme.brandYellow)),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.people, color: AppTheme.brandYellow, size: 24),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Recomendación de Equipo', style: TextStyle(color: AppTheme.brandYellow, fontWeight: FontWeight.bold, fontSize: 14)),
+                        const SizedBox(height: 4),
+                        Text(_recomendacionEquipo, style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.4)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
           if (_aiSalesPitch.isNotEmpty) ...[
             const SizedBox(height: 16),
             Container(
@@ -1063,30 +1086,7 @@ Responde solo con el JSON.''';
             ),
           ),
           
-          const SizedBox(height: 16),
-          if (_recomendacionEquipo.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(color: AppTheme.brandYellow.withOpacity(0.1), borderRadius: BorderRadius.circular(16), border: Border.all(color: AppTheme.brandYellow)),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.people, color: Colors.orange, size: 24),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Recomendación de Equipo', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 14)),
-                        const SizedBox(height: 4),
-                        Text(_recomendacionEquipo, style: const TextStyle(color: Colors.black87, fontSize: 13)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
