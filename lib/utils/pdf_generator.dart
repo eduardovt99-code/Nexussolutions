@@ -105,6 +105,13 @@ class PdfGenerator {
                 3: pw.Alignment.centerRight,
                 4: pw.Alignment.centerRight,
               },
+              columnWidths: const {
+                0: pw.FlexColumnWidth(2),
+                1: pw.FlexColumnWidth(4),
+                2: pw.FlexColumnWidth(1.5),
+                3: pw.FlexColumnWidth(1.5),
+                4: pw.FlexColumnWidth(1.5),
+              },
             ),
             
             pw.SizedBox(height: 24),
