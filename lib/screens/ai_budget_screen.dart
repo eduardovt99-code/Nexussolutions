@@ -664,11 +664,11 @@ Responde solo con el JSON.''';
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppTheme.surfaceLight,
-          title: const Text('Editar Costo', style: TextStyle(color: AppTheme.brandBlack)),
+          title: const Text('Editar Costo', style: TextStyle(color: Colors.white)),
           content: TextField(
             controller: controller,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            style: const TextStyle(color: AppTheme.brandBlack),
+            style: const TextStyle(color: Colors.white),
             decoration: const InputDecoration(
               labelText: 'Costo Base (€)',
               labelStyle: TextStyle(color: AppTheme.textSecondary),
